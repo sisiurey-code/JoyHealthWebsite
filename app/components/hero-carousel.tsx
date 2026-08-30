@@ -1,0 +1,100 @@
+"use client";
+
+import { useState } from "react";
+
+const slides = [
+  {
+    src: "/images/joy-health-morning.webp",
+    alt: "Hands adding citrus to a bowl beside water and an open notebook in morning light",
+    title: "No miracles. Grounded guidance.",
+    copy: "Cure-alls do not exist, but everyone can take practical steps to protect their joy.",
+  },
+  {
+    src: "/images/joy-health-balanced-meal.webp",
+    alt: "Hands arranging grains, greens, vegetables, and salmon on a ceramic plate",
+    title: "Good advice has to survive a Tuesday.",
+    copy: "If it only works in a perfect kitchen, it does not work. We focus on meals and routines people can repeat.",
+  },
+  {
+    src: "/images/joy-health-garden-recovery.webp",
+    alt: "A person setting down water beside fruit and a book after a garden walk",
+    title: "Health is bigger than one bottle.",
+    copy: "Food, movement, rest, and supplements share the same week. No single piece is the whole plan.",
+  },
+] as const;
+
+export function HeroCarousel() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  function showSlide(index: number) {
+    setActiveIndex((index + slides.length) % slides.length);
+  }
+
+  function showNext() {
+    showSlide(activeIndex + 1);
+  }
+
+  return (
+    <figure className="hero-visual">
+      <button
+        className="hero-media"
+        type="button"
+        onClick={showNext}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowLeft") {
+            event.preventDefault();
+            showSlide(activeIndex - 1);
+          }
+
+          if (event.key === "ArrowRight") {
+            event.preventDefault();
+            showNext();
+          }
+        }}
+        aria-label={`Show next wellness scene. Scene ${activeIndex + 1} of ${slides.length}: ${slides[activeIndex].title}`}
+      >
+        {slides.map((slide, index) => (
+          // Vinext currently emits one source for next/image here, without a srcset.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            className={index === activeIndex ? "is-active" : undefined}
+            key={slide.src}
+            src={slide.src}
+            alt={index === activeIndex ? slide.alt : ""}
+            width="1672"
+            height="941"
+            loading={index === 0 ? "eager" : "lazy"}
+            fetchPriority={index === 0 ? "high" : "auto"}
+            decoding="async"
+            aria-hidden={index !== activeIndex}
+          />
+        ))}
+      </button>
+
+      <div
+        className="hero-carousel-controls"
+        role="group"
+        aria-label="Choose a wellness scene"
+      >
+        {slides.map((slide, index) => (
+          <button
+            className={index === activeIndex ? "is-active" : undefined}
+            type="button"
+            key={slide.src}
+            onClick={() => showSlide(index)}
+            aria-label={`Show scene ${index + 1}: ${slide.title}`}
+            aria-current={index === activeIndex ? "true" : undefined}
+          />
+        ))}
+      </div>
+
+      <figcaption className="photo-note" aria-live="polite">
+        <span aria-hidden="true">[•]</span>
+        <p>
+          <strong>{slides[activeIndex].title}</strong>{" "}
+          {slides[activeIndex].copy}
+        </p>
+      </figcaption>
+    </figure>
+  );
+}
