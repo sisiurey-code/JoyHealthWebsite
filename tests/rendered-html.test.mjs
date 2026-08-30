@@ -198,8 +198,33 @@ test("publishes a source-linked USANA quality and innovation page", async () => 
   assert.match(html, /Flagship convenience[\s\S]*HealthPak/i);
   assert.match(
     html,
-    /Procosa[\s\S]*BiOmega[\s\S]*MagneCal D[\s\S]*CoQuinone[\s\S]*Clear Protein \+ Creatine[\s\S]*Core Aminos/i,
+    /Procosa[\s\S]*BiOmega[\s\S]*MagneCal D[\s\S]*CoQuinone[\s\S]*Clear Protein[\s\S]*\+ Creatine[\s\S]*Core Aminos/i,
   );
+  assert.match(
+    html,
+    /class="usana-title-lock">Clear Protein<\/span> \+ Creatine/i,
+  );
+  assert.doesNotMatch(html, /Otherwise, the combination may add cost/i);
+  assert.match(html, /Showing Details for CellSentials, 1 of 2\. Show Product \+ label\./i);
+  assert.match(html, /Showing Details for HealthPak, 1 of 2\. Show Product \+ label\./i);
+  assert.equal(
+    html.match(/Showing Details for [^<"]+, 1 of 3\. Show Product\./gi)?.length,
+    6,
+    "expected six three-state product cards",
+  );
+  for (const image of [
+    "cellsentials",
+    "healthpak",
+    "procosa",
+    "biomega",
+    "magnecal-d",
+    "coquinone",
+    "clear-protein-creatine",
+    "core-aminos",
+  ]) {
+    assert.match(html, new RegExp(`/images/usana/${image}-product\\.png`, "i"));
+    assert.match(html, new RegExp(`/images/usana/${image}-label\\.png`, "i"));
+  }
   assert.match(html, /Clear Protein \+ Creatine Mix/i);
   assert.match(html, /USANA Clear Protein Drink puts clear whey in a can\./i);
   assert.match(html, /Each piña colada can contains 22 grams of clear whey protein/i);

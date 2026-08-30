@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SiteFooter } from "../components/site-footer";
 import { SiteHeader } from "../components/site-header";
 import { UsanaCatalogDock } from "../components/usana-catalog-dock";
+import { UsanaProductCards } from "../components/usana-product-cards";
 import { USANA_STOREFRONT_URL } from "../lib/usana";
 
 const description =
@@ -137,121 +138,7 @@ export default function UsanaPage() {
             </div>
           </header>
 
-          <div className="usana-product-grid">
-            <article className="is-featured">
-              <p className="usana-product-label">Flagship foundation</p>
-              <h3>CellSentials</h3>
-              <p>
-                Core Minerals and Vita-Antioxidant form USANA&apos;s main daily
-                nutrition system. USANA&apos;s 2026 filing identifies
-                Essentials/CellSentials as a key product, and the company
-                reports a 2026 ConsumerLab seal for label accuracy, purity, and
-                potency.
-                <a className="citation" href="#usana-source-7" aria-label="Source 7">[7]</a>
-                <a className="citation" href="#usana-source-8" aria-label="Source 8">[8]</a>
-              </p>
-              <p className="usana-product-fit">
-                Compare the two-bottle routine and ingredient overlap before
-                adding narrower formulas.
-              </p>
-            </article>
-
-            <article className="is-featured">
-              <p className="usana-product-label">Flagship convenience</p>
-              <h3>HealthPak</h3>
-              <p>
-                HealthPak packages CellSentials with MagneCal D and the
-                CellSentials Booster in daily packets. It trades flexibility
-                for the convenience of a wider preset stack.
-                <a className="citation" href="#usana-source-10" aria-label="Source 10">[10]</a>
-              </p>
-              <p className="usana-product-fit">
-                HealthPak reduces daily sorting; CellSentials alone leaves more
-                room to add selectively.
-              </p>
-            </article>
-
-            <article>
-              <p className="usana-product-label">Focused formula</p>
-              <h3>Procosa</h3>
-              <p>
-                A targeted combination built around vegetarian glucosamine,
-                vitamin C, and curcumin. Read the exact serving and other
-                ingredients before comparing it with single-ingredient options.
-                <a className="citation" href="#usana-source-10" aria-label="Source 10">[10]</a>
-              </p>
-            </article>
-
-            <article>
-              <p className="usana-product-label">Omega-3 format</p>
-              <h3>BiOmega</h3>
-              <p>
-                A fish-oil product providing concentrated omega-3 fatty acids
-                plus vitamin D. It is also one of the finished products named in
-                the current NSF listing, which applies to that product and scope.
-                <a className="citation" href="#usana-source-2" aria-label="Source 2">[2]</a>
-                <a className="citation" href="#usana-source-10" aria-label="Source 10">[10]</a>
-              </p>
-            </article>
-
-            <article>
-              <p className="usana-product-label">Mineral combination</p>
-              <h3>MagneCal D</h3>
-              <p>
-                Calcium, magnesium, vitamin D, and boron share one formula.
-                USANA reports that ConsumerLab testing found the claimed amounts
-                and checked purity, label accuracy, and disintegration.
-                <a className="citation" href="#usana-source-9" aria-label="Source 9">[9]</a>
-              </p>
-            </article>
-
-            <article className="is-editor-pick">
-              <p className="usana-product-label">Joy Health pick</p>
-              <h3>CoQuinone</h3>
-              <p>
-                The U.S. CoQuinone 30 label is short: coenzyme Q10 and
-                alpha-lipoic acid. It also identifies soy and gelatin, with no
-                established Daily Value for either active ingredient.
-                <a className="citation" href="#usana-source-11" aria-label="Source 11">[11]</a>
-              </p>
-              <p className="usana-product-fit">
-                Its short label makes ingredient overlap and exclusions easier
-                to spot.
-              </p>
-            </article>
-
-            <article className="is-editor-pick">
-              <p className="usana-product-label">Joy Health pick</p>
-              <h3>Clear Protein + Creatine</h3>
-              <p>
-                One 50-calorie serving combines 10 grams of clear whey protein
-                isolate, 5 grams of creatine monohydrate, and more than 600
-                milligrams of electrolytes. It comes in Twisted Citrus and Green
-                Apple, in bags or single-serve packets.
-                <a className="citation" href="#usana-source-12" aria-label="Source 12">[12]</a>
-              </p>
-              <p className="usana-product-fit">
-                It saves real shelf space when all three ingredients already
-                belong in the routine. Otherwise, the combination may add cost
-                without solving a problem.
-              </p>
-            </article>
-
-            <article className="is-editor-pick">
-              <p className="usana-product-label">Joy Health pick</p>
-              <h3>Core Aminos</h3>
-              <p>
-                Core Aminos is a lemonade-flavored drink mix combining essential
-                amino acids with HMB. USANA introduced it in 2025 as part of its
-                active-nutrition expansion.
-                <a className="citation" href="#usana-source-4" aria-label="Source 4">[4]</a>
-              </p>
-              <p className="usana-product-fit">
-                Check whether both parts of the formula fit the intended routine,
-                then compare the serving with simpler amino-acid products.
-              </p>
-            </article>
-          </div>
+          <UsanaProductCards />
 
           <div className="usana-product-conversion">
             <p>

@@ -1412,30 +1412,23 @@ img {
 
 .usana-product-grid article {
   position: relative;
-  display: grid;
-  align-content: start;
-  min-height: 360px;
-  padding: clamp(1.7rem, 3vw, 2.5rem);
+  min-height: 440px;
+  padding: 0;
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   background: rgba(251, 248, 241, 0.58);
+  cursor: pointer;
+  perspective: 1500px;
 }
 
 .usana-product-grid article.is-featured {
   grid-column: span 3;
-  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.3fr);
-  gap: 0 clamp(2rem, 6vw, 6rem);
-  min-height: 0;
+  min-height: 540px;
   border-left: 4px solid var(--marigold);
   background:
     linear-gradient(105deg, rgba(228, 185, 79, 0.18), rgba(240, 232, 218, 0.92) 34%),
     var(--oat);
   box-shadow: inset 0 1px rgba(255, 224, 151, 0.8);
-}
-
-.usana-product-grid article.is-featured .usana-product-label,
-.usana-product-grid article.is-featured h3 {
-  grid-column: 1;
 }
 
 .usana-product-grid article.is-featured .usana-product-label {
@@ -1452,10 +1445,6 @@ img {
   content: "";
 }
 
-.usana-product-grid article.is-featured > p:not(.usana-product-label) {
-  grid-column: 2;
-}
-
 .usana-product-grid article.is-editor-pick {
   color: var(--paper);
   background: var(--forest-deep);
@@ -1464,6 +1453,61 @@ img {
 .usana-product-grid article.is-editor-pick .usana-product-label,
 .usana-product-grid article.is-editor-pick strong {
   color: var(--marigold);
+}
+
+.usana-product-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  padding: clamp(1.7rem, 3vw, 2.5rem);
+  backface-visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: rotateY(180deg) scale(0.985);
+  transform-style: preserve-3d;
+  transition:
+    opacity 160ms ease,
+    transform 560ms cubic-bezier(0.2, 0.76, 0.22, 1);
+}
+
+.usana-product-face.is-active {
+  z-index: 1;
+  opacity: 1;
+  pointer-events: auto;
+  transform: rotateY(0) scale(1);
+}
+
+.usana-product-details {
+  align-content: start;
+  padding-bottom: 5.5rem;
+  background: rgba(251, 248, 241, 0.58);
+}
+
+.is-featured .usana-product-details {
+  grid-template-columns: minmax(220px, 0.7fr) minmax(0, 1.3fr);
+  gap: 0 clamp(2rem, 6vw, 6rem);
+  background:
+    linear-gradient(105deg, rgba(228, 185, 79, 0.18), rgba(240, 232, 218, 0.92) 34%),
+    var(--oat);
+}
+
+.is-featured .usana-product-details .usana-product-label,
+.is-featured .usana-product-details h3 {
+  grid-column: 1;
+}
+
+.is-featured .usana-product-details .usana-product-copy,
+.is-featured .usana-product-details .usana-product-fit {
+  grid-column: 2;
+}
+
+.is-featured .usana-product-details .usana-product-copy {
+  grid-row: 1 / span 2;
+}
+
+.is-editor-pick .usana-product-details {
+  color: var(--paper);
+  background: var(--forest-deep);
 }
 
 .usana-product-label {
@@ -1481,13 +1525,23 @@ img {
   line-height: 0.95;
 }
 
-.usana-product-grid article > p:not(.usana-product-label) {
+.usana-product-card.has-compact-title h3 {
+  font-size: clamp(1.65rem, 2.4vw, 2.3rem);
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.usana-title-lock {
+  white-space: nowrap;
+}
+
+.usana-product-copy > p {
   margin: 1.5rem 0 0;
   color: var(--ink-soft);
   font-size: 0.88rem;
 }
 
-.usana-product-grid article.is-editor-pick > p:not(.usana-product-label) {
+.usana-product-grid article.is-editor-pick .usana-product-copy > p {
   color: rgba(251, 248, 241, 0.9);
 }
 
@@ -1497,6 +1551,7 @@ img {
 
 .usana-product-fit {
   align-self: end;
+  margin: auto 0 0;
   padding-top: 1.15rem;
   border-top: 1px solid var(--line);
   font-size: 0.76rem !important;
@@ -1504,6 +1559,142 @@ img {
 
 .usana-product-fit strong {
   color: var(--ink);
+}
+
+.usana-product-media {
+  place-items: center;
+  padding: clamp(1.25rem, 2.4vw, 2rem) clamp(1.25rem, 2.4vw, 2rem) 5.25rem;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.98), rgba(244, 239, 229, 0.88) 68%),
+    var(--paper);
+}
+
+.usana-product-pair {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 2.5rem);
+}
+
+.usana-product-figure,
+.usana-label-figure {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+}
+
+.usana-product-figure {
+  display: grid;
+  place-items: center;
+}
+
+.usana-product-figure img,
+.usana-label-figure img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.usana-label-figure {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.65rem;
+}
+
+.usana-label-figure a {
+  --zoom-x: 50%;
+  --zoom-y: 50%;
+
+  display: grid;
+  min-height: 0;
+  overflow: hidden;
+  place-items: center;
+  border: 1px solid rgba(23, 60, 52, 0.16);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(23, 60, 52, 0.08);
+  cursor: zoom-in;
+}
+
+.usana-label-figure a:focus-visible {
+  outline: 3px solid var(--marigold);
+  outline-offset: 3px;
+}
+
+.usana-label-figure img {
+  transform-origin: var(--zoom-x) var(--zoom-y);
+  transition: transform 260ms cubic-bezier(0.2, 0.76, 0.22, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .usana-label-figure a:hover img,
+  .usana-label-figure a:focus-visible img {
+    transform: scale(1.85);
+  }
+}
+
+.usana-label-figure figcaption {
+  color: var(--ink-soft);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.usana-product-state-control {
+  position: absolute;
+  z-index: 3;
+  right: clamp(1rem, 2vw, 1.5rem);
+  bottom: clamp(1rem, 2vw, 1.5rem);
+  display: inline-flex;
+  gap: 0.8rem;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 0.9rem;
+  border: 1px solid rgba(23, 60, 52, 0.22);
+  border-radius: 999px;
+  color: var(--forest-deep);
+  background: rgba(251, 248, 241, 0.94);
+  box-shadow: 0 7px 18px rgba(23, 60, 52, 0.12);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: background-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+.usana-product-state-control:hover {
+  background: #fff;
+  box-shadow: 0 10px 22px rgba(23, 60, 52, 0.18);
+  transform: translateY(-1px);
+}
+
+.usana-product-state-control:focus-visible {
+  outline: 3px solid var(--marigold);
+  outline-offset: 3px;
+}
+
+.usana-product-state-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.usana-product-state-dots i {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0.48;
+}
+
+.usana-product-state-dots i.is-active {
+  background: currentColor;
+  opacity: 1;
 }
 
 .usana-product-conversion {
@@ -2944,6 +3135,22 @@ img {
     gap: 2.5rem;
   }
 
+  .is-featured .usana-product-details {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .is-featured .usana-product-details .usana-product-label,
+  .is-featured .usana-product-details h3,
+  .is-featured .usana-product-details .usana-product-copy,
+  .is-featured .usana-product-details .usana-product-fit {
+    grid-column: 1;
+  }
+
+  .is-featured .usana-product-details .usana-product-copy {
+    grid-row: auto;
+  }
+
   .brand-feature-display {
     min-height: 420px;
   }
@@ -3145,7 +3352,6 @@ img {
   }
 
   .usana-product-grid,
-  .usana-product-grid article.is-featured,
   .usana-product-conversion {
     grid-template-columns: 1fr;
   }
@@ -3153,17 +3359,19 @@ img {
   .usana-product-grid article,
   .usana-product-grid article.is-featured {
     grid-column: 1;
-    min-height: 0;
+    min-height: 460px;
   }
 
-  .usana-product-grid article.is-featured .usana-product-label,
-  .usana-product-grid article.is-featured h3,
-  .usana-product-grid article.is-featured > p:not(.usana-product-label) {
-    grid-column: 1;
+  .usana-product-grid article.is-featured {
+    min-height: 540px;
   }
 
   .usana-product-grid h3 {
     font-size: clamp(2.35rem, 11vw, 3.35rem);
+  }
+
+  .usana-product-card.has-compact-title h3 {
+    font-size: clamp(2rem, 7vw, 3rem);
   }
 
   .usana-product-conversion {
@@ -3413,6 +3621,10 @@ img {
 
   .guide-promise li:last-child {
     grid-column: 1 / -1;
+  }
+
+  .usana-product-pair {
+    gap: 0.65rem;
   }
 
   .library-ledger,
