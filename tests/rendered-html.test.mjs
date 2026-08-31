@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { readFile, stat } from "node:fs/promises";
+import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 const workerUrl = new URL("../dist/server/index.js", import.meta.url);
 workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
@@ -22,7 +24,9 @@ const env = {
             ? "text/javascript; charset=utf-8"
             : url.pathname.endsWith(".webp")
               ? "image/webp"
-              : "application/octet-stream";
+              : url.pathname.endsWith(".png")
+                ? "image/png"
+                : "application/octet-stream";
 
         return new Response(body, {
           headers: { "content-type": contentType },
@@ -39,8 +43,8 @@ const env = {
 };
 
 const ctx = {
-  waitUntil() {},
-  passThroughOnException() {},
+  waitUntil() { },
+  passThroughOnException() { },
 };
 
 function render(path, origin = "https://joyhealth.cc") {
@@ -49,6 +53,57 @@ function render(path, origin = "https://joyhealth.cc") {
     env,
     ctx,
   );
+}
+
+const GUIDE_PUBLICATIONS = [
+  ["/nutrition/building-balanced-meals", "2026-08-28"],
+  ["/nutrition/protein-and-fiber", "2026-08-28"],
+  ["/nutrition/reading-food-labels", "2026-08-28"],
+  ["/nutrition/carbohydrates-and-fats", "2026-08-28"],
+  ["/nutrition/hydration", "2026-08-28"],
+  ["/nutrition/supplement-evidence-and-safety", "2026-08-28"],
+  ["/nutrition/electrolyte-drinks", "2026-08-29"],
+];
+
+const INDEXABLE_PUBLIC_PATHS = [
+  "/",
+  "/standards",
+  "/usana",
+  "/nutrition",
+  ...GUIDE_PUBLICATIONS.map(([path]) => path),
+];
+
+const USANA_IMAGES = [
+  ["cellsentials-product", 1204, false],
+  ["cellsentials-label", 850, true],
+  ["healthpak-product", 1206, false],
+  ["healthpak-label", 409, true],
+  ["procosa-product", 1102, false],
+  ["procosa-label", 1000, true],
+  ["biomega-product", 1000, false],
+  ["biomega-label", 1000, true],
+  ["magnecal-d-product", 1072, false],
+  ["magnecal-d-label", 493, true],
+  ["coquinone-product", 1042, false],
+  ["coquinone-label", 498, true],
+  ["clear-protein-creatine-product", 734, false],
+  ["clear-protein-creatine-label", 488, true],
+  ["core-aminos-product", 850, false],
+  ["core-aminos-label", 850, true],
+];
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function parseSitemap(xml) {
+  return [...xml.matchAll(/<url>([\s\S]*?)<\/url>/gi)].map(([, entry]) => {
+    const location = entry.match(/<loc>([^<]+)<\/loc>/i)?.[1];
+    const lastModified = entry.match(/<lastmod>([^<]+)<\/lastmod>/i)?.[1];
+
+    assert.ok(location, `expected <loc> in sitemap entry: ${entry}`);
+    return { location, lastModified };
+  });
 }
 
 test("server-renders an indexable, self-canonical home page", async () => {
@@ -113,7 +168,7 @@ test("server-renders an indexable, self-canonical home page", async () => {
   assert.match(html, /<span aria-hidden="true">03<\/span>\s*How we work/i);
   assert.doesNotMatch(html, /—/);
   assert.match(html, /general education, not medical advice/i);
-  assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
+  assert.doesNotMatch(html, /react-loading-skeleton/i);
 
   const jsonLdMatch = html.match(
     /<script type="application\/ld\+json">([\s\S]*?)<\/script>/i,
@@ -161,18 +216,18 @@ test("gives the standards page unique metadata", async () => {
   assert.match(html, /Disclosures where they matter/i);
 });
 
-test("publishes a source-linked USANA quality and innovation page", async () => {
+test("publishes a source-linked USANA testing, quality, and manufacturing page", async () => {
   const response = await render("/usana");
   assert.equal(response.status, 200);
 
   const html = await response.text();
   assert.match(
     html,
-    /<title>USANA quality and product innovation \| Joy Health<\/title>/i,
+    /<title>Is USANA third-party tested\? Quality and manufacturing evidence \| Joy Health<\/title>/i,
   );
   assert.match(
     html,
-    /<meta name="description" content="A source-linked look at USANA manufacturing, third-party listings, product quality, and innovation, with an explanation of what each signal can establish\."/i,
+    /<meta name="description" content="Some USANA finished products appear in an official NSF listing\. See which quality signals are independent, which are company-reported, and what neither proves\."/i,
   );
   assert.match(
     html,
@@ -182,7 +237,20 @@ test("publishes a source-linked USANA quality and innovation page", async () => 
     html,
     /<meta property="og:url" content="https:\/\/joyhealth\.cc\/usana"/i,
   );
-  assert.match(html, /<h1[^>]*>Look past the bottle\. See how the product is built\.<\/h1>/i);
+  assert.match(
+    html,
+    /<h1[^>]*>\s*Find the USANA products that fit your routine\.\s*<\/h1>/i,
+  );
+  assert.match(
+    html,
+    /Compare flagship systems and focused formulas[\s\S]*before you choose/i,
+  );
+  assert.match(html, /<h2[^>]*>Is USANA third-party tested\?<\/h2>/i);
+  assert.match(html, /individual product evidence, rather than a brand-wide conclusion/i);
+  assert.match(
+    html,
+    /<h3><span class="usana-title-lock">Core Aminos<\/span><\/h3>/i,
+  );
   assert.match(html, /aria-current="page"[^>]*>USANA<\/a>/i);
   assert.match(html, /67%[\s\S]*manufacturing, production, and quality control/i);
   assert.match(html, /12[\s\S]*NSF\/ANSI 173 official listing/i);
@@ -254,7 +322,7 @@ test("publishes a source-linked USANA quality and innovation page", async () => 
     html,
     /Keep personal safety and medication questions separate from brand quality\.[\s\S]*Prepare one complete list/i,
   );
-  assert.match(html, /Reviewed August 30, 2026/i);
+  assert.match(html, /Updated[\s\S]*August 31, 2026/i);
   assert.match(html, /https:\/\/ir\.usana\.com\/company-information/i);
   assert.match(html, /https:\/\/info\.nsf\.org\/Certified\/Dietary\/Listings\.asp/i);
   assert.match(html, /https:\/\/ir\.usana\.com\/sustainability/i);
@@ -292,7 +360,10 @@ test("publishes a nutrition hub with only complete guides linked", async () => {
   assert.equal(response.status, 200);
 
   const html = await response.text();
-  assert.match(html, /<title>Nutrition essentials \| Joy Health<\/title>/i);
+  assert.match(
+    html,
+    /<title>Nutrition guides: meals, labels, hydration, and supplements \| Joy Health<\/title>/i,
+  );
   assert.match(
     html,
     /<meta name="description" content="An evidence-aware nutrition library organized around food labels, nutrients, meals, hydration, and supplements\."/i,
@@ -305,7 +376,10 @@ test("publishes a nutrition hub with only complete guides linked", async () => {
     html,
     /<meta property="og:url" content="https:\/\/joyhealth\.cc\/nutrition"/i,
   );
-  assert.match(html, /<h1[^>]*>A clearer way into nutrition\.<\/h1>/i);
+  assert.match(
+    html,
+    /<h1[^>]*>Practical nutrition guides for everyday questions\.<\/h1>/i,
+  );
   assert.match(html, /Seven practical places to begin/i);
   assert.match(html, /href="\/nutrition\/building-balanced-meals"/i);
   assert.match(html, /href="\/nutrition\/protein-and-fiber"/i);
@@ -318,6 +392,71 @@ test("publishes a nutrition hub with only complete guides linked", async () => {
   assert.doesNotMatch(html, /—/);
 });
 
+test("serves responsive USANA display images while linking original labels", async () => {
+  const response = await render("/usana");
+  const html = await response.text();
+  const cardSizes =
+    "(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 560px";
+  const featuredSizes = "(max-width: 1100px) 50vw, 560px";
+
+  assert.equal(response.status, 200);
+  assert.doesNotMatch(html, /\/_next\/image/i);
+
+  for (const [basename, intrinsicWidth, isLabel] of USANA_IMAGES) {
+    const originalPath = `/images/usana/${basename}.png`;
+    const expectedSizes = /^(?:cellsentials|healthpak)-/.test(basename)
+      ? featuredSizes
+      : cardSizes;
+
+    assert.match(
+      html,
+      new RegExp(
+        `<img[^>]+src="${escapeRegex(originalPath)}"[^>]+sizes="${escapeRegex(expectedSizes)}"`,
+        "i",
+      ),
+    );
+
+    const expectedWidths = [...new Set([
+      ...[320, 640, 960].filter((candidate) => candidate <= intrinsicWidth),
+      intrinsicWidth,
+    ])];
+
+    for (const width of expectedWidths) {
+      const candidatePath = `/images/responsive/usana/${basename}-${width}.webp`;
+      assert.match(
+        html,
+        new RegExp(`${escapeRegex(candidatePath)} ${width}w`, "i"),
+      );
+
+      const candidateResponse = await worker.fetch(
+        new Request(`https://joyhealth.cc${candidatePath}`, {
+          headers: { accept: "image/webp" },
+        }),
+        env,
+        ctx,
+      );
+      assert.equal(candidateResponse.status, 200, candidatePath);
+      assert.equal(candidateResponse.headers.get("content-type"), "image/webp");
+    }
+
+    if (isLabel) {
+      assert.match(
+        html,
+        new RegExp(`<a[^>]+href="${escapeRegex(originalPath)}"`, "i"),
+      );
+      const originalResponse = await worker.fetch(
+        new Request(`https://joyhealth.cc${originalPath}`, {
+          headers: { accept: "image/png" },
+        }),
+        env,
+        ctx,
+      );
+      assert.equal(originalResponse.status, 200, originalPath);
+      assert.equal(originalResponse.headers.get("content-type"), "image/png");
+    }
+  }
+});
+
 test("publishes a source-traced protein-and-fiber guide with separate reference systems", async () => {
   const response = await render("/nutrition/protein-and-fiber");
   assert.equal(response.status, 200);
@@ -325,11 +464,11 @@ test("publishes a source-traced protein-and-fiber guide with separate reference 
   const html = await response.text();
   assert.match(
     html,
-    /<title>Protein and fiber: two different jobs in a meal \| Joy Health<\/title>/i,
+    /<title>Protein and fiber foods: two different jobs in a meal \| Joy Health<\/title>/i,
   );
   assert.match(
     html,
-    /<meta name="description" content="A practical guide to what protein and fiber are, where they appear in foods and Nutrition Facts labels, and why their reference values are not interchangeable personal targets\."/i,
+    /<meta name="description" content="Learn which foods can contribute protein, fiber, or both, how the nutrients appear on labels, and why their reference values are not personal targets\."/i,
   );
   assert.match(
     html,
@@ -342,11 +481,11 @@ test("publishes a source-traced protein-and-fiber guide with separate reference 
   assert.doesNotMatch(html, /(?:property="og:image"|name="twitter:image")/i);
   assert.match(
     html,
-    /<h1[^>]*>Protein and fiber: two different jobs in a meal<\/h1>/i,
+    /<h1[^>]*>Protein and fiber foods: two different jobs in a meal<\/h1>/i,
   );
   assert.match(html, /Prepared by[\s\S]*Joy Health/i);
   assert.match(html, /Published August 28, 2026/i);
-  assert.match(html, /What this means/i);
+  assert.match(html, /Foods that contribute protein, fiber, or both/i);
   assert.match(html, /What the references can tell us/i);
   assert.match(html, /How to use the information/i);
   assert.match(html, /Limits and open questions/i);
@@ -382,7 +521,7 @@ test("publishes a source-traced protein-and-fiber guide with separate reference 
   assert.equal(jsonLd["@type"], "Article");
   assert.equal(
     jsonLd.headline,
-    "Protein and fiber: two different jobs in a meal",
+    "Protein and fiber foods: two different jobs in a meal",
   );
   assert.equal(
     jsonLd.mainEntityOfPage,
@@ -421,7 +560,7 @@ test("publishes a source-traced balanced-meals guide with matching Article data"
   );
   assert.match(html, /Prepared by[\s\S]*Joy Health/i);
   assert.match(html, /Published August 28, 2026/i);
-  assert.match(html, /What this means/i);
+  assert.match(html, /What makes a balanced meal\?/i);
   assert.match(html, /What the evidence can tell us/i);
   assert.match(html, /How to use the framework/i);
   assert.match(html, /Limits and open questions/i);
@@ -471,7 +610,7 @@ test("publishes a source-traced food-label guide with matching Article data", as
   );
   assert.match(
     html,
-    /<meta name="description" content="A practical guide to serving information, nutrients, percent Daily Value, ingredients, and allergen information on FDA-regulated packaged foods in the United States\."/i,
+    /<meta name="description" content="Learn how to read a U\.S\. Nutrition Facts label: serving size, the 5% and 20% Daily Value rule, added sugars, ingredients, and allergens\."/i,
   );
   assert.match(
     html,
@@ -496,7 +635,7 @@ test("publishes a source-traced food-label guide with matching Article data", as
   );
   assert.match(html, /Prepared by[\s\S]*Joy Health/i);
   assert.match(html, /Published August 28, 2026/i);
-  assert.match(html, /What this means/i);
+  assert.match(html, /Start with serving size, then use the 5% and 20% Daily Value rule/i);
   assert.match(html, /What the evidence can tell us/i);
   assert.match(html, /How to use the information/i);
   assert.match(html, /Limits and open questions/i);
@@ -577,17 +716,18 @@ test("publishes a source-traced hydration guide that distinguishes total water",
   assert.equal(response.status, 200);
   const html = await response.text();
 
-  assert.match(html, /<title>Hydration: what counts and why needs vary \| Joy Health<\/title>/i);
+  assert.match(html, /<title>How much water should you drink\? Total water explained \| Joy Health<\/title>/i);
   assert.match(html, /<link rel="canonical" href="https:\/\/joyhealth\.cc\/nutrition\/hydration"/i);
   assert.match(html, /<meta property="og:url" content="https:\/\/joyhealth\.cc\/nutrition\/hydration"/i);
   assert.doesNotMatch(html, /(?:property="og:image"|name="twitter:image")/i);
   assert.match(html, /Published August 28, 2026/i);
-  assert.match(html, /What this means/i);
+  assert.match(html, /How much water should you drink\? First define total water/i);
   assert.match(html, /What the reference can tell us/i);
   assert.match(html, /How to use the information/i);
   assert.match(html, /Limits and open questions/i);
   assert.match(html, /3\.7 liters per day for men and 2\.7 liters per day for women/i);
   assert.match(html, /not exact requirements or plain-water prescriptions/i);
+  assert.match(html, /href="\/nutrition\/electrolyte-drinks"[^>]*>electrolytes versus water<\/a>/i);
   assert.match(html, /https:\/\/www\.nationalacademies\.org\/read\/10925\/chapter\/6/i);
   assert.match(html, /https:\/\/www\.cdc\.gov\/healthy-weight-growth\/water-healthy-drinks\/index\.html/i);
   assert.doesNotMatch(html, /—/);
@@ -596,7 +736,7 @@ test("publishes a source-traced hydration guide that distinguishes total water",
   assert.ok(jsonLdMatch, "expected Article JSON-LD");
   const jsonLd = JSON.parse(jsonLdMatch[1]);
   assert.equal(jsonLd["@type"], "Article");
-  assert.equal(jsonLd.headline, "Hydration: what counts and why needs vary");
+  assert.equal(jsonLd.headline, "How much water should you drink? Total water explained");
   assert.equal(jsonLd.mainEntityOfPage, "https://joyhealth.cc/nutrition/hydration");
   assert.equal(jsonLd.datePublished, "2026-08-28");
   assert.equal(jsonLd.dateModified, undefined);
@@ -641,17 +781,18 @@ test("publishes a source-traced electrolyte guide that separates the label from 
   assert.equal(response.status, 200);
   const html = await response.text();
 
-  assert.match(html, /<title>Electrolyte drinks: read the label, then match the context \| Joy Health<\/title>/i);
+  assert.match(html, /<title>Electrolytes vs\. water: when do you need an electrolyte drink\? \| Joy Health<\/title>/i);
   assert.match(html, /<link rel="canonical" href="https:\/\/joyhealth\.cc\/nutrition\/electrolyte-drinks"/i);
   assert.match(html, /<meta property="og:url" content="https:\/\/joyhealth\.cc\/nutrition\/electrolyte-drinks"/i);
   assert.doesNotMatch(html, /(?:property="og:image"|name="twitter:image")/i);
   assert.match(html, /Published August 29, 2026/i);
-  assert.match(html, /What this means/i);
+  assert.match(html, /Electrolytes vs\. water: the context decides/i);
   assert.match(html, /What the references can tell us/i);
   assert.match(html, /How to use the information/i);
   assert.match(html, /Limits and open questions/i);
   assert.match(html, /Contains electrolytes[\s\S]*names ingredients, not a need/i);
   assert.match(html, /universal replacement instructions impossible/i);
+  assert.match(html, /href="\/nutrition\/hydration"[^>]*>how much water[\s\S]*counts as total water<\/a>/i);
   assert.match(html, /https:\/\/www\.nata\.org\/sites\/default\/files\/2025-08\/fluid_replacement_for_the_physically_active\.pdf/i);
   assert.match(html, /https:\/\/ods\.od\.nih\.gov\/factsheets\/Potassium-HealthProfessional\//i);
   assert.match(html, /https:\/\/www\.fda\.gov\/food\/nutrition-facts-label\/how-understand-and-use-nutrition-facts-label/i);
@@ -662,7 +803,7 @@ test("publishes a source-traced electrolyte guide that separates the label from 
   assert.ok(jsonLdMatch, "expected Article JSON-LD");
   const jsonLd = JSON.parse(jsonLdMatch[1]);
   assert.equal(jsonLd["@type"], "Article");
-  assert.equal(jsonLd.headline, "Electrolyte drinks: read the label, then match the context");
+  assert.equal(jsonLd.headline, "Electrolytes vs. water: when do you need an electrolyte drink?");
   assert.equal(jsonLd.mainEntityOfPage, "https://joyhealth.cc/nutrition/electrolyte-drinks");
   assert.equal(jsonLd.datePublished, "2026-08-29");
   assert.equal(jsonLd.dateModified, undefined);
@@ -720,7 +861,7 @@ test("matches article breadcrumb data to the visible site hierarchy", async () =
   }
 });
 
-test("publishes crawl controls and canonical URLs", async () => {
+test("publishes the exact unique public URL inventory with truthful dates", async () => {
   const [robotsResponse, sitemapResponse] = await Promise.all([
     render("/robots.txt"),
     render("/sitemap.xml"),
@@ -730,27 +871,134 @@ test("publishes crawl controls and canonical URLs", async () => {
   assert.match(await robotsResponse.text(), /Sitemap: https:\/\/joyhealth\.cc\/sitemap\.xml/i);
   assert.equal(sitemapResponse.status, 200);
   const sitemap = await sitemapResponse.text();
-  assert.match(sitemap, /<loc>https:\/\/joyhealth\.cc<\/loc>/i);
-  assert.match(sitemap, /<loc>https:\/\/joyhealth\.cc\/standards<\/loc>/i);
-  assert.match(sitemap, /<loc>https:\/\/joyhealth\.cc\/usana<\/loc>/i);
-  assert.match(sitemap, /<loc>https:\/\/joyhealth\.cc\/nutrition<\/loc>/i);
-  assert.match(
-    sitemap,
-    /<loc>https:\/\/joyhealth\.cc\/nutrition\/reading-food-labels<\/loc>/i,
+  const entries = parseSitemap(sitemap);
+  const locations = entries.map(({ location }) => location);
+  const expectedLocations = INDEXABLE_PUBLIC_PATHS.map((path) =>
+    path === "/" ? "https://joyhealth.cc" : `https://joyhealth.cc${path}`,
   );
-  assert.match(
-    sitemap,
-    /<loc>https:\/\/joyhealth\.cc\/nutrition\/building-balanced-meals<\/loc>/i,
-  );
-  assert.match(
-    sitemap,
-    /<loc>https:\/\/joyhealth\.cc\/nutrition\/protein-and-fiber<\/loc>/i,
-  );
-  assert.match(sitemap, /<loc>https:\/\/joyhealth\.cc\/nutrition\/carbohydrates-and-fats<\/loc>/i);
-  assert.match(sitemap, /<loc>https:\/\/joyhealth\.cc\/nutrition\/hydration<\/loc>/i);
-  assert.match(sitemap, /<loc>https:\/\/joyhealth\.cc\/nutrition\/supplement-evidence-and-safety<\/loc>/i);
-  assert.match(sitemap, /<loc>https:\/\/joyhealth\.cc\/nutrition\/electrolyte-drinks<\/loc>/i);
+
+  assert.equal(entries.length, 11);
+  assert.equal(new Set(locations).size, entries.length, "duplicate sitemap URL");
+  assert.deepEqual(new Set(locations), new Set(expectedLocations));
   assert.doesNotMatch(sitemap, /priority|changefreq/i);
+
+  const byLocation = new Map(
+    entries.map(({ location, lastModified }) => [location, lastModified]),
+  );
+  assert.equal(byLocation.get("https://joyhealth.cc/usana"), "2026-08-31");
+  assert.equal(byLocation.get("https://joyhealth.cc/nutrition"), "2026-08-28");
+
+  for (const [path, publishedDate] of GUIDE_PUBLICATIONS) {
+    assert.equal(byLocation.get(`https://joyhealth.cc${path}`), publishedDate);
+  }
+});
+
+test("keeps guide canonical and publication-date surfaces aligned", async () => {
+  const sitemapResponse = await render("/sitemap.xml");
+  const sitemapEntries = parseSitemap(await sitemapResponse.text());
+  const sitemapDates = new Map(
+    sitemapEntries.map(({ location, lastModified }) => [location, lastModified]),
+  );
+
+  for (const [path, publishedDate] of GUIDE_PUBLICATIONS) {
+    const canonicalUrl = `https://joyhealth.cc${path}`;
+    const response = await render(path);
+    const html = await response.text();
+    const jsonLdItems = [
+      ...html.matchAll(
+        /<script type="application\/ld\+json">([\s\S]*?)<\/script>/gi,
+      ),
+    ].map((match) => JSON.parse(match[1]));
+    const article = jsonLdItems.find((item) => item["@type"] === "Article");
+
+    assert.equal(response.status, 200);
+    assert.match(
+      html,
+      new RegExp(
+        `<link rel="canonical" href="${canonicalUrl.replaceAll("/", "\\/")}"`,
+        "i",
+      ),
+    );
+    assert.match(
+      html,
+      new RegExp(`<time datetime="${publishedDate}">`, "i"),
+    );
+    assert.match(
+      html,
+      new RegExp(
+        `<meta property="article:published_time" content="${publishedDate}"`,
+        "i",
+      ),
+    );
+    assert.ok(article, `expected Article JSON-LD for ${path}`);
+    assert.equal(article.mainEntityOfPage, canonicalUrl);
+    assert.equal(article.datePublished, publishedDate);
+    assert.deepEqual(article.author, {
+      "@type": "Organization",
+      name: "Joy Health",
+      url: "https://joyhealth.cc/",
+    });
+    assert.deepEqual(article.publisher, {
+      "@type": "Organization",
+      name: "Joy Health",
+      url: "https://joyhealth.cc/",
+    });
+    assert.equal(sitemapDates.get(canonicalUrl), publishedDate);
+  }
+});
+
+test("keeps the USANA review date aligned with the sitemap", async () => {
+  const [pageResponse, sitemapResponse] = await Promise.all([
+    render("/usana"),
+    render("/sitemap.xml"),
+  ]);
+  const html = await pageResponse.text();
+  const usanaEntry = parseSitemap(await sitemapResponse.text()).find(
+    ({ location }) => location === "https://joyhealth.cc/usana",
+  );
+
+  assert.equal(pageResponse.status, 200);
+  assert.match(html, /Updated\s*<time datetime="2026-08-31">August 31, 2026<\/time>/i);
+  assert.equal(usanaEntry?.lastModified, "2026-08-31");
+});
+
+test("prerenders every public route and the 404 with static artifacts", async () => {
+  const distServer = fileURLToPath(new URL("../dist/server", import.meta.url));
+  const manifestPath = path.join(distServer, "vinext-prerender.json");
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+  const routes = new Map(manifest.routes.map((entry) => [entry.route, entry]));
+  const expectedRoutes = [...INDEXABLE_PUBLIC_PATHS, "/404"];
+
+  assert.deepEqual(new Set(routes.keys()), new Set(expectedRoutes));
+  assert.equal(manifest.routes.length, expectedRoutes.length);
+  assert.ok(
+    manifest.routes.every(({ status }) => status === "rendered"),
+    "expected zero skipped, error, or fatal prerender statuses",
+  );
+
+  for (const route of expectedRoutes) {
+    const entry = routes.get(route);
+    const artifactStem = route === "/" ? "index" : route.slice(1);
+
+    assert.ok(entry, `expected prerender manifest entry for ${route}`);
+    assert.equal(entry.status, "rendered");
+    assert.equal(entry.revalidate, false);
+    assert.ok(
+      (await stat(
+        path.join(distServer, "prerendered-routes", `${artifactStem}.html`),
+      )).isFile(),
+      `expected HTML artifact for ${route}`,
+    );
+
+    if (route !== "/404") {
+      assert.ok(
+        (await stat(
+          path.join(distServer, "prerendered-routes", `${artifactStem}.rsc`),
+        )).isFile(),
+        `expected RSC artifact for ${route}`,
+      );
+    }
+  }
 });
 
 test("does not expose an unpublished personalized nutrition route", async () => {
@@ -764,34 +1012,57 @@ test("keeps preview hosts out of search results", async () => {
   assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
 });
 
-test("serves every full-resolution hero image referenced in rendered HTML", async () => {
+test("serves responsive hero images with first-scene preload priority", async () => {
   const homeResponse = await render("/");
   const html = await homeResponse.text();
   const heroImages = [
-    "joy-health-morning.webp",
-    "joy-health-balanced-meal.webp",
-    "joy-health-garden-recovery.webp",
+    "joy-health-morning",
+    "joy-health-balanced-meal",
+    "joy-health-garden-recovery",
   ];
+  const sizes =
+    "(max-width: 760px) 100vw, (max-width: 1180px) 50vw, 836px";
 
   for (const image of heroImages) {
     assert.match(
       html,
-      new RegExp(`<img[^>]*src="/images/${image.replace(".", "\\.")}"[^>]*width="1672"[^>]*height="941"`, "i"),
+      new RegExp(
+        `<img[^>]*src="/images/responsive/hero/${image}-1672\\.webp"[^>]*sizes="${escapeRegex(sizes)}"[^>]*width="1672"[^>]*height="941"`,
+        "i",
+      ),
     );
     assert.doesNotMatch(html, new RegExp(`/_next/image\\?[^"']*${image}`, "i"));
 
-    const response = await worker.fetch(
-      new Request(`https://joyhealth.cc/images/${image}`, {
-        headers: { accept: "image/webp" },
-      }),
-      env,
-      ctx,
-    );
+    for (const width of [640, 1024, 1672]) {
+      const candidatePath = `/images/responsive/hero/${image}-${width}.webp`;
+      assert.match(
+        html,
+        new RegExp(`${escapeRegex(candidatePath)} ${width}w`, "i"),
+      );
+      const response = await worker.fetch(
+        new Request(`https://joyhealth.cc${candidatePath}`, {
+          headers: { accept: "image/webp" },
+        }),
+        env,
+        ctx,
+      );
 
-    assert.equal(response.status, 200);
-    assert.equal(response.headers.get("location"), null);
-    assert.equal(response.headers.get("content-type"), "image/webp");
+      assert.equal(response.status, 200, candidatePath);
+      assert.equal(response.headers.get("location"), null);
+      assert.equal(response.headers.get("content-type"), "image/webp");
+    }
   }
+
+  assert.equal(html.match(/loading="eager"/gi)?.length, 1);
+  assert.equal(html.match(/fetchPriority="high"/gi)?.length, 2);
+  assert.equal(html.match(/loading="lazy"/gi)?.length, 2);
+  assert.match(
+    html,
+    new RegExp(
+      `<link rel="preload" as="image"[^>]+joy-health-morning-640\\.webp[^>]+imageSizes="${escapeRegex(sizes)}"[^>]+fetchPriority="high"`,
+      "i",
+    ),
+  );
 });
 
 test("serves every stylesheet and script emitted by the home page", async () => {

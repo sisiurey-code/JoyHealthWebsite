@@ -18,7 +18,9 @@
     "test": "node --test tests/rendered-html.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck && npm test",
+    "images:generate": "node scripts/generate-responsive-images.mjs",
+    "images:check": "node scripts/generate-responsive-images.mjs --check",
+    "check": "npm run images:check && npm run lint && npm run typecheck && npm test",
     "audit": "npm audit --audit-level=high"
   },
   "dependencies": {
@@ -40,6 +42,7 @@
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "16.4.0",
     "react-server-dom-webpack": "19.2.8",
+    "sharp": "0.35.2",
     "typescript": "5.9.3",
     "typescript-eslint": "8.59.3",
     "vinext": "1.0.0-beta.8",

@@ -23,6 +23,13 @@ const slides = [
   },
 ] as const;
 
+const heroSizes = "(max-width: 760px) 100vw, (max-width: 1180px) 50vw, 836px";
+
+function responsiveHeroSource(src: string, width: number) {
+  const basename = src.slice(src.lastIndexOf("/") + 1, src.lastIndexOf("."));
+  return `/images/responsive/hero/${basename}-${width}.webp`;
+}
+
 export function HeroCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -54,12 +61,17 @@ export function HeroCarousel() {
         aria-label={`Show next wellness scene. Scene ${activeIndex + 1} of ${slides.length}: ${slides[activeIndex].title}`}
       >
         {slides.map((slide, index) => (
-          // Vinext currently emits one source for next/image here, without a srcset.
           // eslint-disable-next-line @next/next/no-img-element
           <img
             className={index === activeIndex ? "is-active" : undefined}
             key={slide.src}
-            src={slide.src}
+            src={responsiveHeroSource(slide.src, 1672)}
+            srcSet={[640, 1024, 1672]
+              .map(
+                (width) => `${responsiveHeroSource(slide.src, width)} ${width}w`,
+              )
+              .join(", ")}
+            sizes={heroSizes}
             alt={index === activeIndex ? slide.alt : ""}
             width="1672"
             height="941"

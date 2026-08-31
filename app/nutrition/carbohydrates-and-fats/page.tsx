@@ -2,25 +2,26 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GuideContents } from "../../components/guide-contents";
 import { JsonLd } from "../../components/json-ld";
-import { buildBreadcrumbJsonLd } from "../../lib/seo";
+import {
+  CARBOHYDRATES_AND_FATS_GUIDE,
+  formatEditorialDate,
+} from "../../lib/publications";
+import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "../../lib/seo";
 
-const title = "Carbohydrates and fats: types, sources, and tradeoffs";
-const description =
-  "A practical guide to carbohydrate and fat categories, Nutrition Facts fields, food sources, and why replacement context matters.";
-const canonicalUrl =
-  "https://joyhealth.cc/nutrition/carbohydrates-and-fats";
+const guide = CARBOHYDRATES_AND_FATS_GUIDE;
+const { title, description } = guide;
 
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/nutrition/carbohydrates-and-fats" },
+  alternates: { canonical: guide.path },
   openGraph: {
     type: "article",
-    url: "/nutrition/carbohydrates-and-fats",
+    url: guide.path,
     siteName: "Joy Health",
     title: `${title} | Joy Health`,
     description,
-    publishedTime: "2026-08-28",
+    publishedTime: guide.datePublished,
     images: [],
   },
   twitter: {
@@ -31,25 +32,14 @@ export const metadata: Metadata = {
   },
 };
 
-const articleJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "@id": `${canonicalUrl}#article`,
-  mainEntityOfPage: canonicalUrl,
-  headline: title,
-  description,
-  author: { "@type": "Organization", name: "Joy Health", url: "https://joyhealth.cc/" },
-  publisher: { "@type": "Organization", name: "Joy Health", url: "https://joyhealth.cc/" },
-  datePublished: "2026-08-28",
-  inLanguage: "en-US",
-};
+const articleJsonLd = buildArticleJsonLd(guide);
 
 const breadcrumbJsonLd = buildBreadcrumbJsonLd([
   { name: "Home", path: "/" },
   { name: "Nutrition", path: "/nutrition" },
   {
-    name: "Carbohydrates and fats",
-    path: "/nutrition/carbohydrates-and-fats",
+    name: guide.breadcrumbLabel,
+    path: guide.path,
   },
 ]);
 
@@ -85,7 +75,11 @@ export default function CarbohydratesAndFatsGuide() {
           </p>
           <div className="guide-meta" aria-label="Article details">
             <p>Prepared by <strong>Joy Health</strong></p>
-            <p><time dateTime="2026-08-28">Published August 28, 2026</time></p>
+            <p>
+              <time dateTime={guide.datePublished}>
+                {`Published ${formatEditorialDate(guide.datePublished)}`}
+              </time>
+            </p>
           </div>
         </header>
 

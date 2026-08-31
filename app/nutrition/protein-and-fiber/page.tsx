@@ -2,24 +2,26 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GuideContents } from "../../components/guide-contents";
 import { JsonLd } from "../../components/json-ld";
-import { buildBreadcrumbJsonLd } from "../../lib/seo";
+import {
+  formatEditorialDate,
+  PROTEIN_AND_FIBER_GUIDE,
+} from "../../lib/publications";
+import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "../../lib/seo";
 
-const title = "Protein and fiber: two different jobs in a meal";
-const description =
-  "A practical guide to what protein and fiber are, where they appear in foods and Nutrition Facts labels, and why their reference values are not interchangeable personal targets.";
-const canonicalUrl = "https://joyhealth.cc/nutrition/protein-and-fiber";
+const guide = PROTEIN_AND_FIBER_GUIDE;
+const { title, description } = guide;
 
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/nutrition/protein-and-fiber" },
+  alternates: { canonical: guide.path },
   openGraph: {
     type: "article",
-    url: "/nutrition/protein-and-fiber",
+    url: guide.path,
     siteName: "Joy Health",
     title: `${title} | Joy Health`,
     description,
-    publishedTime: "2026-08-28",
+    publishedTime: guide.datePublished,
     images: [],
   },
   twitter: {
@@ -30,31 +32,12 @@ export const metadata: Metadata = {
   },
 };
 
-const articleJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "@id": `${canonicalUrl}#article`,
-  mainEntityOfPage: canonicalUrl,
-  headline: title,
-  description,
-  author: {
-    "@type": "Organization",
-    name: "Joy Health",
-    url: "https://joyhealth.cc/",
-  },
-  publisher: {
-    "@type": "Organization",
-    name: "Joy Health",
-    url: "https://joyhealth.cc/",
-  },
-  datePublished: "2026-08-28",
-  inLanguage: "en-US",
-};
+const articleJsonLd = buildArticleJsonLd(guide);
 
 const breadcrumbJsonLd = buildBreadcrumbJsonLd([
   { name: "Home", path: "/" },
   { name: "Nutrition", path: "/nutrition" },
-  { name: "Protein and fiber", path: "/nutrition/protein-and-fiber" },
+  { name: guide.breadcrumbLabel, path: guide.path },
 ]);
 
 function Citation({ source }: Readonly<{ source: number }>) {
@@ -96,7 +79,9 @@ export default function ProteinAndFiberGuide() {
               Prepared by <strong>Joy Health</strong>
             </p>
             <p>
-              <time dateTime="2026-08-28">Published August 28, 2026</time>
+              <time dateTime={guide.datePublished}>
+                {`Published ${formatEditorialDate(guide.datePublished)}`}
+              </time>
             </p>
           </div>
         </header>
@@ -104,7 +89,7 @@ export default function ProteinAndFiberGuide() {
         <GuideContents />
 
         <section className="guide-section" aria-labelledby="meaning-title">
-          <h2 id="meaning-title">What this means</h2>
+          <h2 id="meaning-title">Foods that contribute protein, fiber, or both</h2>
           <div className="guide-copy">
             <p>
               Protein is a group of molecules built from amino acids. The

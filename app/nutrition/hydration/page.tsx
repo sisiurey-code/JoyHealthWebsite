@@ -2,38 +2,29 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GuideContents } from "../../components/guide-contents";
 import { JsonLd } from "../../components/json-ld";
-import { buildBreadcrumbJsonLd } from "../../lib/seo";
+import {
+  formatEditorialDate,
+  HYDRATION_GUIDE,
+} from "../../lib/publications";
+import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "../../lib/seo";
 
-const title = "Hydration: what counts and why needs vary";
-const description =
-  "A guide to total water from beverages and foods, adult Adequate Intakes, and why one universal daily bottle target is misleading.";
-const canonicalUrl = "https://joyhealth.cc/nutrition/hydration";
+const guide = HYDRATION_GUIDE;
+const { title, description } = guide;
 
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/nutrition/hydration" },
-  openGraph: { type: "article", url: "/nutrition/hydration", siteName: "Joy Health", title: `${title} | Joy Health`, description, publishedTime: "2026-08-28", images: [] },
+  alternates: { canonical: guide.path },
+  openGraph: { type: "article", url: guide.path, siteName: "Joy Health", title: `${title} | Joy Health`, description, publishedTime: guide.datePublished, images: [] },
   twitter: { card: "summary", title: `${title} | Joy Health`, description, images: [] },
 };
 
-const articleJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "@id": `${canonicalUrl}#article`,
-  mainEntityOfPage: canonicalUrl,
-  headline: title,
-  description,
-  author: { "@type": "Organization", name: "Joy Health", url: "https://joyhealth.cc/" },
-  publisher: { "@type": "Organization", name: "Joy Health", url: "https://joyhealth.cc/" },
-  datePublished: "2026-08-28",
-  inLanguage: "en-US",
-};
+const articleJsonLd = buildArticleJsonLd(guide);
 
 const breadcrumbJsonLd = buildBreadcrumbJsonLd([
   { name: "Home", path: "/" },
   { name: "Nutrition", path: "/nutrition" },
-  { name: "Hydration", path: "/nutrition/hydration" },
+  { name: guide.breadcrumbLabel, path: guide.path },
 ]);
 
 function Citation({ source }: Readonly<{ source: number }>) {
@@ -53,13 +44,13 @@ export default function HydrationGuide() {
             explains the adult reference values, what they count, and why they
             are not precise requirements for every person or day.
           </p>
-          <div className="guide-meta" aria-label="Article details"><p>Prepared by <strong>Joy Health</strong></p><p><time dateTime="2026-08-28">Published August 28, 2026</time></p></div>
+          <div className="guide-meta" aria-label="Article details"><p>Prepared by <strong>Joy Health</strong></p><p><time dateTime={guide.datePublished}>{`Published ${formatEditorialDate(guide.datePublished)}`}</time></p></div>
         </header>
 
         <GuideContents />
 
         <section className="guide-section" aria-labelledby="meaning-title">
-          <h2 id="meaning-title">What this means</h2>
+          <h2 id="meaning-title">How much water should you drink? First define total water</h2>
           <div className="guide-copy">
             <p>
               The National Academies uses <em>total water</em> to include
@@ -162,6 +153,11 @@ export default function HydrationGuide() {
                 <Citation source={1} />
               </p>
             </div>
+            <p>
+              Comparing plain water with a sports drink or powder? Continue with
+              the guide to <Link href="/nutrition/electrolyte-drinks">electrolytes versus water</Link>,
+              which separates hydration, exercise losses, fuel, and extra active ingredients.
+            </p>
           </div>
         </section>
 

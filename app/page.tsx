@@ -4,6 +4,7 @@ import { HeroCarousel } from "./components/hero-carousel";
 import { JsonLd } from "./components/json-ld";
 import { SiteFooter } from "./components/site-footer";
 import { SiteHeader } from "./components/site-header";
+import { NUTRITION_GUIDES } from "./lib/publications";
 import { SITE_URL } from "./lib/seo";
 import { USANA_STOREFRONT_URL } from "./lib/usana";
 
@@ -84,7 +85,7 @@ export default function Home() {
                   Explore premium USANA <span aria-hidden="true">→</span>
                 </Link>
                 <Link className="text-link" href="/nutrition#guides-title">
-                  Browse 7 practical guides
+                  {`Browse ${NUTRITION_GUIDES.length} practical guides`}
                 </Link>
               </div>
               <aside

@@ -2,22 +2,23 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "../components/site-footer";
 import { SiteHeader } from "../components/site-header";
+import { formatEditorialDate, PUBLICATIONS } from "../lib/publications";
 import { UsanaCatalogDock } from "../components/usana-catalog-dock";
 import { UsanaProductCards } from "../components/usana-product-cards";
 import { USANA_STOREFRONT_URL } from "../lib/usana";
 
-const description =
-  "A source-linked look at USANA manufacturing, third-party listings, product quality, and innovation, with an explanation of what each signal can establish.";
+const usana = PUBLICATIONS.usana;
+const { description, title } = usana;
 
 export const metadata: Metadata = {
-  title: "USANA quality and product innovation",
+  title,
   description,
   alternates: { canonical: "/usana" },
   openGraph: {
     type: "website",
     url: "/usana",
     siteName: "Joy Health",
-    title: "USANA quality and product innovation | Joy Health",
+    title: `${title} | Joy Health`,
     description,
     images: [
       {
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "USANA quality and product innovation | Joy Health",
+    title: `${title} | Joy Health`,
     description,
     images: ["/og.png"],
   },
@@ -45,12 +46,14 @@ export default function UsanaPage() {
         <section className="usana-hero" aria-labelledby="usana-title">
           <div className="usana-hero-inner content-shell">
             <div className="usana-hero-copy">
-              <p className="eyebrow">USANA · Quality and innovation</p>
-              <h1 id="usana-title">Look past the bottle. See how the product is built.</h1>
+              <p className="eyebrow">USANA · Product guide</p>
+              <h1 id="usana-title">
+                Find the USANA products that fit your routine.
+              </h1>
               <p>
-                USANA reports substantial in-house manufacturing and continued
-                investment in new formulations, while NSF independently lists
-                a defined set of finished products.
+                Compare flagship systems and focused formulas, see how their labels
+                and purposes differ, and keep the evidence, ingredient overlap, and
+                limits in view before you choose.
               </p>
               <div className="usana-hero-actions">
                 <a
@@ -155,11 +158,11 @@ export default function UsanaPage() {
         <section className="usana-quality content-shell" id="quality" aria-labelledby="quality-title">
           <header className="usana-section-heading">
             <p className="eyebrow">Quality, made concrete</p>
-            <h2 id="quality-title">Three aspects worth elaborating.</h2>
+            <h2 id="quality-title">Is USANA third-party tested?</h2>
             <p>
-              Quality isn&apos;t just a badge. These aspects answer different
-              questions about control, verification, and organizational
-              commitment.
+              NSF&apos;s official listing names 12 finished products. That is
+              individual product evidence, rather than a brand-wide conclusion. Manufacturing
+              control and company investment answer different quality questions.
             </p>
           </header>
 
@@ -424,8 +427,10 @@ export default function UsanaPage() {
             <p className="eyebrow">Source trail</p>
             <h2 id="usana-sources-title">What Joy Health reads.</h2>
             <p>
-              Reviewed August 30, 2026. Company statements are labeled as such;
-              the NSF listing and FDA guidance serve different evidence roles.
+              Updated <time dateTime={usana.dateModified}>
+                {formatEditorialDate(usana.dateModified)}
+              </time> after rechecking the company manufacturing page and NSF&apos;s
+              official listing. Other source read dates are stated below.
             </p>
           </header>
           <ol className="source-list usana-source-list">
@@ -435,8 +440,8 @@ export default function UsanaPage() {
               </a>
               <p>
                 Company-reported manufacturing share, R&amp;D scope, scientific
-                disciplines, and product-development approach. Read August 29,
-                2026.
+                disciplines, and product-development approach. Read August 29
+                and re-read August 31, 2026.
               </p>
             </li>
             <li id="usana-source-2">
@@ -445,8 +450,8 @@ export default function UsanaPage() {
               </a>
               <p>
                 Independent listing record naming the facility, certification
-                standard, and 12 finished products. Listing current August 27,
-                2026; read August 29, 2026.
+                standard, and 12 finished products. Listing current August 29,
+                2026; read August 29 and re-read August 31, 2026.
               </p>
             </li>
             <li id="usana-source-3">

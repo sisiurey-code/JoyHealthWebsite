@@ -57,8 +57,10 @@ before publishing the generated Worker bundle.
 - Prefer useful original synthesis over search-targeted content volume.
 - Keep pages server-rendered, accessible, and lightweight by default.
 
-Detailed rules live in [docs/EDITORIAL_STANDARDS.md](docs/EDITORIAL_STANDARDS.md).
-Launch and ownership tasks live in [docs/LAUNCH_CHECKLIST.md](docs/LAUNCH_CHECKLIST.md).
+The public editorial charter is published at
+[joyhealth.cc/standards](https://joyhealth.cc/standards). Release verification
+and Search Console monitoring are documented in
+[docs/SEO_OPERATIONS.md](docs/SEO_OPERATIONS.md).
 
 ## License and brand
 

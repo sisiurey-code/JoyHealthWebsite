@@ -2,25 +2,26 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GuideContents } from "../../components/guide-contents";
 import { JsonLd } from "../../components/json-ld";
-import { buildBreadcrumbJsonLd } from "../../lib/seo";
+import {
+  formatEditorialDate,
+  SUPPLEMENT_EVIDENCE_GUIDE,
+} from "../../lib/publications";
+import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "../../lib/seo";
 
-const title = "How to evaluate supplement evidence and safety";
-const description =
-  "A repeatable U.S. framework separating Supplement Facts, marketing claims, supporting evidence, product identity, and safety.";
-const canonicalUrl =
-  "https://joyhealth.cc/nutrition/supplement-evidence-and-safety";
+const guide = SUPPLEMENT_EVIDENCE_GUIDE;
+const { title, description } = guide;
 
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/nutrition/supplement-evidence-and-safety" },
+  alternates: { canonical: guide.path },
   openGraph: {
     type: "article",
-    url: "/nutrition/supplement-evidence-and-safety",
+    url: guide.path,
     siteName: "Joy Health",
     title: `${title} | Joy Health`,
     description,
-    publishedTime: "2026-08-28",
+    publishedTime: guide.datePublished,
     images: [],
   },
   twitter: {
@@ -31,33 +32,14 @@ export const metadata: Metadata = {
   },
 };
 
-const articleJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "@id": `${canonicalUrl}#article`,
-  mainEntityOfPage: canonicalUrl,
-  headline: title,
-  description,
-  author: {
-    "@type": "Organization",
-    name: "Joy Health",
-    url: "https://joyhealth.cc/",
-  },
-  publisher: {
-    "@type": "Organization",
-    name: "Joy Health",
-    url: "https://joyhealth.cc/",
-  },
-  datePublished: "2026-08-28",
-  inLanguage: "en-US",
-};
+const articleJsonLd = buildArticleJsonLd(guide);
 
 const breadcrumbJsonLd = buildBreadcrumbJsonLd([
   { name: "Home", path: "/" },
   { name: "Nutrition", path: "/nutrition" },
   {
-    name: "Supplement evidence and safety",
-    path: "/nutrition/supplement-evidence-and-safety",
+    name: guide.breadcrumbLabel,
+    path: guide.path,
   },
 ]);
 
@@ -93,7 +75,11 @@ export default function SupplementEvidenceAndSafetyGuide() {
           </p>
           <div className="guide-meta" aria-label="Article details">
             <p>Prepared by <strong>Joy Health</strong></p>
-            <p><time dateTime="2026-08-28">Published August 28, 2026</time></p>
+            <p>
+              <time dateTime={guide.datePublished}>
+                {`Published ${formatEditorialDate(guide.datePublished)}`}
+              </time>
+            </p>
           </div>
         </header>
 

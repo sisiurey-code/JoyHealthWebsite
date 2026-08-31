@@ -2,25 +2,26 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GuideContents } from "../../components/guide-contents";
 import { JsonLd } from "../../components/json-ld";
-import { buildBreadcrumbJsonLd } from "../../lib/seo";
+import {
+  BALANCED_MEALS_GUIDE,
+  formatEditorialDate,
+} from "../../lib/publications";
+import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "../../lib/seo";
 
-const title = "How to build a balanced meal without rigid rules";
-const description =
-  "A flexible framework for building everyday meals from familiar foods, with room for culture, budget, access, appetite, and preference.";
-const canonicalUrl =
-  "https://joyhealth.cc/nutrition/building-balanced-meals";
+const guide = BALANCED_MEALS_GUIDE;
+const { title, description } = guide;
 
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/nutrition/building-balanced-meals" },
+  alternates: { canonical: guide.path },
   openGraph: {
     type: "article",
-    url: "/nutrition/building-balanced-meals",
+    url: guide.path,
     siteName: "Joy Health",
     title: `${title} | Joy Health`,
     description,
-    publishedTime: "2026-08-28",
+    publishedTime: guide.datePublished,
     images: [],
   },
   twitter: {
@@ -31,33 +32,14 @@ export const metadata: Metadata = {
   },
 };
 
-const articleJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "@id": `${canonicalUrl}#article`,
-  mainEntityOfPage: canonicalUrl,
-  headline: title,
-  description,
-  author: {
-    "@type": "Organization",
-    name: "Joy Health",
-    url: "https://joyhealth.cc/",
-  },
-  publisher: {
-    "@type": "Organization",
-    name: "Joy Health",
-    url: "https://joyhealth.cc/",
-  },
-  datePublished: "2026-08-28",
-  inLanguage: "en-US",
-};
+const articleJsonLd = buildArticleJsonLd(guide);
 
 const breadcrumbJsonLd = buildBreadcrumbJsonLd([
   { name: "Home", path: "/" },
   { name: "Nutrition", path: "/nutrition" },
   {
-    name: "Balanced meals",
-    path: "/nutrition/building-balanced-meals",
+    name: guide.breadcrumbLabel,
+    path: guide.path,
   },
 ]);
 
@@ -100,7 +82,9 @@ export default function BalancedMealsGuide() {
               Prepared by <strong>Joy Health</strong>
             </p>
             <p>
-              <time dateTime="2026-08-28">Published August 28, 2026</time>
+              <time dateTime={guide.datePublished}>
+                {`Published ${formatEditorialDate(guide.datePublished)}`}
+              </time>
             </p>
           </div>
         </header>
@@ -108,7 +92,7 @@ export default function BalancedMealsGuide() {
         <GuideContents />
 
         <section className="guide-section" aria-labelledby="meaning-title">
-          <h2 id="meaning-title">What this means</h2>
+          <h2 id="meaning-title">What makes a balanced meal?</h2>
           <div className="guide-copy">
             <p>
               Joy Health uses <em>balanced meal</em> as practical shorthand for

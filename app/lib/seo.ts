@@ -1,3 +1,5 @@
+import type { NutritionGuide } from "./publications";
+
 export const SITE_URL = "https://joyhealth.cc";
 
 type BreadcrumbItem = Readonly<{
@@ -19,5 +21,35 @@ export function buildBreadcrumbJsonLd(items: readonly BreadcrumbItem[]) {
       name,
       item: absoluteUrl(path),
     })),
+  };
+}
+
+export function buildArticleJsonLd(
+  guide: Pick<
+    NutritionGuide,
+    "path" | "title" | "description" | "datePublished"
+  >,
+) {
+  const canonicalUrl = absoluteUrl(guide.path);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": `${canonicalUrl}#article`,
+    mainEntityOfPage: canonicalUrl,
+    headline: guide.title,
+    description: guide.description,
+    author: {
+      "@type": "Organization",
+      name: "Joy Health",
+      url: `${SITE_URL}/`,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Joy Health",
+      url: `${SITE_URL}/`,
+    },
+    datePublished: guide.datePublished,
+    inLanguage: "en-US",
   };
 }

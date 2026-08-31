@@ -2,24 +2,26 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GuideContents } from "../../components/guide-contents";
 import { JsonLd } from "../../components/json-ld";
-import { buildBreadcrumbJsonLd } from "../../lib/seo";
+import {
+  ELECTROLYTE_DRINKS_GUIDE,
+  formatEditorialDate,
+} from "../../lib/publications";
+import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "../../lib/seo";
 
-const title = "Electrolyte drinks: read the label, then match the context";
-const description =
-  "A practical guide to reading electrolyte powders and sports drinks by serving size, sodium, potassium, carbohydrate, other active ingredients, and exercise context.";
-const canonicalUrl = "https://joyhealth.cc/nutrition/electrolyte-drinks";
+const guide = ELECTROLYTE_DRINKS_GUIDE;
+const { title, description } = guide;
 
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/nutrition/electrolyte-drinks" },
+  alternates: { canonical: guide.path },
   openGraph: {
     type: "article",
-    url: "/nutrition/electrolyte-drinks",
+    url: guide.path,
     siteName: "Joy Health",
     title: `${title} | Joy Health`,
     description,
-    publishedTime: "2026-08-29",
+    publishedTime: guide.datePublished,
     images: [],
   },
   twitter: {
@@ -30,31 +32,12 @@ export const metadata: Metadata = {
   },
 };
 
-const articleJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "@id": `${canonicalUrl}#article`,
-  mainEntityOfPage: canonicalUrl,
-  headline: title,
-  description,
-  author: {
-    "@type": "Organization",
-    name: "Joy Health",
-    url: "https://joyhealth.cc/",
-  },
-  publisher: {
-    "@type": "Organization",
-    name: "Joy Health",
-    url: "https://joyhealth.cc/",
-  },
-  datePublished: "2026-08-29",
-  inLanguage: "en-US",
-};
+const articleJsonLd = buildArticleJsonLd(guide);
 
 const breadcrumbJsonLd = buildBreadcrumbJsonLd([
   { name: "Home", path: "/" },
   { name: "Nutrition", path: "/nutrition" },
-  { name: "Electrolyte drinks", path: "/nutrition/electrolyte-drinks" },
+  { name: guide.breadcrumbLabel, path: guide.path },
 ]);
 
 function Citation({ source }: Readonly<{ source: number }>) {
@@ -89,14 +72,18 @@ export default function ElectrolyteDrinksGuide() {
           </p>
           <div className="guide-meta" aria-label="Article details">
             <p>Prepared by <strong>Joy Health</strong></p>
-            <p><time dateTime="2026-08-29">Published August 29, 2026</time></p>
+            <p>
+              <time dateTime={guide.datePublished}>
+                {`Published ${formatEditorialDate(guide.datePublished)}`}
+              </time>
+            </p>
           </div>
         </header>
 
         <GuideContents />
 
         <section className="guide-section" aria-labelledby="meaning-title">
-          <h2 id="meaning-title">What this means</h2>
+          <h2 id="meaning-title">Electrolytes vs. water: the context decides</h2>
           <div className="guide-copy">
             <p>
               Electrolytes are electrically charged minerals. Sodium helps
@@ -113,6 +100,11 @@ export default function ElectrolyteDrinksGuide() {
               The National Athletic Trainers&apos; Association says those
               differences make universal replacement instructions impossible.
               <Citation source={1} />
+            </p>
+            <p>
+              Start with the Joy Health guide to <Link href="/nutrition/hydration">how much water
+              counts as total water</Link> when the question is ordinary daily hydration rather
+              than a product or exercise decision.
             </p>
             <aside className="key-point" aria-label="Key point">
               <strong>“Contains electrolytes” names ingredients, not a need.</strong>{" "}

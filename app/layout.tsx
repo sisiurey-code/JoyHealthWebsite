@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { PUBLICATIONS } from "./lib/publications";
+import { SITE_URL } from "./lib/seo";
 
-const siteUrl = "https://joyhealth.cc";
-const homeTitle = "Joy Health | Nutrition guides that show their work";
-const description =
-  "Practical, evidence-aware guides to meals, nutrients, food labels, hydration, and supplements, with sources, tradeoffs, and limits attached.";
+const siteUrl = SITE_URL;
+const homeTitle = PUBLICATIONS.home.title;
+const description = PUBLICATIONS.home.description;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

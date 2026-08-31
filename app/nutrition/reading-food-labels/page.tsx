@@ -2,25 +2,26 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { GuideContents } from "../../components/guide-contents";
 import { JsonLd } from "../../components/json-ld";
-import { buildBreadcrumbJsonLd } from "../../lib/seo";
+import {
+  formatEditorialDate,
+  READING_FOOD_LABELS_GUIDE,
+} from "../../lib/publications";
+import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "../../lib/seo";
 
-const title = "How to read a Nutrition Facts label";
-const description =
-  "A practical guide to serving information, nutrients, percent Daily Value, ingredients, and allergen information on FDA-regulated packaged foods in the United States.";
-const canonicalUrl =
-  "https://joyhealth.cc/nutrition/reading-food-labels";
+const guide = READING_FOOD_LABELS_GUIDE;
+const { title, description } = guide;
 
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/nutrition/reading-food-labels" },
+  alternates: { canonical: guide.path },
   openGraph: {
     type: "article",
-    url: "/nutrition/reading-food-labels",
+    url: guide.path,
     siteName: "Joy Health",
     title: `${title} | Joy Health`,
     description,
-    publishedTime: "2026-08-28",
+    publishedTime: guide.datePublished,
     images: [],
   },
   twitter: {
@@ -31,33 +32,14 @@ export const metadata: Metadata = {
   },
 };
 
-const articleJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "@id": `${canonicalUrl}#article`,
-  mainEntityOfPage: canonicalUrl,
-  headline: title,
-  description,
-  author: {
-    "@type": "Organization",
-    name: "Joy Health",
-    url: "https://joyhealth.cc/",
-  },
-  publisher: {
-    "@type": "Organization",
-    name: "Joy Health",
-    url: "https://joyhealth.cc/",
-  },
-  datePublished: "2026-08-28",
-  inLanguage: "en-US",
-};
+const articleJsonLd = buildArticleJsonLd(guide);
 
 const breadcrumbJsonLd = buildBreadcrumbJsonLd([
   { name: "Home", path: "/" },
   { name: "Nutrition", path: "/nutrition" },
   {
-    name: "Reading food labels",
-    path: "/nutrition/reading-food-labels",
+    name: guide.breadcrumbLabel,
+    path: guide.path,
   },
 ]);
 
@@ -102,7 +84,9 @@ export default function FoodLabelsGuide() {
               Prepared by <strong>Joy Health</strong>
             </p>
             <p>
-              <time dateTime="2026-08-28">Published August 28, 2026</time>
+              <time dateTime={guide.datePublished}>
+                {`Published ${formatEditorialDate(guide.datePublished)}`}
+              </time>
             </p>
           </div>
         </header>
@@ -110,7 +94,9 @@ export default function FoodLabelsGuide() {
         <GuideContents />
 
         <section className="guide-section" aria-labelledby="meaning-title">
-          <h2 id="meaning-title">What this means</h2>
+          <h2 id="meaning-title">
+            Start with serving size, then use the 5% and 20% Daily Value rule
+          </h2>
           <div className="guide-copy">
             <p>
               The most useful first question is not whether the package is

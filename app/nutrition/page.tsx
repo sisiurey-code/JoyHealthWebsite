@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { NUTRITION_GUIDES, PUBLICATIONS } from "../lib/publications";
 
-const description =
-  "An evidence-aware nutrition library organized around food labels, nutrients, meals, hydration, and supplements.";
+const { description, title } = PUBLICATIONS.nutrition;
 
 export const metadata: Metadata = {
-  title: "Nutrition essentials",
+  title,
   description,
   alternates: { canonical: "/nutrition" },
   openGraph: {
     type: "website",
     url: "/nutrition",
     siteName: "Joy Health",
-    title: "Nutrition essentials | Joy Health",
+    title: `${title} | Joy Health`,
     description,
     images: [
       {
@@ -25,63 +25,27 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Nutrition essentials | Joy Health",
+    title: `${title} | Joy Health`,
     description,
     images: ["/og.png"],
   },
 };
 
-const guides = [
-  {
-    topic: "Building balanced meals",
-    title: "How to build a balanced meal without rigid rules",
-    description:
-      "A flexible way to notice what a meal already contains and decide whether one practical addition would be useful.",
-    href: "/nutrition/building-balanced-meals",
-  },
-  {
-    topic: "Protein and fiber",
-    title: "Protein and fiber: two different jobs in a meal",
-    description:
-      "Separate definitions, food sources, label values, and reference systems for two nutrients that should not become one score.",
-    href: "/nutrition/protein-and-fiber",
-  },
-  {
-    topic: "Reading food labels",
-    title: "How to read a Nutrition Facts label",
-    description:
-      "A repeatable way to interpret the serving basis, percent Daily Value, ingredients, and allergen information on FDA-regulated packaged foods in the United States.",
-    href: "/nutrition/reading-food-labels",
-  },
-  {
-    topic: "Carbohydrates and fats",
-    title: "Carbohydrates and fats: types, sources, and tradeoffs",
-    description:
-      "Open the umbrella terms, read their label subcategories, and keep the replacement food or nutrient in view.",
-    href: "/nutrition/carbohydrates-and-fats",
-  },
-  {
-    topic: "Hydration",
-    title: "Hydration: what counts and why needs vary",
-    description:
-      "Distinguish total water from plain water and read adult reference values with their derivation and limits attached.",
-    href: "/nutrition/hydration",
-  },
-  {
-    topic: "Supplement evidence and safety",
-    title: "How to evaluate supplement evidence and safety",
-    description:
-      "Separate what a label declares from marketing claims, supporting evidence, product identity, and personal safety.",
-    href: "/nutrition/supplement-evidence-and-safety",
-  },
-  {
-    topic: "Electrolyte drinks",
-    title: "Electrolyte drinks: read the label, then match the context",
-    description:
-      "Carry the hydration and supplement-reading skills into powders, sports drinks, and mixed-purpose active-nutrition products.",
-    href: "/nutrition/electrolyte-drinks",
-  },
-];
+const guideCount = NUTRITION_GUIDES.length;
+const guideCountWord =
+  [
+    "Zero",
+    "One",
+    "Two",
+    "Three",
+    "Four",
+    "Five",
+    "Six",
+    "Seven",
+    "Eight",
+    "Nine",
+    "Ten",
+  ][guideCount] ?? String(guideCount);
 
 export default function NutritionPage() {
   return (
@@ -89,7 +53,7 @@ export default function NutritionPage() {
       <section className="library-intro" aria-labelledby="nutrition-title">
         <div>
           <p className="eyebrow">Nutrition essentials</p>
-          <h1 id="nutrition-title">A clearer way into nutrition.</h1>
+          <h1 id="nutrition-title">Practical nutrition guides for everyday questions.</h1>
         </div>
         <div className="library-intro-copy">
           <p className="library-lede">
@@ -99,7 +63,7 @@ export default function NutritionPage() {
           </p>
           <dl className="library-ledger" aria-label="Library facts">
             <div>
-              <dt>7</dt>
+              <dt>{guideCount}</dt>
               <dd>completed guides</dd>
             </div>
             <div>
@@ -114,7 +78,9 @@ export default function NutritionPage() {
         <div className="section-kicker">
           <div>
             <p className="eyebrow">Available now</p>
-            <h2 id="guides-title">Seven practical places to begin.</h2>
+            <h2 id="guides-title">
+              {`${guideCountWord} practical places to begin.`}
+            </h2>
           </div>
           <p>
             Follow the suggested order or jump directly to the question in
@@ -122,21 +88,21 @@ export default function NutritionPage() {
           </p>
         </div>
         <ol className="guide-index">
-          {guides.map((guide, index) => (
-            <li key={guide.href}>
+          {NUTRITION_GUIDES.map((guide, index) => (
+            <li key={guide.path}>
               <p className="guide-number" aria-hidden="true">
                 0{index + 1}
               </p>
               <div>
                 <p className="guide-topic">{guide.topic}</p>
                 <h3>
-                  <Link href={guide.href}>{guide.title}</Link>
+                  <Link href={guide.path}>{guide.title}</Link>
                 </h3>
-                <p>{guide.description}</p>
+                <p>{guide.summary}</p>
               </div>
               <Link
                 className="guide-action"
-                href={guide.href}
+                href={guide.path}
                 aria-label={`Read ${guide.title}`}
               >
                 Read the guide <span aria-hidden="true">→</span>

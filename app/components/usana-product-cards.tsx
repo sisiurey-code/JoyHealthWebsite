@@ -22,13 +22,38 @@ type ProductCardProps = Readonly<{
   compactTitle?: boolean;
 }>;
 
-function ProductPhoto({ image }: Readonly<{ image: ProductImage }>) {
+const cardImageSizes =
+  "(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 560px";
+const featuredImageSizes = "(max-width: 1100px) 50vw, 560px";
+
+function responsiveImageSources(image: ProductImage) {
+  const basename = image.src.slice(
+    image.src.lastIndexOf("/") + 1,
+    image.src.lastIndexOf("."),
+  );
+  return [...new Set([
+    ...[320, 640, 960].filter((width) => width <= image.width),
+    image.width,
+  ])]
+    .sort((left, right) => left - right)
+    .map(
+      (width) =>
+        `/images/responsive/usana/${basename}-${width}.webp ${width}w`,
+    )
+    .join(", ");
+}
+
+function ProductPhoto({
+  image,
+  sizes = cardImageSizes,
+}: Readonly<{ image: ProductImage; sizes?: string }>) {
   return (
     <figure className="usana-product-figure">
-      {/* Product photography is kept at its source resolution. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={image.src}
+        srcSet={responsiveImageSources(image)}
+        sizes={sizes}
         alt={image.alt}
         width={image.width}
         height={image.height}
@@ -42,7 +67,8 @@ function ProductPhoto({ image }: Readonly<{ image: ProductImage }>) {
 function LabelPhoto({
   image,
   name,
-}: Readonly<{ image: ProductImage; name: string }>) {
+  sizes = cardImageSizes,
+}: Readonly<{ image: ProductImage; name: string; sizes?: string }>) {
   function setMagnifierOrigin(event: PointerEvent<HTMLAnchorElement>) {
     const bounds = event.currentTarget.getBoundingClientRect();
     const x = ((event.clientX - bounds.left) / bounds.width) * 100;
@@ -65,6 +91,8 @@ function LabelPhoto({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={image.src}
+          srcSet={responsiveImageSources(image)}
+          sizes={sizes}
           alt={image.alt}
           width={image.width}
           height={image.height}
@@ -135,8 +163,12 @@ function ProductCard({
           className={`usana-product-face usana-product-media usana-product-pair${activeState === 1 ? " is-active" : ""}`}
           aria-hidden={activeState !== 1}
         >
-          <ProductPhoto image={product} />
-          <LabelPhoto image={facts} name={name} />
+          <ProductPhoto image={product} sizes={featuredImageSizes} />
+          <LabelPhoto
+            image={facts}
+            name={name}
+            sizes={featuredImageSizes}
+          />
         </div>
       ) : (
         <>
@@ -412,8 +444,10 @@ export function UsanaProductCards() {
 
       <ProductCard
         name="Core Aminos"
+        title={<span className="usana-title-lock">Core Aminos</span>}
         label="Joy Health pick"
         editorPick
+        compactTitle
         {...products.coreAminos}
         fit={
           <>
