@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "./components/site-footer";
 import { SiteHeader } from "./components/site-header";
+
+export const metadata: Metadata = {
+  title: "Page not found",
+  description: "The requested Joy Health page does not exist.",
+  robots: { index: false, follow: false },
+};
 
 export default function NotFound() {
   return (

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { NUTRITION_GUIDES, PUBLICATIONS } from "../lib/publications";
+import { SITE_OG_IMAGE } from "../lib/seo";
+import { countWord } from "../lib/text";
 
 const { description, title } = PUBLICATIONS.nutrition;
 
@@ -14,42 +16,22 @@ export const metadata: Metadata = {
     siteName: "Joy Health",
     title: `${title} | Joy Health`,
     description,
-    images: [
-      {
-        url: "/og.png",
-        width: 1731,
-        height: 909,
-        alt: "Joy Health, healthy living made clearer",
-      },
-    ],
+    images: [SITE_OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: `${title} | Joy Health`,
     description,
-    images: ["/og.png"],
+    images: [SITE_OG_IMAGE.url],
   },
 };
 
 const guideCount = NUTRITION_GUIDES.length;
-const guideCountWord =
-  [
-    "Zero",
-    "One",
-    "Two",
-    "Three",
-    "Four",
-    "Five",
-    "Six",
-    "Seven",
-    "Eight",
-    "Nine",
-    "Ten",
-  ][guideCount] ?? String(guideCount);
+const guideCountWord = countWord(guideCount, { capitalize: true });
 
 export default function NutritionPage() {
   return (
-    <main>
+    <main id="main-content">
       <section className="library-intro" aria-labelledby="nutrition-title">
         <div>
           <p className="eyebrow">Nutrition essentials</p>
@@ -61,7 +43,7 @@ export default function NutritionPage() {
             and supplements. Joy Health links a guide here only after its scope,
             sources, and limits are complete.
           </p>
-          <dl className="library-ledger" aria-label="Library facts">
+          <dl className="library-ledger">
             <div>
               <dt>{guideCount}</dt>
               <dd>completed guides</dd>
@@ -103,7 +85,8 @@ export default function NutritionPage() {
               <Link
                 className="guide-action"
                 href={guide.path}
-                aria-label={`Read ${guide.title}`}
+                aria-hidden="true"
+                tabIndex={-1}
               >
                 Read the guide <span aria-hidden="true">→</span>
               </Link>
@@ -119,7 +102,7 @@ export default function NutritionPage() {
         </div>
         <ol>
           <li>
-            <span>01</span>
+            <span aria-hidden="true">01</span>
             <div>
               <h3>Begin with the meal</h3>
               <p>
@@ -129,7 +112,7 @@ export default function NutritionPage() {
             </div>
           </li>
           <li>
-            <span>02</span>
+            <span aria-hidden="true">02</span>
             <div>
               <h3>Learn the reference systems</h3>
               <p>
@@ -139,7 +122,7 @@ export default function NutritionPage() {
             </div>
           </li>
           <li>
-            <span>03</span>
+            <span aria-hidden="true">03</span>
             <div>
               <h3>Evaluate bigger claims</h3>
               <p>

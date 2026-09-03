@@ -58,7 +58,7 @@ export function HeroCarousel() {
             showNext();
           }
         }}
-        aria-label={`Show next wellness scene. Scene ${activeIndex + 1} of ${slides.length}: ${slides[activeIndex].title}`}
+        aria-label="Show the next wellness scene"
       >
         {slides.map((slide, index) => (
           // eslint-disable-next-line @next/next/no-img-element

@@ -9,7 +9,7 @@ export default function NutritionLayout({
   return (
     <div className="page-shell nutrition-shell">
       <SiteHeader active="nutrition" />
-      <div className="site-shell" id="main-content">
+      <div className="site-shell">
         {children}
       </div>
       <SiteFooter />

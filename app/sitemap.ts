@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { INDEXABLE_PUBLICATIONS } from "./lib/publications";
-import { SITE_URL } from "./lib/seo";
+import { absoluteUrl } from "./lib/seo";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return INDEXABLE_PUBLICATIONS.map((publication) => {
@@ -10,10 +10,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       undefined;
 
     return {
-      url:
-        publication.path === "/"
-          ? SITE_URL
-          : new URL(publication.path, `${SITE_URL}/`).toString(),
+      url: absoluteUrl(publication.path),
       ...(lastModified ? { lastModified } : {}),
     };
   });

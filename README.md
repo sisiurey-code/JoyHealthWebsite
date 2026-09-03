@@ -1,7 +1,7 @@
 # Joy Health
 
-[joyhealth.cc](https://joyhealth.cc) is an evidence-aware collection of
-source-traced nutrition guides.
+[joyhealth.cc](https://joyhealth.cc) publishes plain-language nutrition
+guides that cite their sources.
 
 The first release is intentionally static: no accounts, forms, database, or
 customer health data. Content and code remain reviewable in Git, and the site

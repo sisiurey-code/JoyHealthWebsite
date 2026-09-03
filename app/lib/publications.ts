@@ -13,7 +13,6 @@ type Publication = Readonly<{
 export type NutritionGuide = Publication &
   Readonly<{
     topic: string;
-    breadcrumbLabel: string;
     summary: string;
     datePublished: IsoDate;
   }>;
@@ -22,9 +21,9 @@ export const PUBLICATIONS = {
   home: {
     key: "home",
     path: "/",
-    title: "Joy Health | Nutrition guides that show their work",
+    title: "Healthy living, made clearer | Joy Health",
     description:
-      "Practical, evidence-aware guides to meals, nutrients, food labels, hydration, and supplements, with sources, tradeoffs, and limits attached.",
+      "Accessible guides to food labels, hydration, protein and fiber, and supplements. We cite every source and say when the evidence is uncertain.",
   },
   standards: {
     key: "standards",
@@ -46,8 +45,8 @@ export const PUBLICATIONS = {
     path: "/nutrition",
     title: "Nutrition guides: meals, labels, hydration, and supplements",
     description:
-      "An evidence-aware nutrition library organized around food labels, nutrients, meals, hydration, and supplements.",
-    dateModified: "2026-08-28",
+      "Accessible guides to meals, food labels, protein and fiber, carbohydrates and fats, hydration, electrolyte drinks, and supplements. Sources included.",
+    dateModified: "2026-08-29",
   },
 } as const satisfies Record<string, Publication>;
 
@@ -55,7 +54,6 @@ export const NUTRITION_GUIDES = [
   {
     key: "building-balanced-meals",
     topic: "Building balanced meals",
-    breadcrumbLabel: "Balanced meals",
     path: "/nutrition/building-balanced-meals",
     title: "How to build a balanced meal without rigid rules",
     description:
@@ -67,7 +65,6 @@ export const NUTRITION_GUIDES = [
   {
     key: "protein-and-fiber",
     topic: "Protein and fiber",
-    breadcrumbLabel: "Protein and fiber",
     path: "/nutrition/protein-and-fiber",
     title: "Protein and fiber foods: two different jobs in a meal",
     description:
@@ -79,7 +76,6 @@ export const NUTRITION_GUIDES = [
   {
     key: "reading-food-labels",
     topic: "Reading food labels",
-    breadcrumbLabel: "Reading food labels",
     path: "/nutrition/reading-food-labels",
     title: "How to read a Nutrition Facts label",
     description:
@@ -91,7 +87,6 @@ export const NUTRITION_GUIDES = [
   {
     key: "carbohydrates-and-fats",
     topic: "Carbohydrates and fats",
-    breadcrumbLabel: "Carbohydrates and fats",
     path: "/nutrition/carbohydrates-and-fats",
     title: "Carbohydrates and fats: types, sources, and tradeoffs",
     description:
@@ -103,7 +98,6 @@ export const NUTRITION_GUIDES = [
   {
     key: "hydration",
     topic: "Hydration",
-    breadcrumbLabel: "Hydration",
     path: "/nutrition/hydration",
     title: "How much water should you drink? Total water explained",
     description:
@@ -115,7 +109,6 @@ export const NUTRITION_GUIDES = [
   {
     key: "supplement-evidence-and-safety",
     topic: "Supplement evidence and safety",
-    breadcrumbLabel: "Supplement evidence and safety",
     path: "/nutrition/supplement-evidence-and-safety",
     title: "How to evaluate supplement evidence and safety",
     description:
@@ -127,7 +120,6 @@ export const NUTRITION_GUIDES = [
   {
     key: "electrolyte-drinks",
     topic: "Electrolyte drinks",
-    breadcrumbLabel: "Electrolyte drinks",
     path: "/nutrition/electrolyte-drinks",
     title: "Electrolytes vs. water: when do you need an electrolyte drink?",
     description:
@@ -138,13 +130,28 @@ export const NUTRITION_GUIDES = [
   },
 ] as const satisfies readonly NutritionGuide[];
 
-export const BALANCED_MEALS_GUIDE = NUTRITION_GUIDES[0];
-export const PROTEIN_AND_FIBER_GUIDE = NUTRITION_GUIDES[1];
-export const READING_FOOD_LABELS_GUIDE = NUTRITION_GUIDES[2];
-export const CARBOHYDRATES_AND_FATS_GUIDE = NUTRITION_GUIDES[3];
-export const HYDRATION_GUIDE = NUTRITION_GUIDES[4];
-export const SUPPLEMENT_EVIDENCE_GUIDE = NUTRITION_GUIDES[5];
-export const ELECTROLYTE_DRINKS_GUIDE = NUTRITION_GUIDES[6];
+type GuideKey = (typeof NUTRITION_GUIDES)[number]["key"];
+type GuideByKey<K extends GuideKey> = Extract<
+  (typeof NUTRITION_GUIDES)[number],
+  { key: K }
+>;
+
+/** Looks a guide up by its stable key, so reordering the list is safe. */
+export function getGuide<K extends GuideKey>(key: K): GuideByKey<K> {
+  const guide = NUTRITION_GUIDES.find((entry) => entry.key === key);
+  if (!guide) {
+    throw new Error(`Unknown nutrition guide: ${key}`);
+  }
+  return guide as GuideByKey<K>;
+}
+
+export const BALANCED_MEALS_GUIDE = getGuide("building-balanced-meals");
+export const PROTEIN_AND_FIBER_GUIDE = getGuide("protein-and-fiber");
+export const READING_FOOD_LABELS_GUIDE = getGuide("reading-food-labels");
+export const CARBOHYDRATES_AND_FATS_GUIDE = getGuide("carbohydrates-and-fats");
+export const HYDRATION_GUIDE = getGuide("hydration");
+export const SUPPLEMENT_EVIDENCE_GUIDE = getGuide("supplement-evidence-and-safety");
+export const ELECTROLYTE_DRINKS_GUIDE = getGuide("electrolyte-drinks");
 
 export const INDEXABLE_PUBLICATIONS = [
   PUBLICATIONS.home,

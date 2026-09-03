@@ -1,41 +1,28 @@
+const sections = [
+  { id: "meaning-title", label: "Meaning" },
+  { id: "evidence-title", label: "Evidence and context" },
+  { id: "use-title", label: "Practical use" },
+  { id: "limits-title", label: "Limits" },
+  { id: "sources-title", label: "Sources" },
+] as const;
+
+/** In-page table of contents shared by every nutrition guide. */
 export function GuideContents() {
   return (
-    <nav className="guide-contents" aria-label="In this guide">
-      <p className="guide-contents-label">
+    <nav className="guide-contents" aria-labelledby="guide-contents-label">
+      <p className="guide-contents-label" id="guide-contents-label">
         <span aria-hidden="true">[•]</span>
         In this guide
       </p>
       <ol>
-        <li>
-          <a href="#meaning-title">
-            <span>01</span>
-            Meaning
-          </a>
-        </li>
-        <li>
-          <a href="#evidence-title">
-            <span>02</span>
-            Evidence and context
-          </a>
-        </li>
-        <li>
-          <a href="#use-title">
-            <span>03</span>
-            Practical use
-          </a>
-        </li>
-        <li>
-          <a href="#limits-title">
-            <span>04</span>
-            Limits
-          </a>
-        </li>
-        <li>
-          <a href="#sources-title">
-            <span>05</span>
-            Sources
-          </a>
-        </li>
+        {sections.map((section, index) => (
+          <li key={section.id}>
+            <a href={`#${section.id}`}>
+              <span aria-hidden="true">0{index + 1}</span>
+              {section.label}
+            </a>
+          </li>
+        ))}
       </ol>
     </nav>
   );

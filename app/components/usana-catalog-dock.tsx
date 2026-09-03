@@ -63,7 +63,9 @@ function keepDockInView(dock: HTMLElement, next: Offset, current: Offset): Offse
 export function UsanaCatalogDock() {
   const dockRef = useRef<HTMLElement>(null);
   const dragSessionRef = useRef<DragSession | null>(null);
-  const [isOpen, setIsOpen] = useState(true);
+  // Closed by default so the page content leads; a reader who opened the
+  // panel keeps it open on later visits.
+  const [isOpen, setIsOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState<Offset>({ x: 0, y: 0 });
 
@@ -71,8 +73,8 @@ export function UsanaCatalogDock() {
     let frame: number | undefined;
 
     try {
-      if (window.localStorage.getItem(preferenceKey) === "closed") {
-        frame = window.requestAnimationFrame(() => setIsOpen(false));
+      if (window.localStorage.getItem(preferenceKey) === "open") {
+        frame = window.requestAnimationFrame(() => setIsOpen(true));
       }
     } catch {
       // The panel remains usable when storage is unavailable.
@@ -108,7 +110,7 @@ export function UsanaCatalogDock() {
   }
 
   return (
-    <section className="usana-catalog-region" aria-label="USANA product catalog">
+    <section className="usana-catalog-region" aria-label="Storefront">
       <aside
         className={`usana-catalog-dock${isOpen ? " is-open" : ""}`}
         data-dragging={isDragging ? "true" : undefined}
@@ -171,16 +173,16 @@ export function UsanaCatalogDock() {
           }}
         >
           <span className="usana-catalog-heading">
-            <span className="eyebrow">USANA storefront</span>
-            <strong id="catalog-dock-title">Explore formulas, labels, and prices</strong>
+            <span className="eyebrow">Storefront</span>
+            <strong id="catalog-dock-title">Prices and current formulas</strong>
           </span>
           <span className="usana-catalog-controls">
             <button
               className="usana-catalog-toggle"
               type="button"
               aria-expanded={isOpen}
-              aria-controls="usana-catalog-panel"
-              aria-label={isOpen ? "Minimize the catalog panel" : "Expand the catalog panel"}
+              aria-controls={isOpen ? "usana-catalog-panel" : undefined}
+              aria-label={isOpen ? "Minimize the storefront panel" : "Expand the storefront panel"}
               onClick={() => rememberOpenState(!isOpen)}
             >
               <span aria-hidden="true" />
@@ -203,7 +205,7 @@ export function UsanaCatalogDock() {
                 change the evidence standards or the order of products.
               </p>
               <a href={USANA_STOREFRONT_URL} rel="sponsored">
-                Browse the USANA catalog <span aria-hidden="true">↗</span>
+                Open the storefront <span aria-hidden="true">↗</span>
               </a>
               <small>You&apos;ll leave Joy Health for sissi.usana.com.</small>
             </div>

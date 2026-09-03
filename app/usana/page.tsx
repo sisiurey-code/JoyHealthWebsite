@@ -3,9 +3,16 @@ import Link from "next/link";
 import { SiteFooter } from "../components/site-footer";
 import { SiteHeader } from "../components/site-header";
 import { formatEditorialDate, PUBLICATIONS } from "../lib/publications";
+import { ProductShelf } from "../components/product-shelf";
 import { UsanaCatalogDock } from "../components/usana-catalog-dock";
 import { UsanaProductCards } from "../components/usana-product-cards";
-import { USANA_STOREFRONT_URL } from "../lib/usana";
+import { SITE_OG_IMAGE } from "../lib/seo";
+import { countWord } from "../lib/text";
+import {
+  PRODUCT_SHELF,
+  USANA_PRODUCT_COUNT,
+  USANA_STOREFRONT_URL,
+} from "../lib/usana";
 
 const usana = PUBLICATIONS.usana;
 const { description, title } = usana;
@@ -20,20 +27,13 @@ export const metadata: Metadata = {
     siteName: "Joy Health",
     title: `${title} | Joy Health`,
     description,
-    images: [
-      {
-        url: "/og.png",
-        width: 1731,
-        height: 909,
-        alt: "Joy Health, healthy living made clearer",
-      },
-    ],
+    images: [SITE_OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: `${title} | Joy Health`,
     description,
-    images: ["/og.png"],
+    images: [SITE_OG_IMAGE.url],
   },
 };
 
@@ -46,9 +46,9 @@ export default function UsanaPage() {
         <section className="usana-hero" aria-labelledby="usana-title">
           <div className="usana-hero-inner content-shell">
             <div className="usana-hero-copy">
-              <p className="eyebrow">USANA · Product guide</p>
+              <p className="eyebrow">Supplement guide</p>
               <h1 id="usana-title">
-                Find the USANA products that fit your routine.
+                Highlighted supplements, compared label by label.
               </h1>
               <p>
                 Compare flagship systems and focused formulas, see how their labels
@@ -56,32 +56,27 @@ export default function UsanaPage() {
                 limits in view before you choose.
               </p>
               <div className="usana-hero-actions">
-                <a
-                  className="usana-catalog-link"
-                  href={USANA_STOREFRONT_URL}
-                  rel="sponsored"
-                >
-                  Explore the catalog <span aria-hidden="true">↗</span>
-                </a>
+                <Link className="usana-products-link" href="#products">
+                  See the products <span aria-hidden="true">↓</span>
+                </Link>
                 <Link href="/nutrition/supplement-evidence-and-safety">
-                  Read the supplement guide
+                  Read the supplement evidence guide
                 </Link>
               </div>
               <p className="usana-hero-affiliate-note">
-                Affiliate link: Joy Health may earn a commission. Our evidence
-                standards do not change.
+                The products on this page are made by USANA. Storefront links
+                are affiliate links: Joy Health may earn a commission, and our
+                evidence standards do not change.
               </p>
             </div>
 
-            <div className="usana-word-display" aria-label="USANA">
-              <span>Holistic health product systems</span>
-              <strong>USANA</strong>
-              <p>Control · Verification · Development</p>
-            </div>
+            <ProductShelf
+              caption={`${countWord(PRODUCT_SHELF.length, { capitalize: true })} of the ${countWord(USANA_PRODUCT_COUNT)} highlighted products, reviewed below. The storefront carries the full catalog.`}
+            />
           </div>
         </section>
 
-        <section className="usana-signal-band" aria-label="USANA evidence signals">
+        <section className="usana-signal-band" aria-label="Manufacturer evidence signals">
           <dl className="content-shell">
             <div>
               <dt>67%</dt>
@@ -123,12 +118,14 @@ export default function UsanaPage() {
           <header className="usana-products-heading">
             <div>
               <p className="eyebrow">Start here</p>
-              <h2 id="products-title">Decide where your journey to a healthy life starts with USANA.</h2>
+              <h2 id="products-title">Decide where a routine starts.</h2>
             </div>
             <div>
               <p>
-                The flagships provide essentials and packaged baselines, followed by focused formulas that are
-                easier to compare and complement the routine. Product order is editorial, dive into the catalog for comprehensive information.
+                The flagships provide essentials and packaged baselines, followed
+                by focused formulas that are easier to compare and complement the
+                routine. Select a card to switch between the product and its
+                Supplement Facts label. Product order is editorial.
               </p>
               <div className="usana-products-criteria">
                 <p className="usana-products-criteria-label">Product selection criteria</p>
@@ -150,7 +147,7 @@ export default function UsanaPage() {
               label and avoid paying twice for overlapping ingredients.
             </p>
             <a href={USANA_STOREFRONT_URL} rel="sponsored">
-              Compare the flagship products <span aria-hidden="true">↗</span>
+              See prices and current formulas <span aria-hidden="true">↗</span>
             </a>
           </div>
         </section>
@@ -307,7 +304,9 @@ export default function UsanaPage() {
 
               <div className="usana-innovation-conversion">
                 <p>
-                  The button opens USANA&apos;s site. Check the serving size, Supplement Facts, and specific ingredients before choosing.
+                  The button opens the manufacturer&apos;s storefront. Check the
+                  serving size, Supplement Facts, and specific ingredients before
+                  choosing.
                 </p>
                 <a href={USANA_STOREFRONT_URL} rel="sponsored">
                   See what is available now <span aria-hidden="true">↗</span>

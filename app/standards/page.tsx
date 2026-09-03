@@ -2,34 +2,28 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "../components/site-footer";
 import { SiteHeader } from "../components/site-header";
+import { PUBLICATIONS } from "../lib/publications";
+import { SITE_OG_IMAGE } from "../lib/seo";
+
+const { description, title } = PUBLICATIONS.standards;
 
 export const metadata: Metadata = {
-  title: "Editorial and recommendation standards",
-  description:
-    "How Joy Health researches, writes, updates, and discloses its educational guides and product recommendations.",
+  title,
+  description,
   alternates: { canonical: "/standards" },
   openGraph: {
     type: "website",
     siteName: "Joy Health",
     url: "/standards",
-    title: "Editorial and recommendation standards | Joy Health",
-    description:
-      "How Joy Health researches, writes, updates, and discloses its educational guides and product recommendations.",
-    images: [
-      {
-        url: "/og.png",
-        width: 1731,
-        height: 909,
-        alt: "Joy Health, healthy living made clearer",
-      },
-    ],
+    title: `${title} | Joy Health`,
+    description,
+    images: [SITE_OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Editorial and recommendation standards | Joy Health",
-    description:
-      "How Joy Health researches, writes, updates, and discloses its educational guides and product recommendations.",
-    images: ["/og.png"],
+    title: `${title} | Joy Health`,
+    description,
+    images: [SITE_OG_IMAGE.url],
   },
 };
 
@@ -73,7 +67,7 @@ export default function StandardsPage() {
             guide and recommendation we publish.
           </p>
         </section>
-        <div className="policy-grid" aria-label="Editorial standards">
+        <div className="policy-grid">
           {standards.map((standard, index) => (
             <section key={standard.title}>
               <p className="standard-number" aria-hidden="true">

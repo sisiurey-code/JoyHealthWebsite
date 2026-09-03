@@ -32,18 +32,18 @@ export function SiteHeader({ active }: SiteHeaderProps) {
               Nutrition
             </Link>
             <Link
+              className={active === "usana" ? "is-active" : undefined}
+              href="/usana"
+              aria-current={active === "usana" ? "page" : undefined}
+            >
+              Supplements
+            </Link>
+            <Link
               className={active === "standards" ? "is-active" : undefined}
               href="/standards"
               aria-current={active === "standards" ? "page" : undefined}
             >
               Standards
-            </Link>
-            <Link
-              className={active === "usana" ? "is-active" : undefined}
-              href="/usana"
-              aria-current={active === "usana" ? "page" : undefined}
-            >
-              USANA
             </Link>
           </nav>
         </header>

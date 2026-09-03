@@ -2,11 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { HeroCarousel } from "./components/hero-carousel";
 import { JsonLd } from "./components/json-ld";
+import { ProductShelf } from "./components/product-shelf";
 import { SiteFooter } from "./components/site-footer";
 import { SiteHeader } from "./components/site-header";
-import { NUTRITION_GUIDES } from "./lib/publications";
+import {
+  BALANCED_MEALS_GUIDE,
+  NUTRITION_GUIDES,
+  PUBLICATIONS,
+  READING_FOOD_LABELS_GUIDE,
+  SUPPLEMENT_EVIDENCE_GUIDE,
+} from "./lib/publications";
 import { SITE_URL } from "./lib/seo";
-import { USANA_STOREFRONT_URL } from "./lib/usana";
+import { countWord } from "./lib/text";
+import { USANA_PRODUCT_COUNT, USANA_STOREFRONT_URL } from "./lib/usana";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -19,8 +27,7 @@ const websiteJsonLd = {
   url: `${SITE_URL}/`,
   name: "Joy Health",
   alternateName: "joyhealth.cc",
-  description:
-    "Practical, evidence-aware guides to meals, nutrients, food labels, hydration, and supplements, with sources, tradeoffs, and limits attached.",
+  description: PUBLICATIONS.home.description,
   inLanguage: "en-US",
 };
 
@@ -32,7 +39,7 @@ const organizationJsonLd = {
   alternateName: "joyhealth.cc",
   url: `${SITE_URL}/`,
   description:
-    "An educational publisher of evidence-aware nutrition guides.",
+    "Joy Health publishes plain-language nutrition guides and supplement comparisons for general readers.",
   logo: {
     "@type": "ImageObject",
     url: `${SITE_URL}/favicon.svg`,
@@ -40,6 +47,12 @@ const organizationJsonLd = {
     height: 512,
   },
 };
+
+const featuredGuides = [
+  BALANCED_MEALS_GUIDE,
+  READING_FOOD_LABELS_GUIDE,
+  SUPPLEMENT_EVIDENCE_GUIDE,
+] as const;
 
 const method = [
   {
@@ -71,21 +84,22 @@ export default function Home() {
             <div className="hero-content">
               <p className="hero-kicker">
                 <span aria-hidden="true">01</span>
-                Food, products, and better questions
+                Food, supplements, and better questions
               </p>
               <h1 id="hero-title">
                 Healthy living, made clearer.
               </h1>
               <p className="hero-copy">
-                Practical nutrition guidance, premium wellness products, and
-                the evidence needed to judge both.
+                Practical nutrition guidance, a short list of supplements worth
+                understanding, and the evidence needed to judge both.
               </p>
               <div className="hero-actions">
-                <Link className="primary-link" href="/usana">
-                  Explore premium USANA <span aria-hidden="true">→</span>
+                <Link className="primary-link" href="/nutrition#guides-title">
+                  {`Browse ${NUTRITION_GUIDES.length} practical guides`}{" "}
+                  <span aria-hidden="true">→</span>
                 </Link>
-                <Link className="text-link" href="/nutrition#guides-title">
-                  {`Browse ${NUTRITION_GUIDES.length} practical guides`}
+                <Link className="text-link" href="/usana#products">
+                  Compare the supplements
                 </Link>
               </div>
               <aside
@@ -105,24 +119,69 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="brand-feature" aria-labelledby="brand-feature-title">
-          <div className="brand-feature-inner content-shell">
-            <div className="brand-feature-copy">
+        <section
+          className="home-guides content-shell"
+          aria-labelledby="home-guides-title"
+        >
+          <header className="home-guides-heading">
+            <div>
               <p className="eyebrow section-kicker-numbered">
                 <span aria-hidden="true">02</span>
-                Featured partner · USANA
+                Start with a question
               </p>
-              <h2 id="brand-feature-title">
-                Build a better routine with products worth understanding.
+              <h2 id="home-guides-title">
+                Answers you can check for yourself.
+              </h2>
+            </div>
+            <p>
+              Each guide names its scope, links the sources it read, and states
+              what the evidence cannot settle. Start with the meal, then the
+              label, then the bigger claims.
+            </p>
+          </header>
+          <ol className="home-guide-list">
+            {featuredGuides.map((guide) => (
+              <li key={guide.path}>
+                <p className="guide-topic">{guide.topic}</p>
+                <h3>
+                  <Link href={guide.path}>{guide.title}</Link>
+                </h3>
+                <p>{guide.summary}</p>
+                <Link
+                  className="guide-action"
+                  href={guide.path}
+                  aria-hidden="true"
+                  tabIndex={-1}
+                >
+                  Read the guide <span aria-hidden="true">→</span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+          <div className="home-guides-footer">
+            <p>{`${NUTRITION_GUIDES.length} guides, all complete before they are linked.`}</p>
+            <Link className="text-link" href="/nutrition#guides-title">
+              See every guide
+            </Link>
+          </div>
+        </section>
+
+        <section className="product-feature" aria-labelledby="product-feature-title">
+          <div className="product-feature-inner content-shell">
+            <div className="product-feature-copy">
+              <p className="eyebrow section-kicker-numbered">
+                <span aria-hidden="true">03</span>
+                Supplements, compared
+              </p>
+              <h2 id="product-feature-title">
+                A short list of products worth understanding.
               </h2>
               <p>
-                See how the flagships differ, what the single-purpose formulas contain,
-                and where newer formats fit. Supporting evidence and caveats sit
-                beside the products they describe.
+                {`${countWord(USANA_PRODUCT_COUNT, { capitalize: true })} highlighted formulas, each shown with its current Supplement Facts label, its stated purpose, and where it overlaps with the others. The evidence and the caveats sit beside the product they describe, not on a separate page.`}
               </p>
-              <div className="brand-feature-actions">
-                <Link className="primary-link" href="/usana">
-                  Explore USANA <span aria-hidden="true">→</span>
+              <div className="product-feature-actions">
+                <Link className="primary-link" href="/usana#products">
+                  Compare the products <span aria-hidden="true">→</span>
                 </Link>
                 <Link className="brand-evidence-link" href="/usana#quality">
                   See the quality evidence
@@ -130,14 +189,14 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="brand-feature-display">
-              <p>Nutritionals · Active living · Skincare</p>
-              <strong>USANA</strong>
-              <div className="brand-feature-catalog">
+            <div className="product-feature-display">
+              <ProductShelf />
+              <div className="product-feature-catalog">
                 <p>
-                  <strong>Affiliate disclosure:</strong> Joy Health may earn a
-                  commission when you shop through this link. The price and our
-                  evidence standards do not change.
+                  <strong>Affiliate disclosure:</strong> these are USANA
+                  products, and Joy Health may earn a commission when you shop
+                  through this link. The price and our evidence standards do
+                  not change.
                 </p>
                 <a href={USANA_STOREFRONT_URL} rel="sponsored">
                   See current products and prices <span aria-hidden="true">↗</span>
@@ -155,7 +214,7 @@ export default function Home() {
           <div className="method-inner content-shell">
             <header className="method-heading">
               <p className="eyebrow section-kicker-numbered">
-                <span aria-hidden="true">03</span>
+                <span aria-hidden="true">04</span>
                 How we work
               </p>
               <h2 id="standards-title">Curious, cheerful, and careful.</h2>
