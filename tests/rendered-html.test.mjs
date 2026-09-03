@@ -117,7 +117,7 @@ test("server-renders an indexable, self-canonical home page", async () => {
   assert.match(html, /<html[^>]+lang="en"/i);
   assert.match(
     html,
-    /<title>Joy Health \| Nutrition guides that show their work<\/title>/i,
+    /<title>Healthy living, made clearer \| Joy Health<\/title>/i,
   );
   assert.match(
     html,
@@ -125,7 +125,7 @@ test("server-renders an indexable, self-canonical home page", async () => {
   );
   assert.match(
     html,
-    /<meta property="og:image" content="https:\/\/joyhealth\.cc\/og\.png"/i,
+    /<meta property="og:image" content="https:\/\/joyhealth\.cc\/og\.jpg"/i,
   );
   assert.match(
     html,
@@ -142,19 +142,29 @@ test("server-renders an indexable, self-canonical home page", async () => {
   );
   assert.match(
     html,
-    /href="\/nutrition#guides-title"[^>]*>[\s\S]*Browse 7 practical guides/i,
+    /href="\/nutrition#guides-title"[^>]*>Browse the guides/i,
   );
   assert.match(
     html,
-    /href="\/usana"[^>]*>USANA<\/a>/i,
+    /href="\/usana"[^>]*>Supplements<\/a>/i,
   );
-  assert.match(html, /<span aria-hidden="true">02<\/span>\s*Featured partner · USANA/i);
-  assert.match(html, /Build a better routine with products worth understanding\./i);
-  assert.match(html, /href="\/usana"[^>]*>[\s\S]*Explore USANA/i);
-  assert.match(html, /href="\/usana#quality"[^>]*>See the quality evidence/i);
+  assert.doesNotMatch(html, /<nav[^>]*Primary navigation[\s\S]*?>USANA<\/a>/i);
+  assert.match(html, /<span aria-hidden="true">02<\/span>\s*Start with a question/i);
+  assert.match(html, /<h2[^>]*>Good places to start\.<\/h2>/i);
+  assert.doesNotMatch(html, /Curious, cheerful|Trust is part of the product/i);
+  assert.doesNotMatch(html, /evidence-aware|show their work|limits attached/i);
+  assert.match(html, /href="\/nutrition\/building-balanced-meals"/i);
+  assert.match(html, /href="\/nutrition\/reading-food-labels"/i);
+  assert.match(html, /href="\/nutrition\/supplement-evidence-and-safety"/i);
+  assert.doesNotMatch(html, /href="\/nutrition\/hydration"/i);
   assert.doesNotMatch(html, /class="guide-index"/i);
-  assert.doesNotMatch(html, /href="\/nutrition\/building-balanced-meals"/i);
-  assert.doesNotMatch(html, /href="\/nutrition\/protein-and-fiber"/i);
+  assert.match(html, /<span aria-hidden="true">03<\/span>\s*Supplements, compared/i);
+  assert.match(html, /A few supplements, looked at closely\./i);
+  assert.match(html, /href="\/usana#products"[^>]*>Compare the products/i);
+  assert.match(html, /href="\/usana#quality"[^>]*>See the quality evidence/i);
+  assert.match(html, /class="product-shelf-grid"/i);
+  assert.match(html, /\/images\/responsive\/usana\/cellsentials-product-320\.webp 320w/i);
+  assert.match(html, /\/images\/responsive\/usana\/coquinone-product-320\.webp 320w/i);
   assert.equal(
     html.match(/<a[^>]*href="https:\/\/sissi\.usana\.com\/"/gi)?.length,
     1,
@@ -162,10 +172,10 @@ test("server-renders an indexable, self-canonical home page", async () => {
   );
   assert.match(
     html,
-    /Featured partner · USANA[\s\S]*class="brand-feature-catalog"[\s\S]*href="https:\/\/sissi\.usana\.com\/"[^>]*rel="sponsored"/i,
+    /Supplements, compared[\s\S]*class="product-feature-catalog"[\s\S]*Affiliate disclosure:[\s\S]*these are USANA[\s\S]*href="https:\/\/sissi\.usana\.com\/"[^>]*rel="sponsored"/i,
   );
   assert.match(html, /See current products and prices/i);
-  assert.match(html, /<span aria-hidden="true">03<\/span>\s*How we work/i);
+  assert.match(html, /<span aria-hidden="true">04<\/span>\s*How we work/i);
   assert.doesNotMatch(html, /—/);
   assert.match(html, /general education, not medical advice/i);
   assert.doesNotMatch(html, /react-loading-skeleton/i);
@@ -209,11 +219,11 @@ test("gives the standards page unique metadata", async () => {
   );
   assert.match(
     html,
-    /<meta property="og:image" content="https:\/\/joyhealth\.cc\/og\.png"/i,
+    /<meta property="og:image" content="https:\/\/joyhealth\.cc\/og\.jpg"/i,
   );
   assert.match(html, /<meta property="og:type" content="website"/i);
   assert.match(html, /<meta property="og:site_name" content="Joy Health"/i);
-  assert.match(html, /Disclosures where they matter/i);
+  assert.match(html, /Where disclosures appear/i);
 });
 
 test("publishes a source-linked USANA testing, quality, and manufacturing page", async () => {
@@ -239,8 +249,14 @@ test("publishes a source-linked USANA testing, quality, and manufacturing page",
   );
   assert.match(
     html,
-    /<h1[^>]*>\s*Find the USANA products that fit your routine\.\s*<\/h1>/i,
+    /<h1[^>]*>\s*Highlighted supplements, compared label by label\.\s*<\/h1>/i,
   );
+  assert.match(html, /<p class="eyebrow">Supplement guide<\/p>/i);
+  assert.match(html, /href="#products"[^>]*class="usana-products-link"/i);
+  assert.match(html, /The products on this page are made by USANA\. Storefront links[\s\S]*affiliate links/i);
+  assert.match(html, /class="product-shelf-grid"/i);
+  assert.match(html, /A few of the products reviewed below\./i);
+  assert.doesNotMatch(html, /usana-word-display/i);
   assert.match(
     html,
     /Compare flagship systems and focused formulas[\s\S]*before you choose/i,
@@ -251,7 +267,7 @@ test("publishes a source-linked USANA testing, quality, and manufacturing page",
     html,
     /<h3><span class="usana-title-lock">Core Aminos<\/span><\/h3>/i,
   );
-  assert.match(html, /aria-current="page"[^>]*>USANA<\/a>/i);
+  assert.match(html, /aria-current="page"[^>]*>Supplements<\/a>/i);
   assert.match(html, /67%[\s\S]*manufacturing, production, and quality control/i);
   assert.match(html, /12[\s\S]*NSF\/ANSI 173 official listing/i);
   assert.match(
@@ -260,7 +276,7 @@ test("publishes a source-linked USANA testing, quality, and manufacturing page",
   );
   assert.match(html, /\$10\.7M[\s\S]*research and development in 2025/i);
   assert.match(html, /CellSentials was reformulated in 2025\./i);
-  assert.match(html, /Decide where your journey to a healthy life starts with USANA\./i);
+  assert.match(html, /<h2[^>]*>A closer look at each product\.<\/h2>/i);
   assert.match(html, /class="usana-products-criteria-label">Product selection criteria/i);
   assert.match(html, /Flagship foundation[\s\S]*CellSentials/i);
   assert.match(html, /Flagship convenience[\s\S]*HealthPak/i);
@@ -273,12 +289,17 @@ test("publishes a source-linked USANA testing, quality, and manufacturing page",
     /class="usana-title-lock">Clear Protein<\/span> \+ Creatine/i,
   );
   assert.doesNotMatch(html, /Otherwise, the combination may add cost/i);
-  assert.match(html, /Showing Details for CellSentials, 1 of 2\. Show Product \+ label\./i);
-  assert.match(html, /Showing Details for HealthPak, 1 of 2\. Show Product \+ label\./i);
+  assert.match(html, /Showing the overview for CellSentials\. Show the Supplement Facts label\./i);
+  assert.match(html, /Showing the overview for HealthPak\. Show the Supplement Facts label\./i);
   assert.equal(
-    html.match(/Showing Details for [^<"]+, 1 of 3\. Show Product\./gi)?.length,
-    6,
-    "expected six three-state product cards",
+    html.match(/Showing the overview for [^<"]+\. Show the Supplement Facts label\./gi)?.length,
+    8,
+    "expected eight two-state product cards",
+  );
+  assert.equal(
+    html.match(/class="usana-product-face usana-product-overview is-active"/gi)?.length,
+    8,
+    "expected every card to show its product photo by default",
   );
   for (const image of [
     "cellsentials",
@@ -294,7 +315,7 @@ test("publishes a source-linked USANA testing, quality, and manufacturing page",
     assert.match(html, new RegExp(`/images/usana/${image}-label\\.png`, "i"));
   }
   assert.match(html, /Clear Protein \+ Creatine Mix/i);
-  assert.match(html, /USANA Clear Protein Drink puts clear whey in a can\./i);
+  assert.match(html, /Clear Protein Drink is ready-to-drink clear whey\./i);
   assert.match(html, /Each piña colada can contains 22 grams of clear whey protein/i);
   assert.match(html, /https:\/\/www\.buynutritionals\.com\/usana-clear-protein-drink/i);
   assert.doesNotMatch(html, /Protein Pop|Rise Wellness/i);
@@ -328,24 +349,26 @@ test("publishes a source-linked USANA testing, quality, and manufacturing page",
   assert.match(html, /https:\/\/ir\.usana\.com\/sustainability/i);
   assert.match(html, /usana-expands-its-nutritionals-line-with-powerful-new/i);
   assert.match(html, /https:\/\/www\.fda\.gov\/food\/information-consumers-using-dietary-supplements\/questions-and-answers-dietary-supplements/i);
-  assert.match(html, /<aside[^>]*class="usana-catalog-dock is-open"[^>]*id="catalog"/i);
-  assert.doesNotMatch(html, /usana-catalog-grip/i);
-  assert.match(html, /aria-expanded="true"[^>]*aria-controls="usana-catalog-panel"/i);
-  assert.match(html, /Explore formulas, labels, and prices/i);
-  assert.match(html, /You(?:&#x27;|')ll leave Joy Health for sissi\.usana\.com\./i);
+  assert.match(html, /<aside[^>]*class="usana-catalog-dock"[^>]*id="catalog"/i);
+  assert.doesNotMatch(html, /usana-catalog-dock is-open/i);
+  assert.match(html, /aria-expanded="false"[^>]*aria-label="Expand the storefront panel"/i);
+  assert.doesNotMatch(html, /aria-controls="usana-catalog-panel"/i);
+  assert.match(html, /Prices and current formulas/i);
+  assert.doesNotMatch(html, /USANA storefront/i);
   assert.doesNotMatch(html, /The useful urgency/i);
   assert.match(
     html,
-    /Careful health education, with sources, context, and limits attached\./i,
+    /Friendly nutrition guides that show where the facts come from\./i,
   );
   assert.equal(
     html.match(/<a[^>]*href="https:\/\/sissi\.usana\.com\/"/gi)?.length,
-    4,
-    "expected four clearly disclosed storefront links on the USANA page",
+    2,
+    "expected two clearly disclosed storefront links on the USANA page",
   );
-  assert.match(
-    html,
-    /class="usana-catalog-link"[^>]*href="https:\/\/sissi\.usana\.com\/"[^>]*rel="sponsored"[\s\S]*Affiliate link: Joy Health may earn a commission/i,
+  assert.equal(
+    html.match(/<a[^>]*href="https:\/\/sissi\.usana\.com\/"[^>]*rel="sponsored"/gi)?.length,
+    2,
+    "expected every storefront link to carry rel=sponsored",
   );
   assert.match(
     html,
@@ -366,7 +389,7 @@ test("publishes a nutrition hub with only complete guides linked", async () => {
   );
   assert.match(
     html,
-    /<meta name="description" content="An evidence-aware nutrition library organized around food labels, nutrients, meals, hydration, and supplements\."/i,
+    /<meta name="description" content="Accessible guides to meals, food labels, protein and fiber, carbohydrates and fats, hydration, electrolyte drinks, and supplements\. Sources included\."/i,
   );
   assert.match(
     html,
@@ -380,7 +403,7 @@ test("publishes a nutrition hub with only complete guides linked", async () => {
     html,
     /<h1[^>]*>Practical nutrition guides for everyday questions\.<\/h1>/i,
   );
-  assert.match(html, /Seven practical places to begin/i);
+  assert.match(html, /The guides, in a sensible order\./i);
   assert.match(html, /href="\/nutrition\/building-balanced-meals"/i);
   assert.match(html, /href="\/nutrition\/protein-and-fiber"/i);
   assert.match(html, /href="\/nutrition\/reading-food-labels"/i);
@@ -396,8 +419,8 @@ test("serves responsive USANA display images while linking original labels", asy
   const response = await render("/usana");
   const html = await response.text();
   const cardSizes =
-    "(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 560px";
-  const featuredSizes = "(max-width: 1100px) 50vw, 560px";
+    "(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 400px";
+  const featuredSizes = "(max-width: 760px) 100vw, 480px";
 
   assert.equal(response.status, 200);
   assert.doesNotMatch(html, /\/_next\/image/i);
@@ -674,6 +697,7 @@ test("publishes a source-traced food-label guide with matching Article data", as
   assert.equal(jsonLd.datePublished, "2026-08-28");
   assert.deepEqual(jsonLd.author, {
     "@type": "Organization",
+    "@id": "https://joyhealth.cc/#organization",
     name: "Joy Health",
     url: "https://joyhealth.cc/",
   });
@@ -812,7 +836,7 @@ test("publishes a source-traced electrolyte guide that separates the label from 
 
 test("matches article breadcrumb data to the visible site hierarchy", async () => {
   const guides = [
-    ["/nutrition/building-balanced-meals", "Balanced meals"],
+    ["/nutrition/building-balanced-meals", "Building balanced meals"],
     ["/nutrition/carbohydrates-and-fats", "Carbohydrates and fats"],
     ["/nutrition/hydration", "Hydration"],
     ["/nutrition/electrolyte-drinks", "Electrolyte drinks"],
@@ -838,6 +862,12 @@ test("matches article breadcrumb data to the visible site hierarchy", async () =
     );
 
     assert.ok(breadcrumb, `expected BreadcrumbList JSON-LD for ${path}`);
+    assert.match(
+      html,
+      new RegExp(`<li aria-current="page">${escapeRegex(pageName)}</li>`),
+      `visible breadcrumb should match structured data for ${path}`,
+    );
+    assert.match(html, /<main id="main-content">/i);
     assert.deepEqual(
       breadcrumb.itemListElement.map(({ position, name, item }) => ({
         position,
@@ -873,8 +903,8 @@ test("publishes the exact unique public URL inventory with truthful dates", asyn
   const sitemap = await sitemapResponse.text();
   const entries = parseSitemap(sitemap);
   const locations = entries.map(({ location }) => location);
-  const expectedLocations = INDEXABLE_PUBLIC_PATHS.map((path) =>
-    path === "/" ? "https://joyhealth.cc" : `https://joyhealth.cc${path}`,
+  const expectedLocations = INDEXABLE_PUBLIC_PATHS.map(
+    (path) => `https://joyhealth.cc${path}`,
   );
 
   assert.equal(entries.length, 11);
@@ -886,7 +916,7 @@ test("publishes the exact unique public URL inventory with truthful dates", asyn
     entries.map(({ location, lastModified }) => [location, lastModified]),
   );
   assert.equal(byLocation.get("https://joyhealth.cc/usana"), "2026-08-31");
-  assert.equal(byLocation.get("https://joyhealth.cc/nutrition"), "2026-08-28");
+  assert.equal(byLocation.get("https://joyhealth.cc/nutrition"), "2026-08-29");
 
   for (const [path, publishedDate] of GUIDE_PUBLICATIONS) {
     assert.equal(byLocation.get(`https://joyhealth.cc${path}`), publishedDate);
@@ -935,11 +965,13 @@ test("keeps guide canonical and publication-date surfaces aligned", async () => 
     assert.equal(article.datePublished, publishedDate);
     assert.deepEqual(article.author, {
       "@type": "Organization",
+      "@id": "https://joyhealth.cc/#organization",
       name: "Joy Health",
       url: "https://joyhealth.cc/",
     });
     assert.deepEqual(article.publisher, {
       "@type": "Organization",
+      "@id": "https://joyhealth.cc/#organization",
       name: "Joy Health",
       url: "https://joyhealth.cc/",
     });
@@ -1055,7 +1087,8 @@ test("serves responsive hero images with first-scene preload priority", async ()
 
   assert.equal(html.match(/loading="eager"/gi)?.length, 1);
   assert.equal(html.match(/fetchPriority="high"/gi)?.length, 2);
-  assert.equal(html.match(/loading="lazy"/gi)?.length, 2);
+  // Two lazy hero scenes plus the four lazy product-shelf photos.
+  assert.equal(html.match(/loading="lazy"/gi)?.length, 6);
   assert.match(
     html,
     new RegExp(
@@ -1163,7 +1196,10 @@ test("redirects production variants to the canonical HTTPS hostname", async () =
 test("returns a useful custom 404", async () => {
   const response = await render("/this-page-does-not-exist");
   assert.equal(response.status, 404);
-  assert.match(await response.text(), /This page wandered off/i);
+  const html = await response.text();
+  assert.match(html, /We can(?:&#x27;|')t find that page/i);
+  assert.match(html, /<title>Page not found \| Joy Health<\/title>/i);
+  assert.match(html, /<meta name="robots" content="noindex, nofollow"/i);
 });
 
 test("self-hosts the licensed display font without a runtime font service", async () => {

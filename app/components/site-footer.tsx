@@ -12,13 +12,13 @@ export function SiteFooter() {
             <span>Joy Health</span>
           </Link>
           <p>
-            Careful health education, with sources, context, and limits attached.
+            Friendly nutrition guides that show where the facts come from.
           </p>
         </div>
         <nav aria-label="Footer navigation">
-          <Link href="/nutrition">Nutrition</Link>
+          <Link href="/nutrition">Nutrition guides</Link>
+          <Link href="/usana">Supplement guide</Link>
           <Link href="/standards">Editorial standards</Link>
-          <Link href="/usana">USANA quality &amp; innovation</Link>
         </nav>
         <div className="footer-smallprint">
           <p>General education, not medical advice.</p>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { PUBLICATIONS } from "./lib/publications";
-import { SITE_URL } from "./lib/seo";
+import { SITE_OG_IMAGE, SITE_URL } from "./lib/seo";
 
 const siteUrl = SITE_URL;
 const homeTitle = PUBLICATIONS.home.title;
@@ -27,20 +27,13 @@ export const metadata: Metadata = {
     siteName: "Joy Health",
     title: homeTitle,
     description,
-    images: [
-      {
-        url: "/og.png",
-        width: 1731,
-        height: 909,
-        alt: "Joy Health, healthy living made clearer",
-      },
-    ],
+    images: [SITE_OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: homeTitle,
     description,
-    images: ["/og.png"],
+    images: [SITE_OG_IMAGE.url],
   },
 };
 

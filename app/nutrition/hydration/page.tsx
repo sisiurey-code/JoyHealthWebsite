@@ -1,42 +1,34 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Citation } from "../../components/citation";
+import { GuideBreadcrumbs } from "../../components/guide-breadcrumbs";
 import { GuideContents } from "../../components/guide-contents";
 import { JsonLd } from "../../components/json-ld";
 import {
   formatEditorialDate,
   HYDRATION_GUIDE,
 } from "../../lib/publications";
-import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "../../lib/seo";
+import {
+  buildArticleJsonLd,
+  buildGuideBreadcrumbJsonLd,
+  buildGuideMetadata,
+} from "../../lib/seo";
 
 const guide = HYDRATION_GUIDE;
-const { title, description } = guide;
+const { title } = guide;
 
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: guide.path },
-  openGraph: { type: "article", url: guide.path, siteName: "Joy Health", title: `${title} | Joy Health`, description, publishedTime: guide.datePublished, images: [] },
-  twitter: { card: "summary", title: `${title} | Joy Health`, description, images: [] },
-};
+export const metadata: Metadata = buildGuideMetadata(guide);
 
 const articleJsonLd = buildArticleJsonLd(guide);
 
-const breadcrumbJsonLd = buildBreadcrumbJsonLd([
-  { name: "Home", path: "/" },
-  { name: "Nutrition", path: "/nutrition" },
-  { name: guide.breadcrumbLabel, path: guide.path },
-]);
-
-function Citation({ source }: Readonly<{ source: number }>) {
-  return <sup className="citation"><a href={`#source-${source}`} aria-label={`Source ${source}`}>[{source}]</a></sup>;
-}
+const breadcrumbJsonLd = buildGuideBreadcrumbJsonLd(guide);
 
 export default function HydrationGuide() {
   return (
-    <main>
+    <main id="main-content">
       <article className="guide-article">
         <header className="guide-intro">
-          <nav className="breadcrumbs" aria-label="Breadcrumb"><ol><li><Link href="/">Home</Link></li><li><Link href="/nutrition">Nutrition</Link></li><li aria-current="page">Hydration</li></ol></nav>
+          <GuideBreadcrumbs guide={guide} />
           <p className="eyebrow">Nutrition guide</p>
           <h1>{title}</h1>
           <p className="guide-dek">
@@ -44,7 +36,7 @@ export default function HydrationGuide() {
             explains the adult reference values, what they count, and why they
             are not precise requirements for every person or day.
           </p>
-          <div className="guide-meta" aria-label="Article details"><p>Prepared by <strong>Joy Health</strong></p><p><time dateTime={guide.datePublished}>{`Published ${formatEditorialDate(guide.datePublished)}`}</time></p></div>
+          <div className="guide-meta" role="group" aria-label="Article details"><p>Prepared by <strong>Joy Health</strong></p><p><time dateTime={guide.datePublished}>{`Published ${formatEditorialDate(guide.datePublished)}`}</time></p></div>
         </header>
 
         <GuideContents />
@@ -75,7 +67,7 @@ export default function HydrationGuide() {
             <p>
               The water DRI is a population reference for apparently healthy
               U.S. and Canadian people. Its values describe total water and are
-              best read with their derivation and limits attached.
+              best read alongside how they were derived and what they leave out.
             </p>
             <dl className="label-terms">
               <div>

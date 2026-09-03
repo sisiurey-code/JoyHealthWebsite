@@ -3,8 +3,10 @@ import Link from "next/link";
 import { SiteFooter } from "../components/site-footer";
 import { SiteHeader } from "../components/site-header";
 import { formatEditorialDate, PUBLICATIONS } from "../lib/publications";
+import { ProductShelf } from "../components/product-shelf";
 import { UsanaCatalogDock } from "../components/usana-catalog-dock";
 import { UsanaProductCards } from "../components/usana-product-cards";
+import { SITE_OG_IMAGE } from "../lib/seo";
 import { USANA_STOREFRONT_URL } from "../lib/usana";
 
 const usana = PUBLICATIONS.usana;
@@ -20,20 +22,13 @@ export const metadata: Metadata = {
     siteName: "Joy Health",
     title: `${title} | Joy Health`,
     description,
-    images: [
-      {
-        url: "/og.png",
-        width: 1731,
-        height: 909,
-        alt: "Joy Health, healthy living made clearer",
-      },
-    ],
+    images: [SITE_OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
     title: `${title} | Joy Health`,
     description,
-    images: ["/og.png"],
+    images: [SITE_OG_IMAGE.url],
   },
 };
 
@@ -46,9 +41,9 @@ export default function UsanaPage() {
         <section className="usana-hero" aria-labelledby="usana-title">
           <div className="usana-hero-inner content-shell">
             <div className="usana-hero-copy">
-              <p className="eyebrow">USANA · Product guide</p>
+              <p className="eyebrow">Supplement guide</p>
               <h1 id="usana-title">
-                Find the USANA products that fit your routine.
+                Highlighted supplements, compared label by label.
               </h1>
               <p>
                 Compare flagship systems and focused formulas, see how their labels
@@ -56,32 +51,27 @@ export default function UsanaPage() {
                 limits in view before you choose.
               </p>
               <div className="usana-hero-actions">
-                <a
-                  className="usana-catalog-link"
-                  href={USANA_STOREFRONT_URL}
-                  rel="sponsored"
-                >
-                  Explore the catalog <span aria-hidden="true">↗</span>
-                </a>
+                <Link className="usana-products-link" href="#products">
+                  See the products <span aria-hidden="true">↓</span>
+                </Link>
                 <Link href="/nutrition/supplement-evidence-and-safety">
-                  Read the supplement guide
+                  Read the supplement evidence guide
                 </Link>
               </div>
               <p className="usana-hero-affiliate-note">
-                Affiliate link: Joy Health may earn a commission. Our evidence
-                standards do not change.
+                The products on this page are made by USANA. Storefront links
+                are affiliate links: Joy Health may earn a commission, and our
+                evidence standards do not change.
               </p>
             </div>
 
-            <div className="usana-word-display" aria-label="USANA">
-              <span>Holistic health product systems</span>
-              <strong>USANA</strong>
-              <p>Control · Verification · Development</p>
-            </div>
+            <ProductShelf
+              caption="A few of the products reviewed below. The storefront carries the full catalog."
+            />
           </div>
         </section>
 
-        <section className="usana-signal-band" aria-label="USANA evidence signals">
+        <section className="usana-signal-band" aria-label="Manufacturer evidence signals">
           <dl className="content-shell">
             <div>
               <dt>67%</dt>
@@ -123,12 +113,14 @@ export default function UsanaPage() {
           <header className="usana-products-heading">
             <div>
               <p className="eyebrow">Start here</p>
-              <h2 id="products-title">Decide where your journey to a healthy life starts with USANA.</h2>
+              <h2 id="products-title">A closer look at each product.</h2>
             </div>
             <div>
               <p>
-                The flagships provide essentials and packaged baselines, followed by focused formulas that are
-                easier to compare and complement the routine. Product order is editorial, dive into the catalog for comprehensive information.
+                The flagships come first, then the focused formulas that are
+                easier to compare. Tap or click a card to flip between the
+                product and its Supplement Facts label. The order is ours, not
+                the manufacturer&apos;s.
               </p>
               <div className="usana-products-criteria">
                 <p className="usana-products-criteria-label">Product selection criteria</p>
@@ -150,14 +142,14 @@ export default function UsanaPage() {
               label and avoid paying twice for overlapping ingredients.
             </p>
             <a href={USANA_STOREFRONT_URL} rel="sponsored">
-              Compare the flagship products <span aria-hidden="true">↗</span>
+              See prices and current formulas <span aria-hidden="true">↗</span>
             </a>
           </div>
         </section>
 
         <section className="usana-quality content-shell" id="quality" aria-labelledby="quality-title">
           <header className="usana-section-heading">
-            <p className="eyebrow">Quality, made concrete</p>
+            <p className="eyebrow">Quality evidence</p>
             <h2 id="quality-title">Is USANA third-party tested?</h2>
             <p>
               NSF&apos;s official listing names 12 finished products. That is
@@ -232,12 +224,12 @@ export default function UsanaPage() {
         <section className="usana-innovation" aria-labelledby="innovation-title">
           <div className="usana-innovation-inner content-shell">
             <div>
-              <p className="eyebrow">What is new</p>
-              <h2 id="innovation-title">Natural ingredients paired with innovation.</h2>
+              <p className="eyebrow">Recent changes</p>
+              <h2 id="innovation-title">Recent formula changes and launches.</h2>
               <dl className="usana-innovation-ledger">
                 <div><dt>2025</dt><dd>major nutritionals refresh</dd></div>
                 <div><dt>2026</dt><dd>new active-nutrition formats</dd></div>
-                <div><dt>Current catalog</dt><dd>holistic health solutions in supplements, nutritionals, and skincare</dd></div>
+                <div><dt>Current catalog</dt><dd>supplements, nutritionals, and skincare</dd></div>
               </dl>
             </div>
             <div className="usana-innovation-copy">
@@ -283,7 +275,7 @@ export default function UsanaPage() {
                 </article>
                 <article>
                   <span>02 · New format</span>
-                  <h3>Clear Protein + Creatine Mix puts three jobs in one glass.</h3>
+                  <h3>Clear Protein + Creatine Mix puts protein, creatine, and electrolytes in one glass.</h3>
                   <p>
                     The August 2026 launch combines 10 grams of clear whey
                     protein, 5 grams of creatine monohydrate, and more than 600
@@ -294,7 +286,7 @@ export default function UsanaPage() {
                 </article>
                 <article>
                   <span>03 · Ready to drink</span>
-                  <h3>USANA Clear Protein Drink puts clear whey in a can.</h3>
+                  <h3>Clear Protein Drink is ready-to-drink clear whey.</h3>
                   <p>
                     Each piña colada can contains 22 grams of clear whey protein
                     isolate, zero sugar, and 90 calories. It is noncarbonated and
@@ -307,7 +299,9 @@ export default function UsanaPage() {
 
               <div className="usana-innovation-conversion">
                 <p>
-                  The button opens USANA&apos;s site. Check the serving size, Supplement Facts, and specific ingredients before choosing.
+                  The button opens the manufacturer&apos;s storefront. Check the
+                  serving size, Supplement Facts, and specific ingredients before
+                  choosing.
                 </p>
                 <a href={USANA_STOREFRONT_URL} rel="sponsored">
                   See what is available now <span aria-hidden="true">↗</span>
@@ -323,7 +317,7 @@ export default function UsanaPage() {
 
         <section className="usana-limits content-shell" aria-labelledby="limits-title">
           <div>
-            <p className="eyebrow">The boundary</p>
+            <p className="eyebrow">Limits</p>
             <h2 id="limits-title">Quality is not the same question as efficacy.</h2>
           </div>
           <div>
@@ -424,8 +418,8 @@ export default function UsanaPage() {
 
         <section className="usana-sources content-shell" aria-labelledby="usana-sources-title">
           <header>
-            <p className="eyebrow">Source trail</p>
-            <h2 id="usana-sources-title">What Joy Health reads.</h2>
+            <p className="eyebrow">Sources</p>
+            <h2 id="usana-sources-title">Sources we read.</h2>
             <p>
               Updated <time dateTime={usana.dateModified}>
                 {formatEditorialDate(usana.dateModified)}

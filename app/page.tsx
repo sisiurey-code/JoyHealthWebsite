@@ -2,9 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { HeroCarousel } from "./components/hero-carousel";
 import { JsonLd } from "./components/json-ld";
+import { ProductShelf } from "./components/product-shelf";
 import { SiteFooter } from "./components/site-footer";
 import { SiteHeader } from "./components/site-header";
-import { NUTRITION_GUIDES } from "./lib/publications";
+import {
+  BALANCED_MEALS_GUIDE,
+  PUBLICATIONS,
+  READING_FOOD_LABELS_GUIDE,
+  SUPPLEMENT_EVIDENCE_GUIDE,
+} from "./lib/publications";
 import { SITE_URL } from "./lib/seo";
 import { USANA_STOREFRONT_URL } from "./lib/usana";
 
@@ -19,8 +25,7 @@ const websiteJsonLd = {
   url: `${SITE_URL}/`,
   name: "Joy Health",
   alternateName: "joyhealth.cc",
-  description:
-    "Practical, evidence-aware guides to meals, nutrients, food labels, hydration, and supplements, with sources, tradeoffs, and limits attached.",
+  description: PUBLICATIONS.home.description,
   inLanguage: "en-US",
 };
 
@@ -32,7 +37,7 @@ const organizationJsonLd = {
   alternateName: "joyhealth.cc",
   url: `${SITE_URL}/`,
   description:
-    "An educational publisher of evidence-aware nutrition guides.",
+    "Joy Health publishes plain-language nutrition guides and supplement comparisons for general readers.",
   logo: {
     "@type": "ImageObject",
     url: `${SITE_URL}/favicon.svg`,
@@ -41,22 +46,28 @@ const organizationJsonLd = {
   },
 };
 
+const featuredGuides = [
+  BALANCED_MEALS_GUIDE,
+  READING_FOOD_LABELS_GUIDE,
+  SUPPLEMENT_EVIDENCE_GUIDE,
+] as const;
+
 const method = [
   {
     title: "Scope the question",
-    copy: "Define what the guide can answer before reading beyond the evidence.",
+    copy: "Work out what the guide can honestly answer before writing a word.",
   },
   {
     title: "Read the sources",
-    copy: "Trace material health claims to research and accountable institutions.",
+    copy: "Follow every health claim back to research or an accountable institution.",
   },
   {
     title: "Separate the roles",
-    copy: "Keep source findings distinct from Joy Health interpretation.",
+    copy: "Keep what a source found separate from what we make of it.",
   },
   {
     title: "Name the limits",
-    copy: "State uncertainty, exclusions, tradeoffs, and meaningful conflicts.",
+    copy: "Say plainly what the evidence cannot settle, and who has a stake in the answer.",
   },
 ];
 
@@ -71,21 +82,21 @@ export default function Home() {
             <div className="hero-content">
               <p className="hero-kicker">
                 <span aria-hidden="true">01</span>
-                Food, products, and better questions
+                Food, supplements, and straight answers
               </p>
               <h1 id="hero-title">
                 Healthy living, made clearer.
               </h1>
               <p className="hero-copy">
-                Practical nutrition guidance, premium wellness products, and
-                the evidence needed to judge both.
+                Friendly, careful guides to everyday nutrition, and a close look
+                at a handful of supplements, label by label.
               </p>
               <div className="hero-actions">
-                <Link className="primary-link" href="/usana">
-                  Explore premium USANA <span aria-hidden="true">→</span>
+                <Link className="primary-link" href="/nutrition#guides-title">
+                  Browse the guides <span aria-hidden="true">→</span>
                 </Link>
-                <Link className="text-link" href="/nutrition#guides-title">
-                  {`Browse ${NUTRITION_GUIDES.length} practical guides`}
+                <Link className="text-link" href="/usana#products">
+                  Compare the supplements
                 </Link>
               </div>
               <aside
@@ -105,24 +116,72 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="brand-feature" aria-labelledby="brand-feature-title">
-          <div className="brand-feature-inner content-shell">
-            <div className="brand-feature-copy">
+        <section
+          className="home-guides content-shell"
+          aria-labelledby="home-guides-title"
+        >
+          <header className="home-guides-heading">
+            <div>
               <p className="eyebrow section-kicker-numbered">
                 <span aria-hidden="true">02</span>
-                Featured partner · USANA
+                Start with a question
               </p>
-              <h2 id="brand-feature-title">
-                Build a better routine with products worth understanding.
+              <h2 id="home-guides-title">
+                Good places to start.
+              </h2>
+            </div>
+            <p>
+              Every guide tells you what it covers, where the information comes
+              from, and where the evidence runs out. If you are not sure where
+              to begin, start with the meal.
+            </p>
+          </header>
+          <ol className="home-guide-list">
+            {featuredGuides.map((guide) => (
+              <li key={guide.path}>
+                <p className="guide-topic">{guide.topic}</p>
+                <h3>
+                  <Link href={guide.path}>{guide.title}</Link>
+                </h3>
+                <p>{guide.summary}</p>
+                <Link
+                  className="guide-action"
+                  href={guide.path}
+                  aria-hidden="true"
+                  tabIndex={-1}
+                >
+                  Read the guide <span aria-hidden="true">→</span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+          <div className="home-guides-footer">
+            <p>New guides are added as they are finished, never before.</p>
+            <Link className="text-link" href="/nutrition#guides-title">
+              See every guide
+            </Link>
+          </div>
+        </section>
+
+        <section className="product-feature" aria-labelledby="product-feature-title">
+          <div className="product-feature-inner content-shell">
+            <div className="product-feature-copy">
+              <p className="eyebrow section-kicker-numbered">
+                <span aria-hidden="true">03</span>
+                Supplements, compared
+              </p>
+              <h2 id="product-feature-title">
+                A few supplements, looked at closely.
               </h2>
               <p>
-                See how the flagships differ, what the single-purpose formulas contain,
-                and where newer formats fit. Supporting evidence and caveats sit
-                beside the products they describe.
+                A small selection that changes as formulas do. Each product
+                appears with its current Supplement Facts label and a note on
+                how it overlaps with the others, with the evidence and the
+                caveats sitting right beside it.
               </p>
-              <div className="brand-feature-actions">
-                <Link className="primary-link" href="/usana">
-                  Explore USANA <span aria-hidden="true">→</span>
+              <div className="product-feature-actions">
+                <Link className="primary-link" href="/usana#products">
+                  Compare the products <span aria-hidden="true">→</span>
                 </Link>
                 <Link className="brand-evidence-link" href="/usana#quality">
                   See the quality evidence
@@ -130,14 +189,14 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="brand-feature-display">
-              <p>Nutritionals · Active living · Skincare</p>
-              <strong>USANA</strong>
-              <div className="brand-feature-catalog">
+            <div className="product-feature-display">
+              <ProductShelf />
+              <div className="product-feature-catalog">
                 <p>
-                  <strong>Affiliate disclosure:</strong> Joy Health may earn a
-                  commission when you shop through this link. The price and our
-                  evidence standards do not change.
+                  <strong>Affiliate disclosure:</strong> these are USANA
+                  products, and Joy Health may earn a commission when you shop
+                  through this link. The price and our evidence standards do
+                  not change.
                 </p>
                 <a href={USANA_STOREFRONT_URL} rel="sponsored">
                   See current products and prices <span aria-hidden="true">↗</span>
@@ -155,10 +214,10 @@ export default function Home() {
           <div className="method-inner content-shell">
             <header className="method-heading">
               <p className="eyebrow section-kicker-numbered">
-                <span aria-hidden="true">03</span>
+                <span aria-hidden="true">04</span>
                 How we work
               </p>
-              <h2 id="standards-title">Curious, cheerful, and careful.</h2>
+              <h2 id="standards-title">How every guide gets made.</h2>
               <p>
                 We synthesize research, provide sources, and separate evidence
                 from interpretation. Joy Health provides general education,
@@ -177,7 +236,7 @@ export default function Home() {
               ))}
             </ol>
             <div className="method-footer">
-              <p>Trust is part of the product.</p>
+              <p>Want the full rules? They are public.</p>
               <Link className="standards-link" href="/standards">
                 Read our editorial standards <span aria-hidden="true">→</span>
               </Link>

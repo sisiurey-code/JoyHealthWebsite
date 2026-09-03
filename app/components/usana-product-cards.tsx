@@ -1,13 +1,11 @@
 "use client";
 
-import { useState, type PointerEvent, type ReactNode } from "react";
-
-type ProductImage = Readonly<{
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
-}>;
+import { useState, type ReactNode } from "react";
+import {
+  responsiveProductSources,
+  USANA_PRODUCT_IMAGES,
+  type ProductImage,
+} from "../lib/usana";
 
 type ProductCardProps = Readonly<{
   name: string;
@@ -23,25 +21,8 @@ type ProductCardProps = Readonly<{
 }>;
 
 const cardImageSizes =
-  "(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 560px";
-const featuredImageSizes = "(max-width: 1100px) 50vw, 560px";
-
-function responsiveImageSources(image: ProductImage) {
-  const basename = image.src.slice(
-    image.src.lastIndexOf("/") + 1,
-    image.src.lastIndexOf("."),
-  );
-  return [...new Set([
-    ...[320, 640, 960].filter((width) => width <= image.width),
-    image.width,
-  ])]
-    .sort((left, right) => left - right)
-    .map(
-      (width) =>
-        `/images/responsive/usana/${basename}-${width}.webp ${width}w`,
-    )
-    .join(", ");
-}
+  "(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 400px";
+const featuredImageSizes = "(max-width: 760px) 100vw, 480px";
 
 function ProductPhoto({
   image,
@@ -52,7 +33,7 @@ function ProductPhoto({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={image.src}
-        srcSet={responsiveImageSources(image)}
+        srcSet={responsiveProductSources(image)}
         sizes={sizes}
         alt={image.alt}
         width={image.width}
@@ -69,29 +50,21 @@ function LabelPhoto({
   name,
   sizes = cardImageSizes,
 }: Readonly<{ image: ProductImage; name: string; sizes?: string }>) {
-  function setMagnifierOrigin(event: PointerEvent<HTMLAnchorElement>) {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - bounds.left) / bounds.width) * 100;
-    const y = ((event.clientY - bounds.top) / bounds.height) * 100;
-
-    event.currentTarget.style.setProperty("--zoom-x", `${x}%`);
-    event.currentTarget.style.setProperty("--zoom-y", `${y}%`);
-  }
-
   return (
     <figure className="usana-label-figure">
+      {/* Never wider than the native file, so label text stays crisp. */}
       <a
         href={image.src}
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`Open the full-size Supplement Facts label for ${name}`}
-        onPointerMove={setMagnifierOrigin}
+        style={{ maxWidth: image.width }}
       >
         {/* The native-resolution file also opens directly for close inspection. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={image.src}
-          srcSet={responsiveImageSources(image)}
+          srcSet={responsiveProductSources(image)}
           sizes={sizes}
           alt={image.alt}
           width={image.width}
@@ -100,7 +73,7 @@ function LabelPhoto({
           decoding="async"
         />
       </a>
-      <figcaption>Hover to magnify · select for full size</figcaption>
+      <figcaption>Select the label to open it at full size</figcaption>
     </figure>
   );
 }
@@ -117,16 +90,13 @@ function ProductCard({
   editorPick = false,
   compactTitle = false,
 }: ProductCardProps) {
-  const states = featured
-    ? (["Details", "Product + label"] as const)
-    : (["Details", "Product", "Label"] as const);
-  const [activeState, setActiveState] = useState(0);
+  const [showLabel, setShowLabel] = useState(false);
+  const sizes = featured ? featuredImageSizes : cardImageSizes;
 
-  function advance() {
-    setActiveState((current) => (current + 1) % states.length);
+  function toggle() {
+    setShowLabel((current) => !current);
   }
 
-  const nextState = states[(activeState + 1) % states.length];
   const className = [
     "usana-product-card",
     featured ? "is-featured" : "",
@@ -137,190 +107,58 @@ function ProductCard({
     .join(" ");
 
   return (
-    // The labeled state-control button is the keyboard equivalent; the article
-    // click handler makes the remaining card surface a convenient pointer target.
+    // The labeled toggle button is the keyboard equivalent; the article click
+    // handler makes the remaining card surface a convenient pointer target.
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
     <article
       className={className}
-      data-state={activeState}
+      data-state={showLabel ? "label" : "overview"}
       onClick={(event) => {
         if ((event.target as HTMLElement).closest("a, button")) return;
-        advance();
+        toggle();
       }}
     >
       <div
-        className={`usana-product-face usana-product-details${activeState === 0 ? " is-active" : ""}`}
-        aria-hidden={activeState !== 0}
+        className={`usana-product-face usana-product-overview${showLabel ? "" : " is-active"}`}
+        aria-hidden={showLabel}
       >
-        <p className="usana-product-label">{label}</p>
-        <h3>{title ?? name}</h3>
-        <div className="usana-product-copy">{children}</div>
-        {fit ? <p className="usana-product-fit">{fit}</p> : null}
+        <ProductPhoto image={product} sizes={sizes} />
+        <div className="usana-product-details">
+          <p className="usana-product-label">{label}</p>
+          <h3>{title ?? name}</h3>
+          <div className="usana-product-copy">{children}</div>
+          {fit ? <p className="usana-product-fit">{fit}</p> : null}
+        </div>
       </div>
 
-      {featured ? (
-        <div
-          className={`usana-product-face usana-product-media usana-product-pair${activeState === 1 ? " is-active" : ""}`}
-          aria-hidden={activeState !== 1}
-        >
-          <ProductPhoto image={product} sizes={featuredImageSizes} />
-          <LabelPhoto
-            image={facts}
-            name={name}
-            sizes={featuredImageSizes}
-          />
-        </div>
-      ) : (
-        <>
-          <div
-            className={`usana-product-face usana-product-media${activeState === 1 ? " is-active" : ""}`}
-            aria-hidden={activeState !== 1}
-          >
-            <ProductPhoto image={product} />
-          </div>
-          <div
-            className={`usana-product-face usana-product-media${activeState === 2 ? " is-active" : ""}`}
-            aria-hidden={activeState !== 2}
-          >
-            <LabelPhoto image={facts} name={name} />
-          </div>
-        </>
-      )}
+      <div
+        className={`usana-product-face usana-product-media${showLabel ? " is-active" : ""}`}
+        aria-hidden={!showLabel}
+      >
+        <LabelPhoto image={facts} name={name} sizes={sizes} />
+      </div>
 
       <button
         className="usana-product-state-control"
         type="button"
-        onClick={advance}
-        aria-label={`Showing ${states[activeState]} for ${name}, ${activeState + 1} of ${states.length}. Show ${nextState}.`}
+        onClick={toggle}
+        aria-pressed={showLabel}
+        aria-label={
+          showLabel
+            ? `Showing the Supplement Facts label for ${name}. Show the overview.`
+            : `Showing the overview for ${name}. Show the Supplement Facts label.`
+        }
       >
-        <span>{states[activeState]}</span>
-        <span className="usana-product-state-dots" aria-hidden="true">
-          {states.map((state, index) => (
-            <i className={index === activeState ? "is-active" : undefined} key={state} />
-          ))}
+        <span>{showLabel ? "Overview" : "Supplement Facts"}</span>
+        <span className="usana-product-state-icon" aria-hidden="true">
+          {showLabel ? "←" : "→"}
         </span>
       </button>
     </article>
   );
 }
 
-const products = {
-  cellsentials: {
-    product: {
-      src: "/images/usana/cellsentials-product.png",
-      alt: "USANA CellSentials Core Minerals and Vita Antioxidant bottles",
-      width: 1204,
-      height: 1200,
-    },
-    facts: {
-      src: "/images/usana/cellsentials-label.png",
-      alt: "Supplement Facts labels for CellSentials Vita Antioxidant and Core Minerals",
-      width: 850,
-      height: 860,
-    },
-  },
-  healthpak: {
-    product: {
-      src: "/images/usana/healthpak-product.png",
-      alt: "USANA HealthPak box",
-      width: 1206,
-      height: 1200,
-    },
-    facts: {
-      src: "/images/usana/healthpak-label.png",
-      alt: "Supplement Facts label for USANA HealthPak",
-      width: 409,
-      height: 1000,
-    },
-  },
-  procosa: {
-    product: {
-      src: "/images/usana/procosa-product.png",
-      alt: "USANA Procosa bottle",
-      width: 1102,
-      height: 1102,
-    },
-    facts: {
-      src: "/images/usana/procosa-label.png",
-      alt: "Supplement Facts label for USANA Procosa",
-      width: 1000,
-      height: 935,
-    },
-  },
-  biomega: {
-    product: {
-      src: "/images/usana/biomega-product.png",
-      alt: "USANA BiOmega bottle",
-      width: 1000,
-      height: 1000,
-    },
-    facts: {
-      src: "/images/usana/biomega-label.png",
-      alt: "Supplement Facts label for USANA BiOmega",
-      width: 1000,
-      height: 956,
-    },
-  },
-  magnecal: {
-    product: {
-      src: "/images/usana/magnecal-d-product.png",
-      alt: "USANA MagneCal D bottle",
-      width: 1072,
-      height: 1074,
-    },
-    facts: {
-      src: "/images/usana/magnecal-d-label.png",
-      alt: "Supplement Facts label for USANA MagneCal D",
-      width: 493,
-      height: 401,
-    },
-  },
-  coquinone: {
-    product: {
-      src: "/images/usana/coquinone-product.png",
-      alt: "USANA CoQuinone 30 bottle",
-      width: 1042,
-      height: 1042,
-    },
-    facts: {
-      src: "/images/usana/coquinone-label.png",
-      alt: "Supplement Facts label for USANA CoQuinone 30",
-      width: 498,
-      height: 450,
-    },
-  },
-  clearProtein: {
-    product: {
-      src: "/images/usana/clear-protein-creatine-product.png",
-      alt: "USANA Clear Protein and Creatine green apple pouch",
-      width: 734,
-      height: 1010,
-    },
-    facts: {
-      src: "/images/usana/clear-protein-creatine-label.png",
-      alt: "Supplement Facts label for USANA Clear Protein and Creatine green apple mix",
-      width: 488,
-      height: 1000,
-    },
-  },
-  coreAminos: {
-    product: {
-      src: "/images/usana/core-aminos-product.png",
-      alt: "USANA Core Aminos tub",
-      width: 850,
-      height: 844,
-    },
-    facts: {
-      src: "/images/usana/core-aminos-label.png",
-      alt: "Supplement Facts label for USANA Core Aminos",
-      width: 850,
-      height: 794,
-    },
-  },
-} as const satisfies Record<
-  string,
-  Readonly<{ product: ProductImage; facts: ProductImage }>
->;
+const products = USANA_PRODUCT_IMAGES;
 
 export function UsanaProductCards() {
   return (
@@ -338,7 +176,7 @@ export function UsanaProductCards() {
         }
       >
         <p>
-          Core Minerals and Vita-Antioxidant form USANA&apos;s main daily
+          Core Minerals and Vita-Antioxidant form the flagship daily
           nutrition system. USANA&apos;s 2026 filing identifies
           Essentials/CellSentials as a key product, and the company reports a
           2026 ConsumerLab seal for label accuracy, purity, and potency.

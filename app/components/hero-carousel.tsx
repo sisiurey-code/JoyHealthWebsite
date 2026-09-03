@@ -6,20 +6,20 @@ const slides = [
   {
     src: "/images/joy-health-morning.webp",
     alt: "Hands adding citrus to a bowl beside water and an open notebook in morning light",
-    title: "No miracles. Grounded guidance.",
-    copy: "Cure-alls do not exist, but everyone can take practical steps to protect their joy.",
+    title: "No cure-alls here.",
+    copy: "There is no single fix, but there are steady, practical steps most people can take.",
   },
   {
     src: "/images/joy-health-balanced-meal.webp",
     alt: "Hands arranging grains, greens, vegetables, and salmon on a ceramic plate",
-    title: "Good advice has to survive a Tuesday.",
+    title: "Meals you can repeat on a weekday.",
     copy: "If it only works in a perfect kitchen, it does not work. We focus on meals and routines people can repeat.",
   },
   {
     src: "/images/joy-health-garden-recovery.webp",
     alt: "A person setting down water beside fruit and a book after a garden walk",
-    title: "Health is bigger than one bottle.",
-    copy: "Food, movement, rest, and supplements share the same week. No single piece is the whole plan.",
+    title: "Supplements are one piece, not the plan.",
+    copy: "Food, movement, rest, and supplements all share the same week. No single piece carries it alone.",
   },
 ] as const;
 
@@ -58,7 +58,7 @@ export function HeroCarousel() {
             showNext();
           }
         }}
-        aria-label={`Show next wellness scene. Scene ${activeIndex + 1} of ${slides.length}: ${slides[activeIndex].title}`}
+        aria-label="Show the next wellness scene"
       >
         {slides.map((slide, index) => (
           // eslint-disable-next-line @next/next/no-img-element

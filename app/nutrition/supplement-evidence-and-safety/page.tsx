@@ -1,70 +1,34 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Citation } from "../../components/citation";
+import { GuideBreadcrumbs } from "../../components/guide-breadcrumbs";
 import { GuideContents } from "../../components/guide-contents";
 import { JsonLd } from "../../components/json-ld";
 import {
   formatEditorialDate,
   SUPPLEMENT_EVIDENCE_GUIDE,
 } from "../../lib/publications";
-import { buildArticleJsonLd, buildBreadcrumbJsonLd } from "../../lib/seo";
+import {
+  buildArticleJsonLd,
+  buildGuideBreadcrumbJsonLd,
+  buildGuideMetadata,
+} from "../../lib/seo";
 
 const guide = SUPPLEMENT_EVIDENCE_GUIDE;
-const { title, description } = guide;
+const { title } = guide;
 
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: guide.path },
-  openGraph: {
-    type: "article",
-    url: guide.path,
-    siteName: "Joy Health",
-    title: `${title} | Joy Health`,
-    description,
-    publishedTime: guide.datePublished,
-    images: [],
-  },
-  twitter: {
-    card: "summary",
-    title: `${title} | Joy Health`,
-    description,
-    images: [],
-  },
-};
+export const metadata: Metadata = buildGuideMetadata(guide);
 
 const articleJsonLd = buildArticleJsonLd(guide);
 
-const breadcrumbJsonLd = buildBreadcrumbJsonLd([
-  { name: "Home", path: "/" },
-  { name: "Nutrition", path: "/nutrition" },
-  {
-    name: guide.breadcrumbLabel,
-    path: guide.path,
-  },
-]);
-
-function Citation({ source }: Readonly<{ source: number }>) {
-  return (
-    <sup className="citation">
-      <a href={`#source-${source}`} aria-label={`Source ${source}`}>
-        [{source}]
-      </a>
-    </sup>
-  );
-}
+const breadcrumbJsonLd = buildGuideBreadcrumbJsonLd(guide);
 
 export default function SupplementEvidenceAndSafetyGuide() {
   return (
-    <main>
+    <main id="main-content">
       <article className="guide-article">
         <header className="guide-intro">
-          <nav className="breadcrumbs" aria-label="Breadcrumb">
-            <ol>
-              <li><Link href="/">Home</Link></li>
-              <li><Link href="/nutrition">Nutrition</Link></li>
-              <li aria-current="page">Supplement evidence and safety</li>
-            </ol>
-          </nav>
+          <GuideBreadcrumbs guide={guide} />
           <p className="eyebrow">Nutrition guide</p>
           <h1>{title}</h1>
           <p className="guide-dek">
@@ -73,7 +37,7 @@ export default function SupplementEvidenceAndSafetyGuide() {
             guide keeps them separate so one reassuring detail does not stand
             in for the whole evaluation.
           </p>
-          <div className="guide-meta" aria-label="Article details">
+          <div className="guide-meta" role="group" aria-label="Article details">
             <p>Prepared by <strong>Joy Health</strong></p>
             <p>
               <time dateTime={guide.datePublished}>

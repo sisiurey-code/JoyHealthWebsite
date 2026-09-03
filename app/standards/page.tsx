@@ -2,60 +2,54 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteFooter } from "../components/site-footer";
 import { SiteHeader } from "../components/site-header";
+import { PUBLICATIONS } from "../lib/publications";
+import { SITE_OG_IMAGE } from "../lib/seo";
+
+const { description, title } = PUBLICATIONS.standards;
 
 export const metadata: Metadata = {
-  title: "Editorial and recommendation standards",
-  description:
-    "How Joy Health researches, writes, updates, and discloses its educational guides and product recommendations.",
+  title,
+  description,
   alternates: { canonical: "/standards" },
   openGraph: {
     type: "website",
     siteName: "Joy Health",
     url: "/standards",
-    title: "Editorial and recommendation standards | Joy Health",
-    description:
-      "How Joy Health researches, writes, updates, and discloses its educational guides and product recommendations.",
-    images: [
-      {
-        url: "/og.png",
-        width: 1731,
-        height: 909,
-        alt: "Joy Health, healthy living made clearer",
-      },
-    ],
+    title: `${title} | Joy Health`,
+    description,
+    images: [SITE_OG_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Editorial and recommendation standards | Joy Health",
-    description:
-      "How Joy Health researches, writes, updates, and discloses its educational guides and product recommendations.",
-    images: ["/og.png"],
+    title: `${title} | Joy Health`,
+    description,
+    images: [SITE_OG_IMAGE.url],
   },
 };
 
 const standards = [
   {
-    title: "Evidence before certainty",
+    title: "How we weigh evidence",
     copy: "We prefer primary research, systematic reviews, and guidance from accountable public-health institutions. We describe limitations, conflicts, and uncertainty instead of flattening them into a verdict.",
   },
   {
-    title: "Traceable sources",
+    title: "How we cite sources",
     copy: "Health guides identify their sources and distinguish what a source says from our interpretation. Material updates receive a new review date; changing a date alone does not make an article current.",
   },
   {
-    title: "No borrowed credentials",
+    title: "Who writes and reviews",
     copy: "Joy Health is an educational publisher, not a medical practice. We do not assert clinical authority, and we identify qualified reviewers by name and credentials only when they actually participated.",
   },
   {
-    title: "Recommendations with reasons",
+    title: "How we recommend products",
     copy: "Products are compared using stated criteria, practical tradeoffs, and the available evidence. Payment or commission never buys an undisclosed recommendation or a better conclusion.",
   },
   {
-    title: "Disclosures where they matter",
+    title: "Where disclosures appear",
     copy: "If a link or relationship may financially benefit Joy Health, the disclosure appears with the recommendation. It is never hidden on a separate legal page.",
   },
   {
-    title: "Corrections stay visible",
+    title: "How we correct errors",
     copy: "Substantive errors are corrected promptly. When a correction changes the meaning of a guide, we note what changed rather than silently rewriting the record.",
   },
 ];
@@ -66,14 +60,14 @@ export default function StandardsPage() {
       <SiteHeader active="standards" />
       <main className="site-shell" id="main-content">
         <section className="policy-intro">
-          <p className="eyebrow">Public editorial charter</p>
+          <p className="eyebrow">Editorial policy</p>
           <h1>Editorial and recommendation standards</h1>
           <p>
-            Trust is part of the product. These rules apply to every health
-            guide and recommendation we publish.
+            These rules apply to every guide and product recommendation we
+            publish.
           </p>
         </section>
-        <div className="policy-grid" aria-label="Editorial standards">
+        <div className="policy-grid">
           {standards.map((standard, index) => (
             <section key={standard.title}>
               <p className="standard-number" aria-hidden="true">
@@ -96,8 +90,8 @@ export default function StandardsPage() {
             for personal medical questions and urgent help for emergencies.
           </aside>
           <div className="policy-close-action">
-            <p className="eyebrow">See the standard in practice</p>
-            <h2>Every published guide carries its own evidence trail.</h2>
+            <p className="eyebrow">In practice</p>
+            <h2>Every guide lists the sources it used.</h2>
             <Link className="primary-link" href="/nutrition">
               Browse nutrition guides <span aria-hidden="true">→</span>
             </Link>

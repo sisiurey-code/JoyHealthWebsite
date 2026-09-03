@@ -1,7 +1,7 @@
 {
   "name": "joy-health",
   "version": "0.1.0",
-  "description": "Evidence-aware nutrition guides with sources, context, and limits.",
+  "description": "Plain-language nutrition guides that cite their sources.",
   "private": true,
   "license": "Apache-2.0",
   "homepage": "https://joyhealth.cc",
