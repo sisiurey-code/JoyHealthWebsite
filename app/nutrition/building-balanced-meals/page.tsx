@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Citation } from "../../components/citation";
 import { GuideBreadcrumbs } from "../../components/guide-breadcrumbs";
 import { GuideContents } from "../../components/guide-contents";
+import { RelatedGuides } from "../../components/related-guides";
 import { JsonLd } from "../../components/json-ld";
 import {
   BALANCED_MEALS_GUIDE,
@@ -66,7 +67,7 @@ export default function BalancedMealsGuide() {
               usual quantities and frequencies of foods and beverages over a
               period or life stage. It also notes that patterns can be examined
               at an eating occasion, such as breakfast or a snack.
-              <Citation source={2} /> Joy Health interprets that distinction to
+              <Citation source={1} /> Joy Health interprets that distinction to
               mean a single meal can contribute to a broader pattern without
               having to reproduce the whole pattern perfectly.
             </p>
@@ -80,14 +81,14 @@ export default function BalancedMealsGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="evidence-title">
-          <h2 id="evidence-title">What the evidence can tell us</h2>
+          <h2 id="evidence-title">What the Dietary Guidelines and evidence can tell us</h2>
           <div className="guide-copy">
             <p>
               The current federal policy names broad categories including
               protein foods, dairy, vegetables, fruits, fats, and whole grains.
               It also says calorie needs vary with individual characteristics
               and activity.
-              <Citation source={1} /> That is population guidance, not a
+              <Citation source={2} /> That is population guidance, not a
               personalized plate prescription.
             </p>
             <dl className="label-terms">
@@ -98,7 +99,7 @@ export default function BalancedMealsGuide() {
                   and says they are influenced by factors including food
                   availability, cooking methods, socioeconomic conditions,
                   population norms, preferences, and cultural foodways.
-                  <Citation source={2} />
+                  <Citation source={1} />
                 </dd>
               </div>
               <div>
@@ -107,7 +108,7 @@ export default function BalancedMealsGuide() {
                   Federal policy identifies food categories, but it does not
                   establish Joy Health&apos;s framework or require every category
                   to appear in a separately divided plate at every meal.
-                  <Citation source={1} />
+                  <Citation source={2} />
                 </dd>
               </div>
               <div>
@@ -126,7 +127,7 @@ export default function BalancedMealsGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="use-title">
-          <h2 id="use-title">How to use the framework</h2>
+          <h2 id="use-title">How to build a balanced meal in four steps</h2>
           <div className="guide-copy">
             <ol className="reading-steps">
               <li>
@@ -144,7 +145,7 @@ export default function BalancedMealsGuide() {
                   in current guidance, such as a protein food, vegetables or
                   fruit, a grain or other starchy food, dairy, or a source of
                   fat. Not every meal needs every category.
-                  <Citation source={1} />
+                  <Citation source={2} />
                 </p>
               </li>
               <li>
@@ -162,7 +163,7 @@ export default function BalancedMealsGuide() {
                   Consider variety across meals and days rather than turning
                   one eating occasion into a pass or fail test. Dietary-pattern
                   research looks beyond one isolated plate.
-                  <Citation source={2} />
+                  <Citation source={1} />
                 </p>
               </li>
             </ol>
@@ -183,7 +184,7 @@ export default function BalancedMealsGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="limits-title">
-          <h2 id="limits-title">Limits and open questions</h2>
+          <h2 id="limits-title">What this meal framework does not do</h2>
           <div className="guide-copy">
             <ul className="limit-list">
               <li>
@@ -195,14 +196,14 @@ export default function BalancedMealsGuide() {
                 Federal policy is population guidance. It explicitly notes
                 that needs vary, and this guide does not turn its categories or
                 serving goals into personal targets.
-                <Citation source={1} />
+                <Citation source={2} />
               </li>
               <li>
                 The advisory report informed the federal process, but it is not
                 the final 2025–2030 policy. This guide keeps those evidence
                 roles separate.
-                <Citation source={1} />
                 <Citation source={2} />
+                <Citation source={1} />
               </li>
               <li>
                 Food pattern models use structured assumptions and modeled
@@ -235,18 +236,6 @@ export default function BalancedMealsGuide() {
             </p>
             <ol className="source-list">
               <li id="source-1">
-                <a href="https://cdn.realfood.gov/DGA.pdf">
-                  Dietary Guidelines for Americans, 2025–2030
-                </a>
-                <p>
-                  U.S. Department of Health and Human Services and U.S.
-                  Department of Agriculture. Used for current policy categories
-                  and its statement that individual calorie needs vary.
-                  Limitation: a brief population policy document, not an
-                  individualized plan or the test of this framework.
-                </p>
-              </li>
-              <li id="source-2">
                 <a href="https://www.dietaryguidelines.gov/sites/default/files/2024-12/Part%20D_Ch%202_Dietary%20Patterns_FINAL_508.pdf">
                   Scientific Report of the 2025 Dietary Guidelines Advisory
                   Committee, Part D, Chapter 2: Dietary Patterns
@@ -256,6 +245,18 @@ export default function BalancedMealsGuide() {
                   Limitation: an advisory report submitted before the final
                   policy. Its health-outcome reviews are outside this guide&apos;s
                   claim set.
+                </p>
+              </li>
+              <li id="source-2">
+                <a href="https://cdn.realfood.gov/DGA.pdf">
+                  Dietary Guidelines for Americans, 2025–2030
+                </a>
+                <p>
+                  U.S. Department of Health and Human Services and U.S.
+                  Department of Agriculture. Used for current policy categories
+                  and its statement that individual calorie needs vary.
+                  Limitation: a brief population policy document, not an
+                  individualized plan or the test of this framework.
                 </p>
               </li>
               <li id="source-3">
@@ -272,6 +273,8 @@ export default function BalancedMealsGuide() {
             </ol>
           </div>
         </section>
+
+        <RelatedGuides guide={guide} />
 
         <section className="guide-provenance" aria-labelledby="about-title">
           <div>

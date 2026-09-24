@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Citation } from "../../components/citation";
 import { GuideBreadcrumbs } from "../../components/guide-breadcrumbs";
 import { GuideContents } from "../../components/guide-contents";
+import { RelatedGuides } from "../../components/related-guides";
 import { JsonLd } from "../../components/json-ld";
 import {
   formatEditorialDate,
@@ -84,7 +85,7 @@ export default function FoodLabelsGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="evidence-title">
-          <h2 id="evidence-title">What the evidence can tell us</h2>
+          <h2 id="evidence-title">What each part of the Nutrition Facts label means</h2>
           <div className="guide-copy">
             <p>
               The sources for this guide are FDA regulatory and consumer
@@ -155,7 +156,7 @@ export default function FoodLabelsGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="use-title">
-          <h2 id="use-title">How to use the information</h2>
+          <h2 id="use-title">How to read a Nutrition Facts label in five steps</h2>
           <div className="guide-copy">
             <ol className="reading-steps">
               <li>
@@ -226,7 +227,7 @@ export default function FoodLabelsGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="limits-title">
-          <h2 id="limits-title">Limits and open questions</h2>
+          <h2 id="limits-title">What a Nutrition Facts label cannot tell you</h2>
           <div className="guide-copy">
             <ul className="limit-list">
               <li>
@@ -309,6 +310,8 @@ export default function FoodLabelsGuide() {
             </ol>
           </div>
         </section>
+
+        <RelatedGuides guide={guide} />
 
         <section className="guide-provenance" aria-labelledby="about-title">
           <div>

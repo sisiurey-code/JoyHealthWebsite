@@ -7,16 +7,15 @@ import { SiteFooter } from "./components/site-footer";
 import { SiteHeader } from "./components/site-header";
 import {
   BALANCED_MEALS_GUIDE,
+  NUTRITION_GUIDES,
   PUBLICATIONS,
   READING_FOOD_LABELS_GUIDE,
   SUPPLEMENT_EVIDENCE_GUIDE,
 } from "./lib/publications";
-import { SITE_URL } from "./lib/seo";
+import { buildPageMetadata, SITE_URL } from "./lib/seo";
 import { USANA_STOREFRONT_URL } from "./lib/usana";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-};
+export const metadata: Metadata = buildPageMetadata(PUBLICATIONS.home);
 
 const websiteJsonLd = {
   "@context": "https://schema.org",
@@ -27,6 +26,7 @@ const websiteJsonLd = {
   alternateName: "joyhealth.cc",
   description: PUBLICATIONS.home.description,
   inLanguage: "en-US",
+  publisher: { "@id": `${SITE_URL}/#organization` },
 };
 
 const organizationJsonLd = {
@@ -38,6 +38,8 @@ const organizationJsonLd = {
   url: `${SITE_URL}/`,
   description:
     "Joy Health publishes plain-language nutrition guides and supplement comparisons for general readers.",
+  publishingPrinciples: `${SITE_URL}/standards`,
+  correctionsPolicy: `${SITE_URL}/standards#how-we-correct-errors`,
   logo: {
     "@type": "ImageObject",
     url: `${SITE_URL}/favicon.svg`,
@@ -51,6 +53,10 @@ const featuredGuides = [
   READING_FOOD_LABELS_GUIDE,
   SUPPLEMENT_EVIDENCE_GUIDE,
 ] as const;
+
+const moreGuides = NUTRITION_GUIDES.filter(
+  (guide) => !featuredGuides.some((featured) => featured.key === guide.key),
+);
 
 const method = [
   {
@@ -88,17 +94,25 @@ export default function Home() {
                 Healthy living, made clearer.
               </h1>
               <p className="hero-copy">
-                Friendly, careful guides to everyday nutrition, and a close look
-                at a handful of supplements, label by label.
+                Shop our USANA store, or explore friendly, careful guides to
+                everyday nutrition and supplement comparisons, label by label.
               </p>
               <div className="hero-actions">
-                <Link className="primary-link" href="/nutrition#guides-title">
-                  Browse the guides <span aria-hidden="true">→</span>
-                </Link>
-                <Link className="text-link" href="/usana#products">
-                  Compare the supplements
+                <a
+                  className="primary-link"
+                  href={USANA_STOREFRONT_URL}
+                  rel="sponsored"
+                  aria-describedby="hero-store-disclosure"
+                >
+                  Shop USANA <span aria-hidden="true">↗</span>
+                </a>
+                <Link className="text-link" href="/nutrition#guides-title">
+                  Browse the guides
                 </Link>
               </div>
+              <p className="hero-store-disclosure" id="hero-store-disclosure">
+                Affiliate link: Joy Health may earn a commission when you shop.
+              </p>
               <aside
                 className="guide-promise"
                 aria-label="What every Joy Health guide includes"
@@ -161,6 +175,16 @@ export default function Home() {
               See every guide
             </Link>
           </div>
+          <nav className="home-guides-more" aria-label="More nutrition guides">
+            <p className="eyebrow">Also in the library</p>
+            <ul>
+              {moreGuides.map((guide) => (
+                <li key={guide.path}>
+                  <Link href={guide.path}>{guide.title}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </section>
 
         <section className="product-feature" aria-labelledby="product-feature-title">

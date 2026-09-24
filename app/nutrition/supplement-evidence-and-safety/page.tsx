@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Citation } from "../../components/citation";
 import { GuideBreadcrumbs } from "../../components/guide-breadcrumbs";
 import { GuideContents } from "../../components/guide-contents";
+import { RelatedGuides } from "../../components/related-guides";
 import { JsonLd } from "../../components/json-ld";
 import {
   formatEditorialDate,
@@ -32,10 +33,12 @@ export default function SupplementEvidenceAndSafetyGuide() {
           <p className="eyebrow">Nutrition guide</p>
           <h1>{title}</h1>
           <p className="guide-dek">
-            A supplement label, a marketing claim, supporting research, product
-            identity, and personal safety answer different questions. This
-            guide keeps them separate so one reassuring detail does not stand
-            in for the whole evaluation.
+            In the United States, FDA does not approve dietary supplements for
+            safety or effectiveness before they are sold.<Citation source={1} />{" "}
+            That is why a label, a marketing claim, supporting research,
+            product identity, and personal safety each need their own check.
+            This guide keeps them separate so one reassuring detail does not
+            stand in for the whole evaluation.
           </p>
           <div className="guide-meta" role="group" aria-label="Article details">
             <p>Prepared by <strong>Joy Health</strong></p>
@@ -50,7 +53,7 @@ export default function SupplementEvidenceAndSafetyGuide() {
         <GuideContents />
 
         <section className="guide-section" aria-labelledby="meaning-title">
-          <h2 id="meaning-title">What this means</h2>
+          <h2 id="meaning-title">Are dietary supplements FDA approved before they are sold?</h2>
           <div className="guide-copy">
             <p>
               In the United States, FDA does not approve dietary supplements
@@ -77,7 +80,7 @@ export default function SupplementEvidenceAndSafetyGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="evidence-title">
-          <h2 id="evidence-title">What the sources can tell us</h2>
+          <h2 id="evidence-title">What a Supplement Facts label, a quality seal, and a study can each tell you</h2>
           <div className="guide-copy">
             <p>
               These sources have distinct roles. FDA describes regulation,
@@ -139,7 +142,7 @@ export default function SupplementEvidenceAndSafetyGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="use-title">
-          <h2 id="use-title">How to use the framework</h2>
+          <h2 id="use-title">How to check a supplement&apos;s evidence and safety in six steps</h2>
           <div className="guide-copy">
             <ol className="reading-steps">
               <li>
@@ -212,7 +215,7 @@ export default function SupplementEvidenceAndSafetyGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="limits-title">
-          <h2 id="limits-title">Limits and open questions</h2>
+          <h2 id="limits-title">What this supplement checklist does not do</h2>
           <div className="guide-copy">
             <ul className="limit-list">
               <li>This guide does not recommend products, brands, ingredients, doses, or retailers.</li>
@@ -259,6 +262,8 @@ export default function SupplementEvidenceAndSafetyGuide() {
             </ol>
           </div>
         </section>
+
+        <RelatedGuides guide={guide} />
 
         <section className="guide-provenance" aria-labelledby="about-title">
           <div><p className="eyebrow">About this guide</p><h2 id="about-title">Prepared by Joy Health</h2></div>

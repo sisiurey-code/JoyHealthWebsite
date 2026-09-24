@@ -48,8 +48,8 @@ export const USANA_PRODUCT_IMAGES = {
     facts: {
       src: "/images/usana/cellsentials-label.png",
       alt: "Supplement Facts labels for CellSentials Vita Antioxidant and Core Minerals",
-      width: 850,
-      height: 860,
+      width: 2088,
+      height: 1044,
     },
   },
   healthpak: {
@@ -62,8 +62,8 @@ export const USANA_PRODUCT_IMAGES = {
     facts: {
       src: "/images/usana/healthpak-label.png",
       alt: "Supplement Facts label for HealthPak",
-      width: 409,
-      height: 1000,
+      width: 1392,
+      height: 1392,
     },
   },
   procosa: {
@@ -165,3 +165,64 @@ export const PRODUCT_SHELF = [
   name: string;
   role: string;
 }>[];
+
+export const USANA_BRAND_NAME = "USANA Health Sciences";
+
+/**
+ * The products shown on `/usana`, in page order. Descriptions restate the
+ * visible card copy; keep them in step with `UsanaProductCards`.
+ */
+export const USANA_PRODUCT_CATALOG = [
+  {
+    key: "cellsentials",
+    name: "CellSentials",
+    description:
+      "Core Minerals and Vita-Antioxidant, the flagship daily nutrition system, with a company-reported 2026 ConsumerLab seal for label accuracy, purity, and potency.",
+  },
+  {
+    key: "healthpak",
+    name: "HealthPak",
+    description:
+      "Daily packets that package CellSentials with MagneCal D and the CellSentials Booster.",
+  },
+  {
+    key: "procosa",
+    name: "Procosa",
+    description:
+      "A targeted combination built around vegetarian glucosamine, vitamin C, and curcumin.",
+  },
+  {
+    key: "biomega",
+    name: "BiOmega",
+    description:
+      "A fish-oil product providing concentrated omega-3 fatty acids plus vitamin D, named in the current NSF/ANSI 173 listing.",
+  },
+  {
+    key: "magnecal",
+    name: "MagneCal D",
+    description:
+      "Calcium, magnesium, vitamin D, and boron in one formula, with company-reported ConsumerLab testing.",
+  },
+  {
+    key: "coquinone",
+    name: "CoQuinone 30",
+    description:
+      "Coenzyme Q10 and alpha-lipoic acid on a short U.S. label that also identifies soy and gelatin.",
+  },
+  {
+    key: "clearProtein",
+    name: "Clear Protein + Creatine Mix",
+    description:
+      "A 50-calorie serving combining 10 grams of clear whey protein isolate, 5 grams of creatine monohydrate, and more than 600 milligrams of electrolytes.",
+  },
+  {
+    key: "coreAminos",
+    name: "Core Aminos",
+    description:
+      "A lemonade-flavored drink mix combining essential amino acids with HMB, introduced in 2025.",
+  },
+] as const satisfies readonly {
+  key: keyof typeof USANA_PRODUCT_IMAGES;
+  name: string;
+  description: string;
+}[];

@@ -6,8 +6,12 @@ const sections = [
   { id: "sources-title", label: "Sources" },
 ] as const;
 
-/** In-page table of contents shared by every nutrition guide. */
-export function GuideContents() {
+type ContentsSection = Readonly<{ id: string; label: string }>;
+
+/** In-page table of contents; guides share the default section set. */
+export function GuideContents({
+  sections: entries = sections,
+}: Readonly<{ sections?: readonly ContentsSection[] }>) {
   return (
     <nav className="guide-contents" aria-labelledby="guide-contents-label">
       <p className="guide-contents-label" id="guide-contents-label">
@@ -15,7 +19,7 @@ export function GuideContents() {
         In this guide
       </p>
       <ol>
-        {sections.map((section, index) => (
+        {entries.map((section, index) => (
           <li key={section.id}>
             <a href={`#${section.id}`}>
               <span aria-hidden="true">0{index + 1}</span>

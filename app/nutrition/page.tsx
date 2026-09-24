@@ -1,29 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { JsonLd } from "../components/json-ld";
 import { NUTRITION_GUIDES, PUBLICATIONS } from "../lib/publications";
-import { SITE_OG_IMAGE } from "../lib/seo";
+import { buildPageListJsonLd, buildPageMetadata } from "../lib/seo";
 
-const { description, title } = PUBLICATIONS.nutrition;
+export const metadata: Metadata = buildPageMetadata(PUBLICATIONS.nutrition);
 
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: "/nutrition" },
-  openGraph: {
-    type: "website",
-    url: "/nutrition",
-    siteName: "Joy Health",
-    title: `${title} | Joy Health`,
-    description,
-    images: [SITE_OG_IMAGE],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${title} | Joy Health`,
-    description,
-    images: [SITE_OG_IMAGE.url],
-  },
-};
+const guideListJsonLd = buildPageListJsonLd(
+  "Joy Health nutrition guides",
+  NUTRITION_GUIDES.map((guide) => ({ name: guide.title, path: guide.path })),
+);
 
 export default function NutritionPage() {
   return (
@@ -144,6 +130,7 @@ export default function NutritionPage() {
           </Link>
         </div>
       </section>
+      <JsonLd data={guideListJsonLd} />
     </main>
   );
 }

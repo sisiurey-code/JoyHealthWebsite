@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Citation } from "../../components/citation";
 import { GuideBreadcrumbs } from "../../components/guide-breadcrumbs";
 import { GuideContents } from "../../components/guide-contents";
+import { RelatedGuides } from "../../components/related-guides";
 import { JsonLd } from "../../components/json-ld";
 import {
   formatEditorialDate,
@@ -32,9 +33,11 @@ export default function HydrationGuide() {
           <p className="eyebrow">Nutrition guide</p>
           <h1>{title}</h1>
           <p className="guide-dek">
-            Total water includes more than glasses of plain water. This guide
-            explains the adult reference values, what they count, and why they
-            are not precise requirements for every person or day.
+            The adult reference values are 3.7 liters of total water per day
+            for men and 2.7 liters for women, and total water counts other
+            beverages and food, not just plain water.<Citation source={1} />{" "}
+            This guide explains what those numbers count and why they are not
+            precise requirements for every person or day.
           </p>
           <div className="guide-meta" role="group" aria-label="Article details"><p>Prepared by <strong>Joy Health</strong></p><p><time dateTime={guide.datePublished}>{`Published ${formatEditorialDate(guide.datePublished)}`}</time></p></div>
         </header>
@@ -62,7 +65,7 @@ export default function HydrationGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="evidence-title">
-          <h2 id="evidence-title">What the reference can tell us</h2>
+          <h2 id="evidence-title">How much water per day do the reference values say?</h2>
           <div className="guide-copy">
             <p>
               The water DRI is a population reference for apparently healthy
@@ -114,7 +117,7 @@ export default function HydrationGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="use-title">
-          <h2 id="use-title">How to use the information</h2>
+          <h2 id="use-title">How to use the daily water reference values</h2>
           <div className="guide-copy">
             <ol className="reading-steps">
               <li>
@@ -154,7 +157,7 @@ export default function HydrationGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="limits-title">
-          <h2 id="limits-title">Limits and open questions</h2>
+          <h2 id="limits-title">When the daily water numbers do not apply</h2>
           <div className="guide-copy">
             <ul className="limit-list">
               <li>The AIs come from older, self-reported intake data and are not measured individual requirements.</li>
@@ -176,6 +179,8 @@ export default function HydrationGuide() {
             </ol>
           </div>
         </section>
+
+        <RelatedGuides guide={guide} />
 
         <section className="guide-provenance" aria-labelledby="about-title"><div><p className="eyebrow">About this guide</p><h2 id="about-title">Prepared by Joy Health</h2></div><div><p>Joy Health is an educational publisher, not a medical practice. The reference-reading sequence is Joy Health interpretation checked against the claim-source record. No external clinical reviewer participated.</p><Link href="/standards">Read our editorial standards</Link></div></section>
         <aside className="medical-note" aria-label="Medical information notice"><strong>Medical information notice:</strong> Joy Health offers general education, not medical advice, diagnosis, or treatment. Seek qualified care for personal medical questions and urgent help for emergencies.</aside>

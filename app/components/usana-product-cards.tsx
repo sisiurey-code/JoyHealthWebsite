@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useState, type ReactNode } from "react";
+import { SUPPLEMENT_PRODUCTS } from "../lib/supplements";
 import {
   responsiveProductSources,
   USANA_PRODUCT_IMAGES,
@@ -9,6 +11,8 @@ import {
 
 type ProductCardProps = Readonly<{
   name: string;
+  /** The product's own page, with its label as text. */
+  href: string;
   title?: ReactNode;
   label: string;
   product: ProductImage;
@@ -80,6 +84,7 @@ function LabelPhoto({
 
 function ProductCard({
   name,
+  href,
   title,
   label,
   product,
@@ -128,6 +133,9 @@ function ProductCard({
           <h3>{title ?? name}</h3>
           <div className="usana-product-copy">{children}</div>
           {fit ? <p className="usana-product-fit">{fit}</p> : null}
+          <Link className="usana-product-page-link" href={href}>
+            {name}: full label as text <span aria-hidden="true">→</span>
+          </Link>
         </div>
       </div>
 
@@ -160,6 +168,9 @@ function ProductCard({
 
 const products = USANA_PRODUCT_IMAGES;
 
+const pageFor = (key: (typeof SUPPLEMENT_PRODUCTS)[number]["key"]) =>
+  SUPPLEMENT_PRODUCTS.find((product) => product.key === key)!.path;
+
 export function UsanaProductCards() {
   return (
     <div className="usana-product-grid">
@@ -167,6 +178,7 @@ export function UsanaProductCards() {
         name="CellSentials"
         label="Flagship foundation"
         featured
+        href={pageFor("cellsentials")}
         {...products.cellsentials}
         fit={
           <>
@@ -180,8 +192,8 @@ export function UsanaProductCards() {
           nutrition system. USANA&apos;s 2026 filing identifies
           Essentials/CellSentials as a key product, and the company reports a
           2026 ConsumerLab seal for label accuracy, purity, and potency.
-          <a className="citation" href="#usana-source-7" aria-label="Source 7">[7]</a>
-          <a className="citation" href="#usana-source-8" aria-label="Source 8">[8]</a>
+          <a className="citation" href="#usana-source-4" aria-label="Source 4">[4]</a>
+          <a className="citation" href="#usana-source-5" aria-label="Source 5">[5]</a>
         </p>
       </ProductCard>
 
@@ -189,6 +201,7 @@ export function UsanaProductCards() {
         name="HealthPak"
         label="Flagship convenience"
         featured
+        href={pageFor("healthpak")}
         {...products.healthpak}
         fit={
           <>
@@ -201,35 +214,38 @@ export function UsanaProductCards() {
           HealthPak packages CellSentials with MagneCal D and the CellSentials
           Booster in daily packets. It trades flexibility for the convenience
           of a wider preset stack.
-          <a className="citation" href="#usana-source-10" aria-label="Source 10">[10]</a>
+          <a className="citation" href="#usana-source-6" aria-label="Source 6">[6]</a>
         </p>
       </ProductCard>
 
-      <ProductCard name="Procosa" label="Focused formula" {...products.procosa}>
+      <ProductCard name="Procosa" label="Focused formula" href={pageFor("procosa")}
+        {...products.procosa}>
         <p>
           A targeted combination built around vegetarian glucosamine, vitamin
           C, and curcumin. Read the exact serving and other ingredients before
           comparing it with single-ingredient options.
-          <a className="citation" href="#usana-source-10" aria-label="Source 10">[10]</a>
+          <a className="citation" href="#usana-source-6" aria-label="Source 6">[6]</a>
         </p>
       </ProductCard>
 
-      <ProductCard name="BiOmega" label="Omega-3 format" {...products.biomega}>
+      <ProductCard name="BiOmega" label="Omega-3 format" href={pageFor("biomega")}
+        {...products.biomega}>
         <p>
           A fish-oil product providing concentrated omega-3 fatty acids plus
           vitamin D. It is also one of the finished products named in the
           current NSF listing, which applies to that product and scope.
           <a className="citation" href="#usana-source-2" aria-label="Source 2">[2]</a>
-          <a className="citation" href="#usana-source-10" aria-label="Source 10">[10]</a>
+          <a className="citation" href="#usana-source-6" aria-label="Source 6">[6]</a>
         </p>
       </ProductCard>
 
-      <ProductCard name="MagneCal D" label="Mineral combination" {...products.magnecal}>
+      <ProductCard name="MagneCal D" label="Mineral combination" href={pageFor("magnecal")}
+        {...products.magnecal}>
         <p>
           Calcium, magnesium, vitamin D, and boron share one formula. USANA
           reports that ConsumerLab testing found the claimed amounts and
           checked purity, label accuracy, and disintegration.
-          <a className="citation" href="#usana-source-9" aria-label="Source 9">[9]</a>
+          <a className="citation" href="#usana-source-7" aria-label="Source 7">[7]</a>
         </p>
       </ProductCard>
 
@@ -237,6 +253,7 @@ export function UsanaProductCards() {
         name="CoQuinone"
         label="Joy Health pick"
         editorPick
+        href={pageFor("coquinone")}
         {...products.coquinone}
         fit={
           <>
@@ -249,7 +266,7 @@ export function UsanaProductCards() {
           The U.S. CoQuinone 30 label is short: coenzyme Q10 and alpha-lipoic
           acid. It also identifies soy and gelatin, with no established Daily
           Value for either active ingredient.
-          <a className="citation" href="#usana-source-11" aria-label="Source 11">[11]</a>
+          <a className="citation" href="#usana-source-8" aria-label="Source 8">[8]</a>
         </p>
       </ProductCard>
 
@@ -263,6 +280,7 @@ export function UsanaProductCards() {
         label="Joy Health pick"
         editorPick
         compactTitle
+        href={pageFor("clearProtein")}
         {...products.clearProtein}
         fit={
           <>
@@ -276,7 +294,7 @@ export function UsanaProductCards() {
           isolate, 5 grams of creatine monohydrate, and more than 600
           milligrams of electrolytes. It comes in Twisted Citrus and Green
           Apple, in bags or single-serve packets.
-          <a className="citation" href="#usana-source-12" aria-label="Source 12">[12]</a>
+          <a className="citation" href="#usana-source-9" aria-label="Source 9">[9]</a>
         </p>
       </ProductCard>
 
@@ -286,6 +304,7 @@ export function UsanaProductCards() {
         label="Joy Health pick"
         editorPick
         compactTitle
+        href={pageFor("coreAminos")}
         {...products.coreAminos}
         fit={
           <>
@@ -298,7 +317,7 @@ export function UsanaProductCards() {
           Core Aminos is a lemonade-flavored drink mix combining essential
           amino acids with HMB. USANA introduced it in 2025 as part of its
           active-nutrition expansion.
-          <a className="citation" href="#usana-source-4" aria-label="Source 4">[4]</a>
+          <a className="citation" href="#usana-source-10" aria-label="Source 10">[10]</a>
         </p>
       </ProductCard>
     </div>
