@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { SUPPLEMENT_PRODUCTS } from "../lib/supplements";
 import {
   PRODUCT_SHELF,
   responsiveProductSources,
@@ -12,8 +14,8 @@ type ProductShelfProps = Readonly<{
 }>;
 
 /**
- * A static, server-rendered grid of product photographs. It is the visual
- * anchor for product-first sections and needs no client JavaScript.
+ * A static, server-rendered grid of product photographs, each tile linking to
+ * that product's label page. It needs no client JavaScript.
  */
 export function ProductShelf({ caption }: ProductShelfProps) {
   return (
@@ -35,7 +37,11 @@ export function ProductShelf({ caption }: ProductShelfProps) {
                 decoding="async"
               />
               <span>
-                <strong>{name}</strong>
+                <strong>
+                  <Link href={SUPPLEMENT_PRODUCTS.find((product) => product.key === key)!.path}>
+                    {name}
+                  </Link>
+                </strong>
                 <small>{role}</small>
               </span>
             </li>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Citation } from "../../components/citation";
 import { GuideBreadcrumbs } from "../../components/guide-breadcrumbs";
 import { GuideContents } from "../../components/guide-contents";
+import { RelatedGuides } from "../../components/related-guides";
 import { JsonLd } from "../../components/json-ld";
 import {
   formatEditorialDate,
@@ -52,7 +53,7 @@ export default function ProteinAndFiberGuide() {
         <GuideContents />
 
         <section className="guide-section" aria-labelledby="meaning-title">
-          <h2 id="meaning-title">Foods that contribute protein, fiber, or both</h2>
+          <h2 id="meaning-title">Which foods contribute protein, fiber, or both?</h2>
           <div className="guide-copy">
             <p>
               Protein is a group of molecules built from amino acids. The
@@ -60,18 +61,18 @@ export default function ProteinAndFiberGuide() {
               functional components of cells.
               <Citation source={1} /> Dietary fiber, in the FDA label context,
               is a defined category of nondigestible carbohydrates and lignin.
-              <Citation source={3} /> Those definitions describe two different
+              <Citation source={2} /> Those definitions describe two different
               things.
             </p>
             <p>
               Some foods can contribute both. Beans, peas, lentils, nuts,
               seeds, and soy appear in current federal guidance as plant protein
               foods.
-              <Citation source={4} /> Because they are plants, some can also
+              <Citation source={3} /> Because they are plants, some can also
               contain intrinsic fiber under FDA&apos;s definition. The actual
               grams depend on the food, preparation, and serving, so this guide
               does not treat those foods as nutritionally interchangeable.
-              <Citation source={3} />
+              <Citation source={2} />
             </p>
             <aside className="key-point" aria-label="Key point">
               <strong>Ask two questions.</strong> What in this meal may
@@ -82,7 +83,7 @@ export default function ProteinAndFiberGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="evidence-title">
-          <h2 id="evidence-title">What the references can tell us</h2>
+          <h2 id="evidence-title">How much protein and fiber is recommended? RDA, AI, and Daily Value</h2>
           <div className="guide-copy">
             <p>
               Nutrition numbers can look contradictory when their labels are
@@ -111,7 +112,7 @@ export default function ProteinAndFiberGuide() {
                   adjusted as needed for individual calorie requirements. That
                   is current federal policy language, not a renamed National
                   Academies RDA.
-                  <Citation source={4} />
+                  <Citation source={3} />
                 </dd>
               </div>
               <div>
@@ -121,7 +122,7 @@ export default function ProteinAndFiberGuide() {
                   labeling. Percent Daily Value shows how much a serving
                   contributes to that label reference. Joy Health does not use
                   it as a personal prescription.
-                  <Citation source={2} />
+                  <Citation source={4} />
                 </dd>
               </div>
               <div>
@@ -142,7 +143,7 @@ export default function ProteinAndFiberGuide() {
                   FDA&apos;s Daily Value for dietary fiber is 28 grams for
                   nutrition labeling. That single label reference is not the
                   same thing as the age- and sex-specific Adequate Intakes.
-                  <Citation source={2} />
+                  <Citation source={4} />
                 </dd>
               </div>
             </dl>
@@ -150,7 +151,7 @@ export default function ProteinAndFiberGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="use-title">
-          <h2 id="use-title">How to use the information</h2>
+          <h2 id="use-title">How to use protein and fiber numbers on food labels</h2>
           <div className="guide-copy">
             <ol className="reading-steps">
               <li>
@@ -160,8 +161,8 @@ export default function ProteinAndFiberGuide() {
                   plant protein foods, while FDA gives vegetables, fruits,
                   whole grains, cereal bran, and flours as examples with
                   intrinsic fiber.
+                  <Citation source={2} />
                   <Citation source={3} />
-                  <Citation source={4} />
                 </p>
               </li>
               <li>
@@ -180,7 +181,7 @@ export default function ProteinAndFiberGuide() {
                   Nutrition Facts panel. Read the serving size first, then use
                   the grams and any displayed percent Daily Value for that
                   serving.
-                  <Citation source={2} /> See the complete Joy Health guide to
+                  <Citation source={4} /> See the complete Joy Health guide to
                   <Link href="/nutrition/reading-food-labels">
                     {" "}reading a Nutrition Facts label
                   </Link>
@@ -207,14 +208,14 @@ export default function ProteinAndFiberGuide() {
                 one labeled serving. It does not show that the food supplies
                 20% or 25% of a particular person&apos;s requirement, and it does
                 not make the two nutrients equivalent.
-                <Citation source={2} />
+                <Citation source={4} />
               </p>
             </div>
           </div>
         </section>
 
         <section className="guide-section" aria-labelledby="limits-title">
-          <h2 id="limits-title">Limits and open questions</h2>
+          <h2 id="limits-title">What these protein and fiber numbers do not tell you</h2>
           <div className="guide-copy">
             <ul className="limit-list">
               <li>
@@ -226,13 +227,13 @@ export default function ProteinAndFiberGuide() {
                 within their stated life-stage groups. The current federal
                 protein goal is a separate policy statement.
                 <Citation source={1} />
-                <Citation source={4} />
+                <Citation source={3} />
               </li>
               <li>
                 FDA&apos;s dietary-fiber category includes intrinsic plant fibers
                 and selected isolated or synthetic fibers. That shared label
                 category does not mean all fiber types have identical effects.
-                <Citation source={3} />
+                <Citation source={2} />
               </li>
               <li>
                 Food examples identify possible sources, not equivalent
@@ -276,17 +277,6 @@ export default function ProteinAndFiberGuide() {
                 </p>
               </li>
               <li id="source-2">
-                <a href="https://www.fda.gov/food/nutrition-facts-label/daily-value-nutrition-and-supplement-facts-labels">
-                  Daily Value on the Nutrition and Supplement Facts Labels
-                </a>
-                <p>
-                  U.S. Food and Drug Administration. Used for the 50-gram
-                  protein Daily Value, 28-gram dietary-fiber Daily Value, and
-                  percent Daily Value meaning. Limitation: label references are
-                  not individualized requirements.
-                </p>
-              </li>
-              <li id="source-3">
                 <a href="https://www.fda.gov/food/nutrition-food-labeling-and-critical-foods/questions-and-answers-dietary-fiber">
                   Questions and Answers on Dietary Fiber
                 </a>
@@ -297,7 +287,7 @@ export default function ProteinAndFiberGuide() {
                   identical effects for every fiber type or food.
                 </p>
               </li>
-              <li id="source-4">
+              <li id="source-3">
                 <a href="https://cdn.realfood.gov/DGA.pdf">
                   Dietary Guidelines for Americans, 2025–2030
                 </a>
@@ -309,9 +299,22 @@ export default function ProteinAndFiberGuide() {
                   or personalized prescription.
                 </p>
               </li>
+              <li id="source-4">
+                <a href="https://www.fda.gov/food/nutrition-facts-label/daily-value-nutrition-and-supplement-facts-labels">
+                  Daily Value on the Nutrition and Supplement Facts Labels
+                </a>
+                <p>
+                  U.S. Food and Drug Administration. Used for the 50-gram
+                  protein Daily Value, 28-gram dietary-fiber Daily Value, and
+                  percent Daily Value meaning. Limitation: label references are
+                  not individualized requirements.
+                </p>
+              </li>
             </ol>
           </div>
         </section>
+
+        <RelatedGuides guide={guide} />
 
         <section className="guide-provenance" aria-labelledby="about-title">
           <div>

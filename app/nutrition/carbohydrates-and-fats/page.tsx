@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Citation } from "../../components/citation";
 import { GuideBreadcrumbs } from "../../components/guide-breadcrumbs";
 import { GuideContents } from "../../components/guide-contents";
+import { RelatedGuides } from "../../components/related-guides";
 import { JsonLd } from "../../components/json-ld";
 import {
   CARBOHYDRATES_AND_FATS_GUIDE,
@@ -50,7 +51,7 @@ export default function CarbohydratesAndFatsGuide() {
         <GuideContents />
 
         <section className="guide-section" aria-labelledby="meaning-title">
-          <h2 id="meaning-title">What this means</h2>
+          <h2 id="meaning-title">What do carbohydrate and fat mean on a Nutrition Facts label?</h2>
           <div className="guide-copy">
             <p>
               On a U.S. Nutrition Facts label, Total Carbohydrate sits above
@@ -74,7 +75,7 @@ export default function CarbohydratesAndFatsGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="evidence-title">
-          <h2 id="evidence-title">What guidance can tell us</h2>
+          <h2 id="evidence-title">Types of carbohydrates and fats, and where they come from</h2>
           <div className="guide-copy">
             <p>
               The sources here play two roles. FDA defines U.S. label fields.
@@ -138,7 +139,7 @@ export default function CarbohydratesAndFatsGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="use-title">
-          <h2 id="use-title">How to use the information</h2>
+          <h2 id="use-title">How to compare carbohydrates and fats in real foods</h2>
           <div className="guide-copy">
             <ol className="reading-steps">
               <li>
@@ -194,7 +195,7 @@ export default function CarbohydratesAndFatsGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="limits-title">
-          <h2 id="limits-title">Limits and open questions</h2>
+          <h2 id="limits-title">What this guide does not decide about carbohydrates and fats</h2>
           <div className="guide-copy">
             <ul className="limit-list">
               <li>Neither carbohydrate nor fat is one uniform substance or one health score.</li>
@@ -239,6 +240,8 @@ export default function CarbohydratesAndFatsGuide() {
             </ol>
           </div>
         </section>
+
+        <RelatedGuides guide={guide} />
 
         <section className="guide-provenance" aria-labelledby="about-title">
           <div><p className="eyebrow">About this guide</p><h2 id="about-title">Prepared by Joy Health</h2></div>

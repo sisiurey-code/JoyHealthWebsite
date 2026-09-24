@@ -60,7 +60,9 @@ before publishing the generated Worker bundle.
 The public editorial charter is published at
 [joyhealth.cc/standards](https://joyhealth.cc/standards). Release verification
 and Search Console monitoring are documented in
-[docs/SEO_OPERATIONS.md](docs/SEO_OPERATIONS.md).
+[docs/SEO_OPERATIONS.md](docs/SEO_OPERATIONS.md). How supplement labels were
+transcribed and how to re-check them is in
+[docs/SUPPLEMENT_LABELS.md](docs/SUPPLEMENT_LABELS.md).
 
 ## License and brand
 

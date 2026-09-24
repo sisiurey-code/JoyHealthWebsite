@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Citation } from "../../components/citation";
 import { GuideBreadcrumbs } from "../../components/guide-breadcrumbs";
 import { GuideContents } from "../../components/guide-contents";
+import { RelatedGuides } from "../../components/related-guides";
 import { JsonLd } from "../../components/json-ld";
 import {
   ELECTROLYTE_DRINKS_GUIDE,
@@ -57,7 +58,7 @@ export default function ElectrolyteDrinksGuide() {
               regulate extracellular fluid volume; potassium is concentrated
               inside cells and participates in fluid balance, nerve
               transmission, and muscle contraction.
-              <Citation source={2} /> A product can contain both without being
+              <Citation source={1} /> A product can contain both without being
               necessary for every walk, desk day, or glass of water.
             </p>
             <p>
@@ -66,7 +67,7 @@ export default function ElectrolyteDrinksGuide() {
               acclimatization, body size, clothing, and opportunities to drink.
               The National Athletic Trainers&apos; Association says those
               differences make universal replacement instructions impossible.
-              <Citation source={1} />
+              <Citation source={2} />
             </p>
             <p>
               Start with the Joy Health guide to <Link href="/nutrition/hydration">how much water
@@ -82,7 +83,7 @@ export default function ElectrolyteDrinksGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="evidence-title">
-          <h2 id="evidence-title">What the references can tell us</h2>
+          <h2 id="evidence-title">What to compare on an electrolyte drink label</h2>
           <div className="guide-copy">
             <p>
               A label and an exercise position statement answer different
@@ -107,7 +108,7 @@ export default function ElectrolyteDrinksGuide() {
                   the Nutrition Facts Daily Value is a whole-day reference, not
                   a personalized sweat-replacement target. FDA lists 2,300
                   milligrams as 100 percent Daily Value.
-                  <Citation source={1} /><Citation source={3} />
+                  <Citation source={2} /><Citation source={3} />
                 </dd>
               </div>
               <div>
@@ -117,7 +118,7 @@ export default function ElectrolyteDrinksGuide() {
                   disease and medications that alter potassium excretion can
                   make added potassium unsafe, so a higher number is not always
                   a better number.
-                  <Citation source={2} />
+                  <Citation source={1} />
                 </dd>
               </div>
               <div>
@@ -145,7 +146,7 @@ export default function ElectrolyteDrinksGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="use-title">
-          <h2 id="use-title">How to use the information</h2>
+          <h2 id="use-title">How to decide between water and an electrolyte drink</h2>
           <div className="guide-copy">
             <ol className="reading-steps">
               <li>
@@ -180,7 +181,7 @@ export default function ElectrolyteDrinksGuide() {
                   questions from a short routine session. Individual sweat loss
                   varies widely, and both too little and too much fluid can be
                   harmful.
-                  <Citation source={1} />
+                  <Citation source={2} />
                 </p>
               </li>
               <li>
@@ -209,7 +210,7 @@ export default function ElectrolyteDrinksGuide() {
         </section>
 
         <section className="guide-section" aria-labelledby="limits-title">
-          <h2 id="limits-title">Limits and open questions</h2>
+          <h2 id="limits-title">When electrolyte guidance needs more context than this guide</h2>
           <div className="guide-copy">
             <ul className="limit-list">
               <li>This guide does not calculate a personal sweat rate or prescribe fluid, sodium, potassium, carbohydrate, or supplement amounts.</li>
@@ -238,6 +239,16 @@ export default function ElectrolyteDrinksGuide() {
             </p>
             <ol className="source-list">
               <li id="source-1">
+                <a href="https://ods.od.nih.gov/factsheets/Potassium-HealthProfessional/">
+                  NIH Office of Dietary Supplements, Potassium Fact Sheet for Health Professionals
+                </a>
+                <p>
+                  Used for potassium&apos;s physiological roles, food sources,
+                  kidney handling, and medication-related safety. It is a broad
+                  nutrient review, not sports-drink guidance.
+                </p>
+              </li>
+              <li id="source-2">
                 <a href="https://www.nata.org/sites/default/files/2025-08/fluid_replacement_for_the_physically_active.pdf">
                   National Athletic Trainers&apos; Association Position Statement: Fluid Replacement for the Physically Active
                 </a>
@@ -249,16 +260,6 @@ export default function ElectrolyteDrinksGuide() {
                   several authors disclosed consulting, speaking, advisory, or
                   research relationships with Gatorade, Danone, PepsiCo, and
                   other commercial organizations.
-                </p>
-              </li>
-              <li id="source-2">
-                <a href="https://ods.od.nih.gov/factsheets/Potassium-HealthProfessional/">
-                  NIH Office of Dietary Supplements, Potassium Fact Sheet for Health Professionals
-                </a>
-                <p>
-                  Used for potassium&apos;s physiological roles, food sources,
-                  kidney handling, and medication-related safety. It is a broad
-                  nutrient review, not sports-drink guidance.
                 </p>
               </li>
               <li id="source-3">
@@ -295,6 +296,8 @@ export default function ElectrolyteDrinksGuide() {
             </ol>
           </div>
         </section>
+
+        <RelatedGuides guide={guide} />
 
         <section className="guide-provenance" aria-labelledby="about-title">
           <div>

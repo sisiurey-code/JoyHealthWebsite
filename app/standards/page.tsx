@@ -3,29 +3,9 @@ import Link from "next/link";
 import { SiteFooter } from "../components/site-footer";
 import { SiteHeader } from "../components/site-header";
 import { PUBLICATIONS } from "../lib/publications";
-import { SITE_OG_IMAGE } from "../lib/seo";
+import { buildPageMetadata } from "../lib/seo";
 
-const { description, title } = PUBLICATIONS.standards;
-
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: "/standards" },
-  openGraph: {
-    type: "website",
-    siteName: "Joy Health",
-    url: "/standards",
-    title: `${title} | Joy Health`,
-    description,
-    images: [SITE_OG_IMAGE],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${title} | Joy Health`,
-    description,
-    images: [SITE_OG_IMAGE.url],
-  },
-};
+export const metadata: Metadata = buildPageMetadata(PUBLICATIONS.standards);
 
 const standards = [
   {
@@ -54,6 +34,11 @@ const standards = [
   },
 ];
 
+/** Stable fragment for each standard, e.g. `#how-we-correct-errors`. */
+function standardId(title: string) {
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
 export default function StandardsPage() {
   return (
     <div className="page-shell policy-shell">
@@ -69,7 +54,7 @@ export default function StandardsPage() {
         </section>
         <div className="policy-grid">
           {standards.map((standard, index) => (
-            <section key={standard.title}>
+            <section key={standard.title} id={standardId(standard.title)}>
               <p className="standard-number" aria-hidden="true">
                 [0{index + 1}]
               </p>

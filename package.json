@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext dev",
     "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
+    "postbuild": "node scripts/build-agent-files.mjs",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
     "deploy": "npm run check && npm run deploy:worker",
     "deploy:worker": "wrangler deploy --config dist/server/wrangler.json",
@@ -21,6 +22,9 @@
     "images:generate": "node scripts/generate-responsive-images.mjs",
     "images:check": "node scripts/generate-responsive-images.mjs --check",
     "check": "npm run images:check && npm run lint && npm run typecheck && npm test",
+    "seo:audit": "node scripts/audit-seo.mjs",
+    "aeo:probe": "node scripts/aeo-probe.mjs",
+    "indexnow": "node scripts/indexnow.mjs",
     "audit": "npm audit --audit-level=high"
   },
   "dependencies": {
@@ -28,7 +32,7 @@
     "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.53.1",
+    "@cloudflare/vite-plugin": "1.60.0",
     "@eslint/js": "9.39.4",
     "@next/eslint-plugin-next": "16.2.6",
     "@types/node": "22.19.19",
@@ -42,12 +46,12 @@
     "eslint-plugin-react-hooks": "7.1.1",
     "globals": "16.4.0",
     "react-server-dom-webpack": "19.2.8",
-    "sharp": "0.35.2",
+    "sharp": "0.35.4",
     "typescript": "5.9.3",
     "typescript-eslint": "8.59.3",
     "vinext": "1.0.0-beta.8",
     "vite": "8.2.2",
-    "wrangler": "4.125.0"
+    "wrangler": "4.139.0"
   },
   "type": "module"
 }

@@ -13,6 +13,116 @@ Production checks establish what the origin currently serves. Google Search
 Console reports what Google observed. None of those evidence layers substitutes
 for another.
 
+## Automated technical audit
+
+Run `npm run seo:audit` to check the currently deployed canonical origin, or
+`npm run seo:audit -- http://localhost:3000` against a local HTTP server. The
+same audit runs against the built Worker inside `npm run check`, checking
+sitemap structure, metadata uniqueness, canonicals, social metadata, internal
+page/fragment links, reachability, linked assets, and 404 behavior. HTTP checks
+fail rather than silently following a canonical resource through a redirect.
+See [`SEO_AUDIT.md`](SEO_AUDIT.md) for the dated findings and validation limits.
+
+## Answer engines and AI assistants
+
+Assistants such as ChatGPT, Claude, Perplexity, and Google's AI features answer
+from pages they retrieve, usually passage by passage. The site serves the same
+content in forms those systems read cheaply, generated from the built pages so
+they cannot drift:
+
+| Surface | What it is | Indexing |
+| --- | --- | --- |
+| `/<path>.md` (home: `/index.md`) | Markdown twin of every sitemap page, with a front-matter block naming the canonical URL | `X-Robots-Tag: noindex`, so search indexes keep the HTML page |
+| `Accept: text/markdown` on a canonical URL | The same twin, negotiated, with `Vary: Accept` | Never `noindex`: an indexer asking for Markdown must not drop the page |
+| `/llms.txt` | Curated index of every page with its description ([llmstxt.org](https://llmstxt.org) format) | `noindex` |
+| `/llms-full.txt` | Every page's Markdown in sitemap order | `noindex` |
+| `/feed.xml` | RSS of dated guides and product pages, editorial dates only | Normal |
+| `/data/supplement-labels.json`, `.csv` | Every transcribed label row, with daily amounts and upper limits (JSON), generated from `app/lib/supplement-labels.ts`; described by a `Dataset` on `/usana#label-data`; licensed CC BY 4.0 | Normal |
+| `/robots.txt` | `Content-Signal: search=yes, ai-input=yes, ai-train=yes` ([contentsignals.org](https://contentsignals.org/)), the publisher's decision of 2026-09-24 | Normal |
+
+`scripts/build-agent-files.mjs` writes the twins and both text files after
+every `vinext build` (the `postbuild` script), rendering through the built
+Worker. Never hand-edit them in `dist/`. Every page head links its twin and the
+feed with `<link rel="alternate">`, the HTML response repeats the twin in a
+`Link` header, and the release gate checks all of it. Markdown headings end in
+`{#id}` (the HTML fragment), so an agent can cite one section as
+`canonical#id`.
+
+Structured data links each page to the entities it discusses: `about` and
+`mentions` point at Wikidata items and English Wikipedia articles listed in
+`app/lib/entities.ts` (`PAGE_TOPICS`). Add an entity only when the visible page
+discusses it, and resolve new identifiers against the Wikidata API first.
+Product pages describe a `WebPage` about a `DietarySupplement` whose
+ingredients and directions come from the label records, with `citation`
+entries that equal the visible source list; the creatine guide cites its
+sources the same way. `DietarySupplement` is a schema.org subtype of `Product`,
+and the pages state no price or rating, so Search Console may list them as
+product snippets missing `offers`, `review`, or `aggregateRating`. That is
+expected: do not add offers or ratings the page does not show.
+
+The Worker adds an `ETag` to pages, twins, feeds, and data files and answers a
+matching `If-None-Match` with `304`, so crawlers can recheck unchanged pages
+cheaply.
+
+Evidence that `llms.txt` changes how any assistant ranks or cites pages is
+thin; treat it and the twins as low-cost conveniences for agents that fetch
+pages, not as a ranking lever. What demonstrably matters is that crawlers can
+fetch the HTML, that the search indexes assistants draw on contain the pages,
+and that each page answers its question in a self-contained opening passage
+with its sources. `npm run aeo:probe` is a rough local check of that last point:
+it ranks the Markdown corpus with BM25 for a fixed set of reader questions and
+reports whether the top passage contains the answer. It is a lexical proxy, not
+a model of any assistant, so use it to catch regressions in answer-first copy,
+not as a score to optimize.
+
+Checks after a deploy:
+
+```bash
+curl -sI https://joyhealth.cc/nutrition/hydration.md | grep -iE 'content-type|x-robots-tag'
+curl -s -H 'Accept: text/markdown' https://joyhealth.cc/nutrition/hydration | head -5
+curl -s https://joyhealth.cc/llms.txt | head -12
+curl -s -A 'Mozilla/5.0 (compatible; GPTBot/1.2; +https://openai.com/gptbot)' -o /dev/null -w '%{http_code}\n' https://joyhealth.cc/
+curl -s https://joyhealth.cc/robots.txt | grep Content-Signal
+curl -s -o /dev/null -w '%{http_code}\n' -H "If-None-Match: $(curl -s -D - -o /dev/null https://joyhealth.cc/usana | grep -i '^etag' | cut -d' ' -f2 | tr -d '\r')" https://joyhealth.cc/usana
+```
+
+The last command should print `304`; Cloudflare may weaken the ETag when it
+compresses a response, and the Worker compares tags weakly. HTML keeps its ETag
+only because of the zone's Cache Rule "ETags" (expression: hostname equals
+`joyhealth.cc`; action: eligible for cache, Respect strong ETags). Without that
+rule, Cloudflare's HTML features, such as Email Obfuscation, Automatic HTTPS
+Rewrites, Rocket Loader, Cloudflare Fonts, and Replace insecure JavaScript
+libraries, drop the ETag from HTML while Markdown, text, and data files keep
+theirs. The rule also turns off Rocket Loader, Email Obfuscation, and
+Automatic HTTPS Rewrites for the hostname, whatever their zone toggles say, so
+revisit it before publishing an email address on the site. On 2026-09-24 the
+rule first used a full-URI wildcard of `joyhealth.cc` with no `*`, which
+matched nothing; matching the hostname fixed it. If this check prints `200`,
+confirm the rule still exists and matches.
+
+Account-side steps that code cannot take (each needs the owner's decision):
+
+- **Bing Webmaster Tools:** verify the site (it can import the Search Console
+  property) and submit the sitemap. Bing's index feeds Copilot and has been
+  among the search providers behind ChatGPT search.
+- **IndexNow:** `public/<key>.txt` holds the site's IndexNow key (public by
+  design). After a deploy that adds or substantively changes pages, preview
+  with `npm run indexnow -- --since YYYY-MM-DD` (reads `lastmod` from the live
+  sitemap) or `npm run indexnow -- /path ...`, then add `--submit`. Submit only
+  added, updated, or deleted URLs. Cloudflare's Crawler Hints setting is an
+  alternative that notifies IndexNow engines automatically; either is enough.
+- **Cloudflare bot settings:** on 2026-09-23 every major AI crawler user agent
+  received HTTP 200, and `robots.txt` is the site's own, not Cloudflare's
+  managed version. Keep "Block AI bots" and AI Crawl Control blocking off if
+  assistant visibility is the goal. Browser Integrity Check returns error 1010
+  to the `Python-urllib` user agent, which some agent tools send; other HTTP
+  clients were allowed.
+
+A Page Indexing exclusion for `sitemap.xml` itself is different from an error
+in the Sitemaps report. Evaluate XML processing in the Sitemaps report and
+index inclusion on the HTML URLs. Do not try to get the XML document indexed
+as a search result or repeatedly resubmit it to clear an indexing exclusion.
+
 ## Operating boundaries
 
 - **Canonical origin:** `https://joyhealth.cc`
@@ -80,7 +190,7 @@ Run release validation from a clean checkout with Node.js 22.13 or newer:
 npm ci
 npm run check
 npm run build
-node -e "const fs=require('node:fs');const m=JSON.parse(fs.readFileSync('dist/server/vinext-prerender.json','utf8'));const bad=m.routes.filter(r=>r.status!=='rendered'||r.revalidate!==false);if(bad.length||m.routes.length!==12){console.error(bad);process.exit(1)}console.log('Verified 11 public routes plus the 404 as static artifacts.')"
+node -e "const fs=require('node:fs');const m=JSON.parse(fs.readFileSync('dist/server/vinext-prerender.json','utf8'));const pages=m.routes.filter(r=>r.reason!=='api');const bad=pages.filter(r=>r.status!=='rendered'||r.revalidate!==false);if(bad.length||pages.length!==21){console.error(bad);process.exit(1)}console.log('Verified 20 public routes plus the 404 as static artifacts; /feed.xml, /robots.txt, and /data/* are served by the Worker.')"
 npx wrangler deploy --dry-run --config dist/server/wrangler.json
 ```
 
@@ -164,7 +274,7 @@ process.stdin.on("end", () => {
 '
 ```
 
-The expected count is 11. Investigate any other count against
+The expected count is 20. Investigate any other count against
 `app/lib/publications.ts` and the rendered integration test before treating it
 as intentional.
 

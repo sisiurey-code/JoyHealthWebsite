@@ -6,31 +6,128 @@ import { formatEditorialDate, PUBLICATIONS } from "../lib/publications";
 import { ProductShelf } from "../components/product-shelf";
 import { UsanaCatalogDock } from "../components/usana-catalog-dock";
 import { UsanaProductCards } from "../components/usana-product-cards";
-import { SITE_OG_IMAGE } from "../lib/seo";
-import { USANA_STOREFRONT_URL } from "../lib/usana";
+import { JsonLd } from "../components/json-ld";
+import { LabelOverlapMatrix, overlapMatrixRows } from "../components/label-overlap-matrix";
+import {
+  buildLabelDatasetJsonLd,
+  LABEL_DATA_CSV_PATH,
+  LABEL_DATA_JSON_PATH,
+  LABEL_DATA_LICENSE,
+} from "../lib/label-dataset";
+import { LABEL_TRANSCRIBED_ON } from "../lib/supplement-labels";
+import {
+  absoluteUrl,
+  buildPageMetadata,
+  buildProductListJsonLd,
+  topicJsonLd,
+  WEBSITE_ID,
+} from "../lib/seo";
+import { UL_DEFINITION } from "../lib/supplement-sources";
+import { SUPPLEMENT_PRODUCTS } from "../lib/supplements";
+import {
+  USANA_BRAND_NAME,
+  USANA_PRODUCT_CATALOG,
+  USANA_PRODUCT_IMAGES,
+  USANA_STOREFRONT_URL,
+} from "../lib/usana";
 
 const usana = PUBLICATIONS.usana;
-const { description, title } = usana;
 
-export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: "/usana" },
-  openGraph: {
-    type: "website",
-    url: "/usana",
-    siteName: "Joy Health",
-    title: `${title} | Joy Health`,
-    description,
-    images: [SITE_OG_IMAGE],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${title} | Joy Health`,
-    description,
-    images: [SITE_OG_IMAGE.url],
-  },
+export const metadata: Metadata = buildPageMetadata(PUBLICATIONS.usana);
+
+const productListJsonLd = buildProductListJsonLd(
+  "USANA supplements compared on Joy Health",
+  USANA_BRAND_NAME,
+  USANA_PRODUCT_CATALOG.map((product) => ({
+    name: product.name,
+    description: product.description,
+    imagePath: USANA_PRODUCT_IMAGES[product.key].product.src,
+    path: SUPPLEMENT_PRODUCTS.find(({ key }) => key === product.key)!.path,
+  })),
+);
+
+const webPageJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "@id": `${absoluteUrl(usana.path)}#webpage`,
+  url: absoluteUrl(usana.path),
+  name: usana.title,
+  description: usana.description,
+  isPartOf: { "@id": WEBSITE_ID },
+  inLanguage: "en-US",
+  dateModified: usana.dateModified,
+  ...topicJsonLd(usana.key),
 };
+
+const datasetJsonLd = buildLabelDatasetJsonLd();
+
+/**
+ * The source list is numbered by first appearance, top to bottom. The
+ * hand-numbered entries (1–10) come before the overlap table; the table's
+ * sources and the sources cited after it are numbered from data, so the
+ * numbers cannot drift when the table changes.
+ */
+const FIRST_OVERLAP_SOURCE = 11;
+const OVERLAP_ROWS = overlapMatrixRows();
+const OVERLAP_NOTES: Readonly<Record<string, string>> = {
+  "https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/":
+    "Used for the supplemental magnesium upper limit and what it counts. Read September 23, 2026.",
+  "https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/":
+    "Used for the niacin upper limit and its basis in skin flushing. Read September 23, 2026.",
+};
+const overlapSources = [
+  UL_DEFINITION,
+  ...OVERLAP_ROWS.map(({ limit }) => ({
+    ...limit.source,
+    note:
+      OVERLAP_NOTES[limit.source.url] ??
+      "Used for the adult upper limit and what it counts. Read September 23, 2026.",
+  })),
+].filter((source, index, list) => list.findIndex(({ url }) => url === source.url) === index);
+
+const CLEAR_PROTEIN_DRINK_LISTING = {
+  title: "Buy Nutritionals, USANA Clear Protein Drink listing",
+  url: "https://www.buynutritionals.com/usana-clear-protein-drink",
+  note: "Authorized independent distributor listing used for the current flavor, package quantity, protein amount, calories, sugar claim, and noncarbonated ready-to-drink format. Read August 30, 2026.",
+} as const;
+
+const FDA_SUPPLEMENT_QA = {
+  title: "U.S. Food and Drug Administration, Questions and Answers on Dietary Supplements",
+  url: "https://www.fda.gov/food/information-consumers-using-dietary-supplements/questions-and-answers-dietary-supplements",
+  note: "Regulatory context for manufacturing practices, premarket approval, labeling, and consumer safety. Read August 30, 2026.",
+} as const;
+
+/** Sources cited after the overlap table, in order of appearance; uncited last. */
+const laterSources = [
+  CLEAR_PROTEIN_DRINK_LISTING,
+  FDA_SUPPLEMENT_QA,
+  {
+    title: "NSF/ANSI 173-2025, Dietary Supplements",
+    url: "https://standards.nsf.org/discussion/nsfansi-173-2025-dietary-supplements-uploaded",
+    note: "Official standards-development record describing the standard's scope and evaluation criteria. Read August 29, 2026.",
+  },
+] as const;
+const FIRST_LATER_SOURCE = FIRST_OVERLAP_SOURCE + overlapSources.length;
+
+function citationLink(number: number) {
+  return (
+    <a className="citation" href={`#usana-source-${number}`} aria-label={`Source ${number}`}>
+      [{number}]
+    </a>
+  );
+}
+
+function overlapCite(url: string) {
+  const index = overlapSources.findIndex((source) => source.url === url);
+  if (index < 0) throw new Error(`/usana: overlap source missing: ${url}`);
+  return citationLink(FIRST_OVERLAP_SOURCE + index);
+}
+
+function laterCite(url: string) {
+  const index = laterSources.findIndex((source) => source.url === url);
+  if (index < 0) throw new Error(`/usana: later source missing: ${url}`);
+  return citationLink(FIRST_LATER_SOURCE + index);
+}
 
 export default function UsanaPage() {
   return (
@@ -43,22 +140,31 @@ export default function UsanaPage() {
             <div className="usana-hero-copy">
               <p className="eyebrow">Supplement guide</p>
               <h1 id="usana-title">
-                Highlighted supplements, compared label by label.
+                USANA supplements, compared label by label.
               </h1>
               <p>
-                Compare flagship systems and focused formulas, see how their labels
-                and purposes differ, and keep the evidence, ingredient overlap, and
-                limits in view before you choose.
+                Compare CellSentials, HealthPak, and six focused formulas by
+                their Supplement Facts labels, see which third-party testing
+                claims are independently verified, and keep the ingredient
+                overlap and limits in view before you choose.
               </p>
               <div className="usana-hero-actions">
-                <Link className="usana-products-link" href="#products">
-                  See the products <span aria-hidden="true">↓</span>
+                <a
+                  className="usana-products-link"
+                  href={USANA_STOREFRONT_URL}
+                  rel="sponsored"
+                  aria-describedby="usana-hero-store-disclosure"
+                >
+                  Shop USANA <span aria-hidden="true">↗</span>
+                </a>
+                <Link href="#products">
+                  Compare the products
                 </Link>
                 <Link href="/nutrition/supplement-evidence-and-safety">
                   Read the supplement evidence guide
                 </Link>
               </div>
-              <p className="usana-hero-affiliate-note">
+              <p className="usana-hero-affiliate-note" id="usana-hero-store-disclosure">
                 The products on this page are made by USANA. Storefront links
                 are affiliate links: Joy Health may earn a commission, and our
                 evidence standards do not change.
@@ -84,7 +190,7 @@ export default function UsanaPage() {
               </dd>
             </div>
             <div>
-              <dt>12</dt>
+              <dt>11</dt>
               <dd>
                 finished products in the current NSF/ANSI 173 official listing
                 <a className="citation" href="#usana-source-2" aria-label="Source 2">
@@ -113,7 +219,7 @@ export default function UsanaPage() {
           <header className="usana-products-heading">
             <div>
               <p className="eyebrow">Start here</p>
-              <h2 id="products-title">A closer look at each product.</h2>
+              <h2 id="products-title">Each USANA product, with its Supplement Facts label.</h2>
             </div>
             <div>
               <p>
@@ -147,12 +253,75 @@ export default function UsanaPage() {
           </div>
         </section>
 
+        <section className="usana-overlap content-shell" id="overlap" aria-labelledby="overlap-title">
+          <header className="usana-section-heading">
+            <p className="eyebrow">Label overlap</p>
+            <h2 id="overlap-title">Where the labels overlap, and the upper limits</h2>
+            <p>
+              Several of these products repeat the same nutrients. The table
+              shows each product&apos;s daily amount at its label directions
+              next to the adult Tolerable Upper Intake Level (UL), the highest
+              daily intake likely to pose no risk of adverse effects for almost
+              all healthy adults. A UL is not a target.
+              {overlapCite(UL_DEFINITION.url)} HealthPak repeats
+              CellSentials&apos; vitamins and minerals, so read those two
+              columns as alternatives rather than a stack.
+            </p>
+          </header>
+          <LabelOverlapMatrix cite={overlapCite} />
+          <p className="usana-overlap-note">
+            Three amounts stand out. MagneCal D (520 mg) and HealthPak (486 mg)
+            each exceed, on their own, the 350 mg upper limit for magnesium
+            from supplements, and CellSentials and HealthPak each provide 40 mg
+            of niacin against a 35 mg limit that is based on skin flushing.
+            {overlapCite("https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/")}
+            {overlapCite("https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/")}{" "}
+            Combinations add up quickly: CellSentials with MagneCal D, both at
+            their label directions, comes to 746 mg of supplemental magnesium a
+            day. Food, fortified foods, and other supplements add to every
+            total.
+          </p>
+          <p className="usana-overlap-note">
+            Food changes the picture differently for the two nutrients. Most
+            U.S. adults already get more niacin from food than recommended,
+            while many get less magnesium than recommended, and neither upper
+            limit counts what food provides.
+            {overlapCite("https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/")}
+            {overlapCite("https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/")}{" "}
+            <strong>Joy Health interpretation:</strong> label directions are
+            the manufacturer&apos;s, not a minimum. One serving a day of
+            CellSentials, HealthPak, or MagneCal D, each on its own, stays under
+            both limits, which is a reasonable option for someone whose diet
+            already covers much of what the supplement adds.
+            Each product&apos;s page has its full label as text and what to
+            check before taking it.
+          </p>
+          <div className="usana-overlap-note">
+            <h3 id="label-data">Download the label data</h3>
+            <p>
+              Every label row on the product pages, with the daily amounts and
+              upper limits in this table, is available as{" "}
+              <a href={LABEL_DATA_JSON_PATH}>JSON</a> and{" "}
+              <a href={LABEL_DATA_CSV_PATH}>CSV</a>. The files are generated
+              from the same transcription the pages use, checked{" "}
+              <time dateTime={LABEL_TRANSCRIBED_ON}>
+                {formatEditorialDate(LABEL_TRANSCRIBED_ON)}
+              </time>
+              , so they always match what the pages show. Amounts are as
+              printed; the label discrepancies we found are described on each
+              product page. The files are licensed{" "}
+              <a href={LABEL_DATA_LICENSE} rel="license">CC BY 4.0</a>: reuse
+              them freely, crediting Joy Health with a link to this page.
+            </p>
+          </div>
+        </section>
+
         <section className="usana-quality content-shell" id="quality" aria-labelledby="quality-title">
           <header className="usana-section-heading">
             <p className="eyebrow">Quality evidence</p>
             <h2 id="quality-title">Is USANA third-party tested?</h2>
             <p>
-              NSF&apos;s official listing names 12 finished products. That is
+              NSF&apos;s official listing names 11 finished products. That is
               individual product evidence, rather than a brand-wide conclusion. Manufacturing
               control and company investment answer different quality questions.
             </p>
@@ -183,13 +352,13 @@ export default function UsanaPage() {
               <span aria-hidden="true">02</span>
               <h3>Finished-product verification</h3>
               <p>
-                NSF&apos;s official listing identifies 12 USANA finished products
+                NSF&apos;s official listing identifies 11 USANA finished products
                 under{` `}
                 <a href="https://standards.nsf.org/discussion/nsfansi-173-2025-dietary-supplements-uploaded">
                   NSF/ANSI 173
                 </a>
-                , including CellSentials Core Minerals, CellSentials
-                Vita-Antioxidant, BiOmega, and MagneCal D.
+                , including HealthPak, CellSentials Core Minerals, CellSentials
+                Vita-Antioxidant, Procosa, BiOmega, and MagneCal D.
                 <a className="citation" href="#usana-source-2" aria-label="Source 2">
                   [2]
                 </a>
@@ -250,8 +419,8 @@ export default function UsanaPage() {
                   A company announcement records the addition of PQQ to the
                   InCelligence Complex and the launch of Core Aminos and
                   Circulate+ alongside other portfolio updates.
-                  <a className="citation" href="#usana-source-4" aria-label="Source 4">
-                    [4]
+                  <a className="citation" href="#usana-source-10" aria-label="Source 10">
+                    [10]
                   </a>
                 </p>
               </div>
@@ -270,7 +439,7 @@ export default function UsanaPage() {
                     CellSentials, HealthPak, BiOmega, and Proflavanol alongside
                     launches including Core Aminos, Marine Collagen Peptides,
                     and Circulate+.
-                    <a className="citation" href="#usana-source-4" aria-label="Source 4">[4]</a>
+                    <a className="citation" href="#usana-source-10" aria-label="Source 10">[10]</a>
                   </p>
                 </article>
                 <article>
@@ -281,7 +450,7 @@ export default function UsanaPage() {
                     protein, 5 grams of creatine monohydrate, and more than 600
                     milligrams of electrolytes per serving. The combination can
                     save time, space, and steps for someone already using all three.
-                    <a className="citation" href="#usana-source-12" aria-label="Source 12">[12]</a>
+                    <a className="citation" href="#usana-source-9" aria-label="Source 9">[9]</a>
                   </p>
                 </article>
                 <article>
@@ -292,7 +461,7 @@ export default function UsanaPage() {
                     isolate, zero sugar, and 90 calories. It is noncarbonated and
                     sold in 12-packs. We like it cold when a powder and shaker
                     bottle would be more trouble than they are worth.
-                    <a className="citation" href="#usana-source-13" aria-label="Source 13">[13]</a>
+                    {laterCite(CLEAR_PROTEIN_DRINK_LISTING.url)}
                   </p>
                 </article>
               </div>
@@ -328,9 +497,7 @@ export default function UsanaPage() {
               supplement use with a doctor, pharmacist, or other health
               professional because products can interact with medicines or
               other supplements.
-              <a className="citation" href="#usana-source-5" aria-label="Source 5">
-                [5]
-              </a>
+              {laterCite(FDA_SUPPLEMENT_QA.url)}
             </p>
             <ul aria-label="Three supplement verification checks">
               <li>
@@ -403,9 +570,7 @@ export default function UsanaPage() {
                     <p className="usana-limit-result">
                       The FDA recommends discussing supplement use with a health
                       professional because medicines and supplements can interact.
-                      <a className="citation" href="#usana-source-5" aria-label="Source 5">
-                        [5]
-                      </a>
+                      {laterCite(FDA_SUPPLEMENT_QA.url)}
                     </p>
                   </div>
                 </details>
@@ -423,8 +588,8 @@ export default function UsanaPage() {
             <p>
               Updated <time dateTime={usana.dateModified}>
                 {formatEditorialDate(usana.dateModified)}
-              </time> after rechecking the company manufacturing page and NSF&apos;s
-              official listing. Other source read dates are stated below.
+              </time> after rechecking NSF&apos;s official listing and adding the
+              label overlap table. Other source read dates are stated below.
             </p>
           </header>
           <ol className="source-list usana-source-list">
@@ -444,8 +609,11 @@ export default function UsanaPage() {
               </a>
               <p>
                 Independent listing record naming the facility, certification
-                standard, and 12 finished products. Listing current August 29,
-                2026; read August 29 and re-read August 31, 2026.
+                standard, finished products, and each product&apos;s recommended
+                daily serving. Read August 29 and August 31, 2026, when it named
+                12 finished products, and re-read September 23, 2026, when it
+                named 11; the counts on this page were corrected in the September 24,
+                2026 update.
               </p>
             </li>
             <li id="usana-source-3">
@@ -458,35 +626,6 @@ export default function UsanaPage() {
               </p>
             </li>
             <li id="usana-source-4">
-              <a href="https://ir.usana.com/news-events/press-releases/detail/795/usana-expands-its-nutritionals-line-with-powerful-new">
-                USANA Health Sciences, 2025 Nutritionals Portfolio Announcement
-              </a>
-              <p>
-                Company announcement used for the Core Aminos format and
-                ingredients, plus named formulation changes and launches. It is
-                not independent efficacy evidence. Read August 30, 2026.
-              </p>
-            </li>
-            <li id="usana-source-5">
-              <a href="https://www.fda.gov/food/information-consumers-using-dietary-supplements/questions-and-answers-dietary-supplements">
-                U.S. Food and Drug Administration, Questions and Answers on Dietary Supplements
-              </a>
-              <p>
-                Regulatory context for manufacturing practices, premarket
-                approval, labeling, and consumer safety. Read August 30, 2026.
-              </p>
-            </li>
-            <li id="usana-source-6">
-              <a href="https://standards.nsf.org/discussion/nsfansi-173-2025-dietary-supplements-uploaded">
-                NSF/ANSI 173-2025, Dietary Supplements
-              </a>
-              <p>
-                Official standards-development record describing the
-                standard&apos;s scope and evaluation criteria. Read August 29,
-                2026.
-              </p>
-            </li>
-            <li id="usana-source-7">
               <a href="https://ir.usana.com/sec-filings/all-sec-filings/content/0000896264-26-000056/usna-20260704.htm">
                 USANA Health Sciences, 2026 second-quarter filing
               </a>
@@ -496,7 +635,7 @@ export default function UsanaPage() {
                 Read August 29, 2026.
               </p>
             </li>
-            <li id="usana-source-8">
+            <li id="usana-source-5">
               <a href="https://ir.usana.com/news-events/press-releases/detail/820/tested-trusted-approved-usana-cellsentials-earns">
                 USANA Health Sciences, 2026 CellSentials ConsumerLab announcement
               </a>
@@ -506,17 +645,7 @@ export default function UsanaPage() {
                 available in the source reviewed here. Read August 29, 2026.
               </p>
             </li>
-            <li id="usana-source-9">
-              <a href="https://ir.usana.com/news-events/press-releases/detail/805/proven-power-for-strong-bone-support--usanas-magnecal-d">
-                USANA Health Sciences, 2025 MagneCal D ConsumerLab announcement
-              </a>
-              <p>
-                Company announcement describing ingredients and the reported
-                purity, potency, label-accuracy, and disintegration checks.
-                Read August 29, 2026.
-              </p>
-            </li>
-            <li id="usana-source-10">
+            <li id="usana-source-6">
               <a href="https://askthescientists.com/qa/usana-products/">
                 Ask The Scientists, USANA product overview
               </a>
@@ -527,7 +656,17 @@ export default function UsanaPage() {
                 August 29, 2026.
               </p>
             </li>
-            <li id="usana-source-11">
+            <li id="usana-source-7">
+              <a href="https://ir.usana.com/news-events/press-releases/detail/805/proven-power-for-strong-bone-support--usanas-magnecal-d">
+                USANA Health Sciences, 2025 MagneCal D ConsumerLab announcement
+              </a>
+              <p>
+                Company announcement describing ingredients and the reported
+                purity, potency, label-accuracy, and disintegration checks.
+                Read August 29, 2026.
+              </p>
+            </li>
+            <li id="usana-source-8">
               <a href="https://www.usana.com/content/96e011a2-a52a-4880-8f05-d3505154462f.pdf">
                 USANA, U.S. CoQuinone 30 Supplement Facts
               </a>
@@ -537,7 +676,7 @@ export default function UsanaPage() {
                 August 29, 2026.
               </p>
             </li>
-            <li id="usana-source-12">
+            <li id="usana-source-9">
               <a href="https://ir.usana.com/news-events/press-releases/detail/841/usana-introduces-3-in-1-protein-creatine-and-electrolyte">
                 USANA Health Sciences, 2026 Clear Protein + Creatine Mix announcement
               </a>
@@ -547,21 +686,38 @@ export default function UsanaPage() {
                 comparative clinical evidence. Read August 30, 2026.
               </p>
             </li>
-            <li id="usana-source-13">
-              <a href="https://www.buynutritionals.com/usana-clear-protein-drink">
-                Buy Nutritionals, USANA Clear Protein Drink listing
+            <li id="usana-source-10">
+              <a href="https://ir.usana.com/news-events/press-releases/detail/795/usana-expands-its-nutritionals-line-with-powerful-new">
+                USANA Health Sciences, 2025 Nutritionals Portfolio Announcement
               </a>
               <p>
-                Authorized independent distributor listing used for the current
-                flavor, package quantity, protein amount, calories, sugar claim,
-                and noncarbonated ready-to-drink format. Read August 30, 2026.
+                Company announcement used for the Core Aminos format and
+                ingredients, plus named formulation changes and launches. It is
+                not independent efficacy evidence. Read August 30, 2026.
               </p>
             </li>
+            {overlapSources.map((source, index) => (
+              <li id={`usana-source-${FIRST_OVERLAP_SOURCE + index}`} key={source.url}>
+                <a href={source.url}>{source.title}</a>
+                <p>
+                  {source.publisher}. {source.note}
+                </p>
+              </li>
+            ))}
+            {laterSources.map((source, index) => (
+              <li id={`usana-source-${FIRST_LATER_SOURCE + index}`} key={source.url}>
+                <a href={source.url}>{source.title}</a>
+                <p>{source.note}</p>
+              </li>
+            ))}
           </ol>
         </section>
       </main>
 
       <SiteFooter />
+      <JsonLd data={webPageJsonLd} />
+      <JsonLd data={productListJsonLd} />
+      <JsonLd data={datasetJsonLd} />
     </div>
   );
 }

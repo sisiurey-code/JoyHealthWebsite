@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { USANA_STOREFRONT_URL } from "../lib/usana";
 
 type SiteHeaderProps = Readonly<{
   active?: "nutrition" | "standards" | "usana";
@@ -46,6 +47,19 @@ export function SiteHeader({ active }: SiteHeaderProps) {
               Standards
             </Link>
           </nav>
+          <div className="site-store">
+            <a
+              className="site-store-link"
+              href={USANA_STOREFRONT_URL}
+              rel="sponsored"
+              aria-describedby="header-store-disclosure"
+            >
+              Shop USANA <span aria-hidden="true">↗</span>
+            </a>
+            <p id="header-store-disclosure">
+              Affiliate link: we may earn a commission.
+            </p>
+          </div>
         </header>
       </div>
     </>
