@@ -135,10 +135,13 @@ export default function ElectrolyteDrinksGuide() {
                 <dt>Extra actives</dt>
                 <dd>
                   Protein, creatine, caffeine, vitamins, or botanical ingredients
-                  turn a hydration product into a mixed-purpose product. Evaluate
-                  every active ingredient, serving, and safety question rather
-                  than letting “electrolyte” stand in for the whole formula.
-                  <Citation source={5} />
+                  turn a hydration product into a mixed-purpose product. Each
+                  brings its own serving and safety questions, and FDA notes
+                  that supplements can interact with medicines and other
+                  supplements.
+                  <Citation source={5} /> <strong>Joy Health interpretation:</strong>{" "}
+                  read every active ingredient rather than letting
+                  “electrolyte” stand in for the whole formula.
                 </dd>
               </div>
             </dl>
@@ -187,7 +190,9 @@ export default function ElectrolyteDrinksGuide() {
               <li>
                 <h3>Check whether the simpler option wins.</h3>
                 <p>
-                  Water plus ordinary meals may already cover the job. A combined
+                  Water plus ordinary meals may already cover the job for
+                  activity shorter than about an hour.
+                  <Citation source={2} /> A combined
                   product earns its price when its specific ingredients and
                   convenience fit the real use, not simply because the front
                   label sounds more complete.
@@ -255,8 +260,10 @@ export default function ElectrolyteDrinksGuide() {
                 <p>
                   McDermott BP et al., Journal of Athletic Training, 2017. Used
                   for variability, fluid-overload risk, sweat-loss context, and
-                  the limited role of carbohydrate-electrolyte beverages during
-                  intense or long-duration activity. Important limitation:
+                  the conditions under which carbohydrate-electrolyte beverages
+                  may help (activity longer than an hour or repeated intense
+                  intervals) versus plain water for shorter efforts. Important
+                  limitation:
                   several authors disclosed consulting, speaking, advisory, or
                   research relationships with Gatorade, Danone, PepsiCo, and
                   other commercial organizations.

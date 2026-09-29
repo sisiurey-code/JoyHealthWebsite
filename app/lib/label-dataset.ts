@@ -19,7 +19,7 @@ export const LABEL_DATA_PAGE_PATH = "/usana#label-data";
 
 const DATASET_NAME = "USANA Supplement Facts labels as text, with daily amounts and adult upper limits";
 const DATASET_DESCRIPTION =
-  "Every row of the U.S. Supplement Facts or Nutrition Facts label for eight USANA products (CellSentials, HealthPak, Procosa, BiOmega, MagneCal D, CoQuinone 30, Clear Protein + Creatine Mix, and Core Aminos), transcribed exactly as printed and checked against the label PDFs USANA publishes where one exists. For each ingredient it also gives the daily amount at the label's directions and, where one exists, the adult Tolerable Upper Intake Level from the National Academies as reported by the NIH Office of Dietary Supplements, including what that limit counts. Prepared by Joy Health, which earns commissions on USANA purchases made through its storefront links.";
+  "Every row of the U.S. Supplement Facts or Nutrition Facts label for eight USANA products (CellSentials, HealthPak, Procosa, BiOmega, MagneCal D, CoQuinone 30, Clear Protein + Creatine Mix, and Core Aminos), transcribed exactly as printed and checked against the label PDFs USANA publishes where one exists. For each ingredient it also gives the daily amount at the label's directions and, where one exists, the adult Tolerable Upper Intake Level from the National Academies as reported by the NIH Office of Dietary Supplements, including what that limit counts. Prepared by Joy Health.";
 
 const CAVEATS = [
   "Amounts, units, and % Daily Values are as printed on the label; formulas change, so compare the label on the package.",

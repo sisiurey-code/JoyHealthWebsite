@@ -143,8 +143,9 @@ export default function BalancedMealsGuide() {
                 <p>
                   Ask whether the meal draws from more than one category named
                   in current guidance, such as a protein food, vegetables or
-                  fruit, a grain or other starchy food, dairy, or a source of
-                  fat. Not every meal needs every category.
+                  fruit, a whole grain or other starchy food, dairy, or a source
+                  of fat. Not every meal needs every category. The guidelines
+                  also say to prioritize protein foods at every meal.
                   <Citation source={2} />
                 </p>
               </li>

@@ -22,7 +22,7 @@ export function GuideContents({
         {entries.map((section, index) => (
           <li key={section.id}>
             <a href={`#${section.id}`}>
-              <span aria-hidden="true">0{index + 1}</span>
+              <span aria-hidden="true">{index + 1}</span>
               {section.label}
             </a>
           </li>

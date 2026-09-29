@@ -173,7 +173,8 @@ export default function HealthPakPage() {
             vitamin A a day, of which 1,032 µg is preformed. NIH advises people
             who are or might be pregnant against high-dose vitamin A
             supplements, above 3,000 µg RAE a day, counting the preformed
-            share of a mixed label.
+            share of a mixed label. The preformed 1,032 µg is under that
+            3,000 µg.
             <Citation source={7} />
           </li>
           <li>

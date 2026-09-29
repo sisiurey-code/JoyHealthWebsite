@@ -111,7 +111,7 @@ const sources: readonly Source[] = [
     title: "Agency Response Letter, GRAS Notice No. GRN 000931 (creatine monohydrate)",
     url: "https://www.fda.gov/media/144598/download",
     publisher: "U.S. Food and Drug Administration, 2020",
-    note: "Full text read. Used for the scope of FDA's response to AlzChem's notice about one company's ingredient in foods at 1 g of creatine per serving.",
+    note: "Full text read. Used for the scope of FDA's response to AlzChem's notice about one company's ingredient in energy drinks, bars, powders, shakes, meal replacements, meat analogs, and drink mixes at 1 g of creatine per serving. This is a corrected re-issue of a letter signed November 12, 2020.",
   },
 ];
 
@@ -127,13 +127,13 @@ export default function CreatineGuide() {
           <h1>{title}</h1>
           <p className="guide-dek">
             For healthy adults, creatine monohydrate has a steady safety record
-            in trials lasting up to about two years, and its best-supported
-            benefit is modest: a little more strength gain when it is paired
-            with resistance training, including for older adults.
+            in the trials we reviewed, the longest about two years, and its
+            best-supported benefit is modest: a little more strength gain when
+            it is paired with resistance training, including for older adults.
             <Citation source={1} /><Citation source={2} /><Citation source={3} />{" "}
-            Studies show no harm to the kidneys in healthy people, though
-            creatine can raise a common kidney blood test, and early weight gain is mostly
-            water.
+            Studies have not found kidney harm in healthy people, though
+            creatine can raise a common kidney blood test, and early weight
+            gain is attributed to water retention.
             <Citation source={4} /><Citation source={1} /> Claims about memory,
             mood, and bone are much less settled. This guide separates those
             findings; it does not tell you whether to take creatine.
@@ -207,7 +207,7 @@ export default function CreatineGuide() {
                   training, and essentially none without exercise (0.03 kg).
                   <Citation source={7} /> Lean mass includes water, so these
                   gains may overstate new muscle.
-                  <Citation source={2} />
+                  <Citation source={7} />
                 </dd>
               </div>
               <div>
@@ -247,15 +247,16 @@ export default function CreatineGuide() {
                   A 2025 meta-analysis of 11 trials in depression found an
                   average effect below the threshold considered clinically
                   important, with very low certainty.
-                  <Citation source={10} /> Creatine is not a substitute for
-                  depression treatment.
+                  <Citation source={10} />
                 </dd>
               </div>
               <div>
                 <dt>Bone</dt>
                 <dd>
                   In a 2-year trial of 237 postmenopausal women, creatine with
-                  exercise did not change bone mineral density.
+                  exercise did not change bone mineral density. It did improve
+                  some measures of bone geometry, which were secondary
+                  outcomes.
                   <Citation source={3} />
                 </dd>
               </div>
@@ -310,11 +311,7 @@ export default function CreatineGuide() {
                 learn it. The full panel is on the{" "}
                 <Link href="/supplements/clear-protein-creatine">Clear Protein + Creatine page</Link>.
               </p>
-              <p>
-                <strong>Disclosure:</strong> Joy Health earns a commission on
-                purchases made through its USANA storefront links, so read
-                this as a label exercise, not a ranking.
-              </p>
+              <p>Read this as a label exercise, not a ranking.</p>
             </div>
           </div>
         </section>
@@ -336,26 +333,30 @@ export default function CreatineGuide() {
                   trial, a few high-creatinine and low-eGFR results appeared
                   only in the creatine group, yet total kidney-related adverse
                   events were similar to placebo.
-                  <Citation source={3} /> If you take creatine, tell whoever
-                  orders your blood work; markers such as cystatin C do not
-                  depend on creatinine.
+                  <Citation source={3} /> Kidney markers such as cystatin C do
+                  not depend on creatinine, so they are not affected in the
+                  same way.
                   <Citation source={4} />
                 </dd>
               </div>
               <div>
                 <dt>Weight</dt>
                 <dd>
-                  Expect about 1 to 2 kg of weight gain in the first month,
-                  largely from water retention.
+                  NIH reports that people using creatine with a
+                  strength-training program gained about 1 to 2 kg in a month,
+                  which it attributes to water retention and possibly to
+                  muscle protein synthesis.
                   <Citation source={1} />
                 </dd>
               </div>
               <div>
                 <dt>Stomach, cramps, dehydration</dt>
                 <dd>
-                  Stomach upset is uncommon and tied to large single doses.
-                  Controlled studies do not support claims that creatine
-                  causes dehydration or muscle cramps.
+                  In pooled trial data, stomach upset was about as common with
+                  creatine as with placebo (5.5% versus 4.2%), though one
+                  trial found more diarrhea at 10 g than at 5 g. Controlled
+                  studies do not support claims that creatine causes
+                  dehydration or muscle cramps.
                   <Citation source={4} />
                 </dd>
               </div>
@@ -366,8 +367,9 @@ export default function CreatineGuide() {
                   that found a rise in the hormone DHT; it did not measure
                   hair.
                   <Citation source={12} /> A 12-week trial in 38 men that did
-                  measure hair found no change, though it was short and its
-                  authors have supplement-industry ties.
+                  measure hair found no change, though it was short, used no
+                  loading phase, and its authors have supplement-industry
+                  ties.
                   <Citation source={13} />
                 </dd>
               </div>
@@ -395,15 +397,18 @@ export default function CreatineGuide() {
                   before they are sold.
                   <Citation source={15} /> Its 2020 letter on creatine
                   monohydrate answered one manufacturer&apos;s notice about
-                  using 1 g per serving in foods and drinks, and states that it
-                  is not an affirmation that creatine is generally recognized
-                  as safe.
+                  using 1 g per serving in &ldquo;energy&rdquo; drinks,
+                  protein bars and powders, shakes, meal replacements, meat
+                  analogs, and powdered drink mixes. FDA said it had no
+                  questions at this time about that conclusion, and stated
+                  that the letter is not an affirmation that creatine is
+                  generally recognized as safe.
                   <Citation source={16} />
                 </dd>
               </div>
             </dl>
             <ul className="limit-list">
-              <li>The longest controlled trials in healthy adults run about two years, so rare or longer-term harms are harder to rule out.<Citation source={3} /></li>
+              <li>The longest controlled trial we reviewed ran about two years, so rare or longer-term harms are harder to rule out.<Citation source={3} /></li>
               <li>This guide does not set a dose for you or say whether you should take creatine.</li>
               <li>It does not cover people under 18, athletes under drug-testing rules, or medical uses of creatine.</li>
               <li>It reports conflicts of interest but cannot correct for them.</li>
@@ -415,7 +420,8 @@ export default function CreatineGuide() {
           <h2 id="sources-title">Sources we read</h2>
           <div className="guide-copy">
             <p>
-              All sources were read on September 23, 2026; several are
+              All sources were read on September 23, 2026, and the FDA
+              letter was re-read on September 29, 2026; several are
               abstracts only, as marked. Many creatine researchers disclose
               ties to creatine manufacturers, including AlzChem, or to the
               International Society of Sports Nutrition, which accepts industry

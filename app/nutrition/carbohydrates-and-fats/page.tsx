@@ -128,10 +128,19 @@ export default function CarbohydratesAndFatsGuide() {
                 <dt>Current U.S. policy</dt>
                 <dd>
                   The Dietary Guidelines for Americans, 2025–2030 prioritizes
-                  fiber-rich whole grains and states that saturated fat should
-                  generally stay below 10 percent of daily calories. This is a
-                  population policy limit, not a personalized treatment target.
-                  <Citation source={4} />
+                  fiber-rich whole grains and says to significantly reduce
+                  highly processed, refined carbohydrates. It states that no
+                  amount of added sugars is recommended and suggests that one
+                  meal contain no more than 10 grams; the FDA Daily Value for
+                  added sugars is a labeling reference, not a policy limit.
+                  <Citation source={4} /><Citation source={1} /> The same
+                  guidelines say saturated fat consumption should generally
+                  not exceed 10 percent of total daily calories. They do not
+                  repeat WHO&apos;s replacement language, and they note that
+                  more research is needed on which types of fat best support
+                  long-term health.
+                  <Citation source={4} /> These are population policy
+                  statements, not personalized treatment targets.
                 </dd>
               </div>
             </dl>
@@ -216,7 +225,8 @@ export default function CarbohydratesAndFatsGuide() {
           <h2 id="sources-title">Sources we read</h2>
           <div className="guide-copy">
             <p>
-              All four sources were read on August 28, 2026. FDA supplies label
+              All four sources were read on August 28, 2026, and the Dietary
+              Guidelines were re-read on September 29, 2026. FDA supplies label
               mechanics; WHO and the U.S. Dietary Guidelines supply population
               policy. No health-outcome claim is adopted here.
             </p>
@@ -235,7 +245,7 @@ export default function CarbohydratesAndFatsGuide() {
               </li>
               <li id="source-4">
                 <a href="https://cdn.realfood.gov/DGA.pdf">Dietary Guidelines for Americans, 2025–2030</a>
-                <p>HHS and USDA. Used for current U.S. whole-grain and saturated-fat policy. Limitation: population guidance, not individualized treatment.</p>
+                <p>HHS and USDA. Used for current U.S. whole-grain, refined-carbohydrate, added-sugars, and saturated-fat policy. Limitation: population guidance, not individualized treatment.</p>
               </li>
             </ol>
           </div>

@@ -25,7 +25,6 @@ Joy Health publishes for readers first. SEO work must preserve these rules:
   treatment.
 - Credentials or expert review are named only when verified and genuinely
   involved.
-- Compensation never buys an undisclosed placement, ranking, or conclusion.
 - No page exists solely to target a keyword variant.
 - Indexable content remains useful in semantic HTML without client-side
   JavaScript.
@@ -244,15 +243,13 @@ Editorial usefulness and claim strength must remain independent of commercial
 performance.
 
 - State product selection criteria and tradeoffs before recommending.
-- Place the material-connection disclosure next to every affected
-  recommendation and link.
 - Mark compensated or affiliate outbound links with `rel="sponsored"`.
 - Use manufacturer sources only for claims they can establish and label that
   evidence role clearly.
 - Do not imply that quality control, third-party listing, popularity, investment,
   or innovation proves efficacy.
 - Do not let search demand or conversion performance produce a stronger health
-  claim, hidden limitation, or undisclosed ranking.
+  claim or a hidden limitation.
 - Review educational and commercial page performance separately. A commercial
   page's traffic does not set the editorial backlog by itself.
 
@@ -267,7 +264,7 @@ Before merging a new page or substantive update, confirm:
 - the title, H1, description, canonical, visible dates, Open Graph data,
   structured data, and sitemap entry agree;
 - contextual internal links are useful and resolve to canonical routes;
-- affected affiliate links have adjacent disclosure and `rel="sponsored"`;
+- affected affiliate links carry `rel="sponsored"`;
 - no unpublished or placeholder page is linked;
 - the content remains useful without client-side JavaScript; and
 - `npm run check` passes.

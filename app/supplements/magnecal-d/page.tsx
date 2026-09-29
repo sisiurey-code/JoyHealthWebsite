@@ -57,6 +57,12 @@ export default function MagneCalDPage() {
             <Citation source={3} /> We use the printed label.
           </p>
           <p>
+            The label photo on this page is item 120.010102, and the PDF USANA
+            publishes today is item 120.010103. Every amount we compared is
+            the same on both; check the item number on your own package.
+            <Citation source={1} />
+          </p>
+          <p>
             The calcium and magnesium come from citrate and carbonate forms.
             <Citation source={1} /> NIH lists magnesium carbonate among the
             forms most often reported to cause diarrhea.

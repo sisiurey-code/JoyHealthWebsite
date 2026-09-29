@@ -22,11 +22,7 @@ const standards = [
   },
   {
     title: "How we recommend products",
-    copy: "Products are compared using stated criteria, practical tradeoffs, and the available evidence. Payment or commission never buys an undisclosed recommendation or a better conclusion.",
-  },
-  {
-    title: "Where disclosures appear",
-    copy: "If a link or relationship may financially benefit Joy Health, the disclosure appears with the recommendation. It is never hidden on a separate legal page.",
+    copy: "Products are compared using stated criteria, practical tradeoffs, and the available evidence.",
   },
   {
     title: "How we correct errors",
@@ -56,7 +52,7 @@ export default function StandardsPage() {
           {standards.map((standard, index) => (
             <section key={standard.title} id={standardId(standard.title)}>
               <p className="standard-number" aria-hidden="true">
-                [0{index + 1}]
+                {String(index + 1).padStart(2, "0")}
               </p>
               <div>
                 <h2>{standard.title}</h2>

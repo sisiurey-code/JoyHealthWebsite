@@ -102,7 +102,6 @@ export default function Home() {
                   className="primary-link"
                   href={USANA_STOREFRONT_URL}
                   rel="sponsored"
-                  aria-describedby="hero-store-disclosure"
                 >
                   Shop USANA <span aria-hidden="true">↗</span>
                 </a>
@@ -110,9 +109,6 @@ export default function Home() {
                   Browse the guides
                 </Link>
               </div>
-              <p className="hero-store-disclosure" id="hero-store-disclosure">
-                Affiliate link: Joy Health may earn a commission when you shop.
-              </p>
               <aside
                 className="guide-promise"
                 aria-label="What every Joy Health guide includes"

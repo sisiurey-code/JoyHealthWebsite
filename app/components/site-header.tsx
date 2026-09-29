@@ -52,13 +52,9 @@ export function SiteHeader({ active }: SiteHeaderProps) {
               className="site-store-link"
               href={USANA_STOREFRONT_URL}
               rel="sponsored"
-              aria-describedby="header-store-disclosure"
             >
               Shop USANA <span aria-hidden="true">↗</span>
             </a>
-            <p id="header-store-disclosure">
-              Affiliate link: we may earn a commission.
-            </p>
           </div>
         </header>
       </div>

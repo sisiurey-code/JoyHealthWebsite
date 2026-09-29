@@ -131,7 +131,7 @@ export const USANA_PRODUCT_IMAGES = {
     },
     facts: {
       src: "/images/usana/clear-protein-creatine-label.png",
-      alt: "Supplement Facts label for Clear Protein and Creatine green apple mix",
+      alt: "Nutrition Facts panel for Clear Protein and Creatine green apple mix",
       width: 488,
       height: 1000,
     },

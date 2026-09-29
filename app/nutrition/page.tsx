@@ -52,7 +52,7 @@ export default function NutritionPage() {
           {NUTRITION_GUIDES.map((guide, index) => (
             <li key={guide.path}>
               <p className="guide-number" aria-hidden="true">
-                0{index + 1}
+                {String(index + 1).padStart(2, "0")}
               </p>
               <div>
                 <p className="guide-topic">{guide.topic}</p>

@@ -201,7 +201,7 @@ npx wrangler deploy --dry-run --config dist/server/wrangler.json
 - canonical-host redirects, preview-host `noindex`, and a true 404;
 - parseable structured data whose visible identity and dates agree with the
   sitemap;
-- affiliate disclosures and `rel="sponsored"` beside affected links;
+- `rel="sponsored"` on affected links;
 - public content in server-rendered HTML without depending on client-side
   JavaScript; and
 - every public route and the 404 in Vinext's prerender manifest with matching

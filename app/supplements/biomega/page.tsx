@@ -28,7 +28,7 @@ const sources = [
     title: "Response to the Petition for a Health Claim for Eicosapentaenoic Acid and Docosahexaenoic Acid and Reduction of Blood Pressure in the General Population (Docket No. FDA-2014-Q-1146)",
     url: "https://www.fda.gov/media/128043/download",
     publisher: "U.S. Food and Drug Administration, letter to the Global Organization for EPA and DHA Omega-3s, 2019",
-    note: "Used for FDA's conclusion that supplements providing no more than 5 g a day of EPA and DHA are safe and lawful when used as labeled. Read September 23, 2026.",
+    note: "Used for FDA's conclusion, for the purpose of qualified health claims and from bleeding-risk trials, that supplements providing no more than 5 g a day of EPA and DHA are safe and lawful when used as labeled, and its finding of not enough evidence above 5 g. Read September 23, 2026.",
   },
   odsSheet("Vitamin D", "VitaminD", "Used for where vitamin D toxicity comes from."),
   ODS_EXERCISE,
@@ -68,9 +68,12 @@ export default function BiOmegaPage() {
           the 100 µg limit. It does add to the vitamin D in the other products
           below, and NIH notes that vitamin D toxicity almost always comes
           from supplements.
-          <Citation source={5} /> Fish oil has no UL. FDA has concluded that
-          supplements providing no more than 5 g of EPA and DHA a day, used as
-          labeled, are safe and lawful; two capsules provide 1.1 g.
+          <Citation source={5} /> Fish oil has no UL. In a letter about
+          qualified health claims, FDA concluded from bleeding-risk trials
+          that supplements providing no more than 5 g of EPA and DHA a day,
+          used as labeled, are safe and lawful for that purpose, and it found
+          not enough evidence to say the same above 5 g; two capsules provide
+          1.1 g.
           <Citation source={4} />
         </p>
       }
@@ -82,8 +85,8 @@ export default function BiOmegaPage() {
             BiOmega™&rdquo; under NSF/ANSI 173, the dietary supplement
             standard, with a recommended daily serving of 2 gelcaps.
             <Citation source={2} /> NIH describes this kind of third-party
-            certification as independent assurance that a product contains the
-            labeled amounts of its ingredients.
+            certification as giving some assurance that a product contains the
+            labeled ingredients.
             <Citation source={6} />
           </p>
           <p className="usana-interpretation">

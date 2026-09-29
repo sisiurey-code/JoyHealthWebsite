@@ -199,11 +199,6 @@ export function UsanaCatalogDock() {
               </p>
             </div>
             <div className="usana-catalog-action">
-              <p>
-                <strong>Affiliate disclosure:</strong> Joy Health may earn a
-                commission if you buy through this link. Compensation does not
-                change the evidence standards or the order of products.
-              </p>
               <a href={USANA_STOREFRONT_URL} rel="sponsored">
                 Open the storefront <span aria-hidden="true">↗</span>
               </a>

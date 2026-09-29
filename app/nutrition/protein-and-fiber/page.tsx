@@ -68,11 +68,13 @@ export default function ProteinAndFiberGuide() {
               Some foods can contribute both. Beans, peas, lentils, nuts,
               seeds, and soy appear in current federal guidance as plant protein
               foods.
-              <Citation source={3} /> Because they are plants, some can also
-              contain intrinsic fiber under FDA&apos;s definition. The actual
-              grams depend on the food, preparation, and serving, so this guide
-              does not treat those foods as nutritionally interchangeable.
-              <Citation source={2} />
+              <Citation source={3} /> Joy Health infers that, because they are
+              plants, some can also contain intrinsic fiber under FDA&apos;s
+              definition, which names vegetables, whole grains, and fruits
+              among its examples.
+              <Citation source={2} /> The actual grams depend on the food,
+              preparation, and serving, so this guide does not treat those
+              foods as nutritionally interchangeable.
             </p>
             <aside className="key-point" aria-label="Key point">
               <strong>Ask two questions.</strong> What in this meal may
@@ -264,7 +266,7 @@ export default function ProteinAndFiberGuide() {
             </p>
             <ol className="source-list">
               <li id="source-1">
-                <a href="https://nap.nationalacademies.org/catalog/11537/dietary-reference-intakes-the-essential-guide-to-nutrient-requirements">
+                <a href="https://www.nationalacademies.org/publications/11537">
                   Dietary Reference Intakes: The Essential Guide to Nutrient
                   Requirements
                 </a>

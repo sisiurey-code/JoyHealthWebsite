@@ -165,11 +165,11 @@ test("server-renders an indexable, self-canonical home page", async () => {
   );
   assert.match(
     html,
-    /<div class="site-store">[\s\S]*?<a(?=[^>]*href="https:\/\/sissi\.usana\.com\/")(?=[^>]*rel="sponsored")(?=[^>]*aria-describedby="header-store-disclosure")[^>]*>\s*Shop USANA[\s\S]*?id="header-store-disclosure"[^>]*>\s*Affiliate link: we may earn a commission\./i,
+    /<div class="site-store">[\s\S]*?<a(?=[^>]*href="https:\/\/sissi\.usana\.com\/")(?=[^>]*rel="sponsored")[^>]*>\s*Shop USANA/i,
   );
   assert.match(
     html,
-    /<div class="hero-actions">\s*<a(?=[^>]*class="primary-link")(?=[^>]*href="https:\/\/sissi\.usana\.com\/")(?=[^>]*rel="sponsored")(?=[^>]*aria-describedby="hero-store-disclosure")[^>]*>\s*Shop USANA/i,
+    /<div class="hero-actions">\s*<a(?=[^>]*class="primary-link")(?=[^>]*href="https:\/\/sissi\.usana\.com\/")(?=[^>]*rel="sponsored")[^>]*>\s*Shop USANA/i,
   );
   assert.match(html, /<span aria-hidden="true">02<\/span>\s*Start with a question/i);
   assert.match(html, /<h2[^>]*>Good places to start\.<\/h2>/i);
@@ -250,7 +250,7 @@ test("gives the standards page unique metadata", async () => {
   );
   assert.match(html, /<meta property="og:type" content="website"/i);
   assert.match(html, /<meta property="og:site_name" content="Joy Health"/i);
-  assert.match(html, /Where disclosures appear/i);
+  assert.doesNotMatch(html, /Where disclosures appear/i);
 });
 
 test("publishes a source-linked USANA testing, quality, and manufacturing page", async () => {
@@ -284,7 +284,7 @@ test("publishes a source-linked USANA testing, quality, and manufacturing page",
     html,
     /<div class="usana-hero-actions">\s*<a(?=[^>]*class="usana-products-link")(?=[^>]*href="https:\/\/sissi\.usana\.com\/")(?=[^>]*rel="sponsored")[^>]*>\s*Shop USANA/i,
   );
-  assert.match(html, /The products on this page are made by USANA\. Storefront links[\s\S]*affiliate links/i);
+  assert.match(html, /The products on this page are made by USANA\./i);
   assert.match(html, /class="product-shelf-grid"/i);
   assert.match(html, /A few of the products reviewed below\./i);
   assert.doesNotMatch(html, /usana-word-display/i);
@@ -409,16 +409,12 @@ test("publishes a source-linked USANA testing, quality, and manufacturing page",
   assert.equal(
     html.match(/<a[^>]*href="https:\/\/sissi\.usana\.com\/"/gi)?.length,
     4,
-    "expected four clearly disclosed storefront links on the USANA page",
+    "expected four storefront links on the USANA page",
   );
   assert.equal(
     html.match(/<a[^>]*href="https:\/\/sissi\.usana\.com\/"[^>]*rel="sponsored"/gi)?.length,
     4,
     "expected every storefront link to carry rel=sponsored",
-  );
-  assert.match(
-    html,
-    /Affiliate disclosure:[\s\S]*Joy Health may earn a[\s\S]*href="https:\/\/sissi\.usana\.com\/"[^>]*rel="sponsored"/i,
   );
   assert.doesNotMatch(html, /FDA-approved facility/i);
   assert.doesNotMatch(html, /—/);
@@ -579,7 +575,7 @@ test("publishes a source-traced protein-and-fiber guide with separate reference 
   assert.match(html, /href="\/nutrition\/reading-food-labels"/i);
   assert.match(
     html,
-    /https:\/\/nap\.nationalacademies\.org\/catalog\/11537\/dietary-reference-intakes-the-essential-guide-to-nutrient-requirements/i,
+    /https:\/\/www\.nationalacademies\.org\/publications\/11537/i,
   );
   assert.match(
     html,
@@ -1442,11 +1438,6 @@ test("publishes a noindexed Markdown twin of every sitemap page that matches its
     const h1 = html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)[1].replace(/<[^>]+>/g, "").replace(/&#x27;|&apos;/g, "'").replace(/&amp;/g, "&");
     assert.ok(markdown.includes(`# ${h1.trim()}`), `${pathname}: H1 carried into Markdown`);
     assert.doesNotMatch(markdown, /<[a-z][^>]*>|&(?:amp|quot|#x27);/i, `${pathname}: HTML residue`);
-    // Affiliate disclosures stay beside storefront links in the mirror.
-    for (const [line] of markdown.matchAll(/^.*sissi\.usana\.com.*$/gm)) {
-      const context = markdown.slice(Math.max(0, markdown.indexOf(line) - 600), markdown.indexOf(line) + line.length + 600);
-      assert.match(context, /affiliate|commission/i, `${pathname}: storefront link without nearby disclosure`);
-    }
   }
 });
 
@@ -1487,7 +1478,6 @@ test("publishes llms.txt and llms-full.txt covering exactly the sitemap", async 
   const index = await llms.text();
   assert.match(index, /^# Joy Health\n\n> .+\n/);
   assert.match(index, /not individualized medical advice/);
-  assert.match(index, /affiliate links, disclosed next to each link/);
   const listed = [...index.matchAll(/^- \[[^\]]+\]\((https:\/\/joyhealth\.cc[^)]*)\):/gm)].map(([, url]) => url);
   assert.deepEqual(
     new Set(listed),
@@ -1552,7 +1542,7 @@ function overLimitRows(html) {
   return [...html.matchAll(/<tr class="is-over-limit"><th scope="row">([^<]+)<\/th>/g)].map(([, name]) => name);
 }
 
-test("publishes a label page per product with text tables, sources, and adjacent disclosures", async () => {
+test("publishes a label page per product with text tables and sources", async () => {
   for (const pathname of SUPPLEMENT_PAGES) {
     const response = await render(pathname);
     assert.equal(response.status, 200, pathname);
@@ -1571,11 +1561,6 @@ test("publishes a label page per product with text tables, sources, and adjacent
     for (const [link] of html.matchAll(/<a href="https:\/\/sissi\.usana\.com\/"[^>]*>/g)) {
       assert.match(link, /rel="sponsored"/, `${pathname}: sponsored rel`);
     }
-    assert.match(
-      html,
-      /<strong>Affiliate disclosure:<\/strong>[^<]*commission[\s\S]{0,400}<a href="https:\/\/sissi\.usana\.com\/" rel="sponsored">/,
-      `${pathname}: disclosure beside the storefront link`,
-    );
 
     const breadcrumb = jsonLdBlocks(html).find((item) => item["@type"] === "BreadcrumbList");
     assert.deepEqual(
@@ -1619,7 +1604,7 @@ test("prints label amounts as text and flags upper limits exactly where the arit
   assert.ok(productList.itemListElement.every(({ item }) => item.url?.startsWith("https://joyhealth.cc/supplements/")));
 });
 
-test("publishes a source-traced creatine guide with a disclosed product example", async () => {
+test("publishes a source-traced creatine guide with a product example", async () => {
   const html = (await (await render("/nutrition/creatine")).text()).replace(/<!-- -->/g, "");
   assert.match(html, /<h1>Is creatine safe, and who benefits from it\?<\/h1>/);
   const article = jsonLdBlocks(html).find((item) => item["@type"] === "Article");
@@ -1631,7 +1616,7 @@ test("publishes a source-traced creatine guide with a disclosed product example"
   assert.match(html, /Abstract only/);
   assert.match(
     html,
-    /href="\/supplements\/clear-protein-creatine"[\s\S]{0,600}<strong>Disclosure:<\/strong> Joy Health earns a commission/,
+    /href="\/supplements\/clear-protein-creatine"[\s\S]{0,600}Read this as a label exercise, not a ranking\./,
   );
   const related = await (await render("/nutrition/supplement-evidence-and-safety")).text();
   assert.match(related, /href="\/nutrition\/creatine"/);

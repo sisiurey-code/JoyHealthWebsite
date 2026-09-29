@@ -53,7 +53,6 @@ before publishing the generated Worker bundle.
 
 - Cite and characterize health evidence accurately.
 - Never imply medical credentials or individualized medical advice.
-- Put material product-link disclosures beside the recommendation.
 - Prefer useful original synthesis over search-targeted content volume.
 - Keep pages server-rendered, accessible, and lightweight by default.
 

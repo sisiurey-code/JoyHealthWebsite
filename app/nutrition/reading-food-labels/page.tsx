@@ -110,8 +110,8 @@ export default function FoodLabelsGuide() {
                 <dt>Percent Daily Value</dt>
                 <dd>
                   Percent Daily Value, or %DV, shows how much one serving
-                  contributes to the Daily Value for an individual nutrient.
-                  FDA&apos;s general guide calls 5% DV or less low and 20% DV or
+                  contributes to the Daily Value for an individual nutrient,
+                  based on a 2,000-calorie reference diet. FDA&apos;s general guide calls 5% DV or less low and 20% DV or
                   more high for that nutrient per serving.
                   <Citation source={1} />
                 </dd>
@@ -246,10 +246,12 @@ export default function FoodLabelsGuide() {
                 <Citation source={2} />
               </li>
               <li>
-                Allergen labels have important boundaries. A missing Contains
-                or May contain statement is not, by itself, an allergen-free
-                guarantee.
-                <Citation source={3} />
+                Allergen labels have important boundaries. FDA says not all
+                products use a Contains statement, so it advises reading the
+                whole ingredient list, and it describes advisory statements
+                such as May contain as voluntary.
+                <Citation source={3} /> Joy Health infers that a missing
+                statement is not, by itself, an allergen-free guarantee.
               </li>
               <li>
                 This guide does not cover Supplement Facts labels, restaurant

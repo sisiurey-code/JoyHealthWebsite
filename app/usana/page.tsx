@@ -153,7 +153,6 @@ export default function UsanaPage() {
                   className="usana-products-link"
                   href={USANA_STOREFRONT_URL}
                   rel="sponsored"
-                  aria-describedby="usana-hero-store-disclosure"
                 >
                   Shop USANA <span aria-hidden="true">↗</span>
                 </a>
@@ -164,10 +163,8 @@ export default function UsanaPage() {
                   Read the supplement evidence guide
                 </Link>
               </div>
-              <p className="usana-hero-affiliate-note" id="usana-hero-store-disclosure">
-                The products on this page are made by USANA. Storefront links
-                are affiliate links: Joy Health may earn a commission, and our
-                evidence standards do not change.
+              <p className="usana-hero-affiliate-note">
+                The products on this page are made by USANA.
               </p>
             </div>
 
@@ -233,7 +230,7 @@ export default function UsanaPage() {
                 <ul aria-label="Product selection criteria">
                   <li>Clear purpose in the catalog</li>
                   <li>Current formula information</li>
-                  <li>Cost and ingredient overlap</li>
+                  <li>Ingredient overlap between products</li>
                 </ul>
               </div>
             </div>
@@ -243,9 +240,8 @@ export default function UsanaPage() {
 
           <div className="usana-product-conversion">
             <p>
-              <strong>Affiliate disclosure:</strong> Joy Health may earn a
-              commission if you buy through this link. Start with the current
-              label and avoid paying twice for overlapping ingredients.
+              Start with the current label and avoid paying twice for
+              overlapping ingredients.
             </p>
             <a href={USANA_STOREFRONT_URL} rel="sponsored">
               See prices and current formulas <span aria-hidden="true">↗</span>
@@ -448,8 +444,7 @@ export default function UsanaPage() {
                   <p>
                     The August 2026 launch combines 10 grams of clear whey
                     protein, 5 grams of creatine monohydrate, and more than 600
-                    milligrams of electrolytes per serving. The combination can
-                    save time, space, and steps for someone already using all three.
+                    milligrams of electrolytes per serving.
                     <a className="citation" href="#usana-source-9" aria-label="Source 9">[9]</a>
                   </p>
                 </article>
@@ -459,8 +454,7 @@ export default function UsanaPage() {
                   <p>
                     Each piña colada can contains 22 grams of clear whey protein
                     isolate, zero sugar, and 90 calories. It is noncarbonated and
-                    sold in 12-packs. We like it cold when a powder and shaker
-                    bottle would be more trouble than they are worth.
+                    sold in 12-packs.
                     {laterCite(CLEAR_PROTEIN_DRINK_LISTING.url)}
                   </p>
                 </article>
@@ -475,10 +469,6 @@ export default function UsanaPage() {
                 <a href={USANA_STOREFRONT_URL} rel="sponsored">
                   See what is available now <span aria-hidden="true">↗</span>
                 </a>
-                <small>
-                  Affiliate link. Joy Health may earn a commission; our evidence
-                  standards do not change.
-                </small>
               </div>
             </div>
           </div>
@@ -667,7 +657,7 @@ export default function UsanaPage() {
               </p>
             </li>
             <li id="usana-source-8">
-              <a href="https://www.usana.com/content/96e011a2-a52a-4880-8f05-d3505154462f.pdf">
+              <a href="https://www.usana.com/content/82b184dd-a31d-4438-8e45-28553f2fac51.pdf">
                 USANA, U.S. CoQuinone 30 Supplement Facts
               </a>
               <p>

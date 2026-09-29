@@ -289,10 +289,8 @@ export function SupplementPage({
 
         <div className="usana-product-conversion supplement-store">
           <p>
-            <strong>Affiliate disclosure:</strong> Joy Health may earn a
-            commission if you buy through this link. It opens USANA&apos;s
-            storefront, where you can check the current label and price for{" "}
-            {product.name}.
+            This link opens USANA&apos;s storefront, where you can check the
+            current label and price for {product.name}.
           </p>
           <a href={USANA_STOREFRONT_URL} rel="sponsored">
             See {product.name} on the USANA store <span aria-hidden="true">↗</span>
@@ -303,7 +301,9 @@ export function SupplementPage({
           <h2 id="sources-title">Sources we read</h2>
           <div className="guide-copy">
             <p>
-              Every source was read on September 23, 2026. Manufacturer
+              Every source was first read on September 23, 2026; where a note
+              says a part was re-read, that part was read again on the date
+              given. Manufacturer
               documents are records of what the label says, not independent
               evidence that a product works.
             </p>
@@ -346,9 +346,7 @@ export function SupplementPage({
               Joy Health is an educational publisher, not a medical practice.
               The label transcription and daily totals are Joy Health&apos;s
               work; the upper limits come from the National Academies as
-              reported by NIH. No external clinical reviewer participated. Joy
-              Health earns commissions on purchases made through the storefront
-              link on this page.
+              reported by NIH. No external clinical reviewer participated.
             </p>
             <Link href="/standards">Read our editorial standards</Link>
           </div>

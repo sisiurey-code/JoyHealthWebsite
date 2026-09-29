@@ -32,7 +32,7 @@ export const PUBLICATIONS = {
     path: "/standards",
     title: "Editorial and recommendation standards",
     description:
-      "How Joy Health handles evidence, uncertainty, recommendations, disclosures, corrections, and the limits of general health information.",
+      "How Joy Health handles evidence, uncertainty, recommendations, corrections, and the limits of general health information.",
   },
   usana: {
     key: "usana",

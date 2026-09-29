@@ -151,7 +151,8 @@ export default function CellSentialsPage() {
             pregnant not to take high doses of vitamin A supplements, above
             3,000 µg RAE a day, and says to use the preformed share of a mixed
             label when comparing with that limit. CellSentials provides 3,608
-            µg RAE of vitamin A a day, of which 1,032 µg is preformed.
+            µg RAE of vitamin A a day, of which 1,032 µg is preformed, under
+            that 3,000 µg.
             <Citation source={6} />
           </li>
           <li>

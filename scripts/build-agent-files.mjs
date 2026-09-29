@@ -298,7 +298,7 @@ export function buildLlmsTxt(pages) {
     "",
     `> ${home.metadata.description}`,
     "",
-    "Joy Health publishes general nutrition education, not individualized medical advice, diagnosis, or treatment. Every guide lists the sources it read, separates source findings from Joy Health interpretation, and states its limits. Supplement pages compare products by their Supplement Facts labels; links to the storefront are affiliate links, disclosed next to each link.",
+    "Joy Health publishes general nutrition education, not individualized medical advice, diagnosis, or treatment. Every guide lists the sources it read, separates source findings from Joy Health interpretation, and states its limits. Supplement pages compare products by their Supplement Facts labels.",
     "",
     `Every page below is also available as Markdown: append \`.md\` to its path (the home page is ${SITE}/index.md) or request it with \`Accept: text/markdown\`. When citing, please link the canonical page URL listed here. Headings in the Markdown end with \`{#id}\`; to cite one section, link the canonical URL with that fragment, such as ${SITE}/supplements/magnecal-d#daily-title.`,
     "",
