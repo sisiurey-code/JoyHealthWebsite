@@ -157,7 +157,7 @@ test("server-renders an indexable, self-canonical home page", async () => {
   );
   assert.match(
     html,
-    /href="\/nutrition#guides-title"[^>]*>Browse the guides/i,
+    /class="goal-more">Or <a href="\/usana#products">compare the supplements<\/a>, or(?:<!-- -->)? <a href="\/nutrition#guides-title">browse every guide<\/a>/i,
   );
   assert.match(
     html,
@@ -166,10 +166,6 @@ test("server-renders an indexable, self-canonical home page", async () => {
   assert.match(
     html,
     /<div class="site-store">[\s\S]*?<a(?=[^>]*href="https:\/\/sissi\.usana\.com\/")(?=[^>]*rel="sponsored")[^>]*>\s*Shop USANA/i,
-  );
-  assert.match(
-    html,
-    /<div class="hero-actions">\s*<a(?=[^>]*class="primary-link")(?=[^>]*href="https:\/\/sissi\.usana\.com\/")(?=[^>]*rel="sponsored")[^>]*>\s*Shop USANA/i,
   );
   assert.match(html, /<span aria-hidden="true">02<\/span>\s*Start with a question/i);
   assert.match(html, /<h2[^>]*>Good places to start\.<\/h2>/i);
@@ -194,8 +190,8 @@ test("server-renders an indexable, self-canonical home page", async () => {
   assert.match(html, /\/images\/responsive\/usana\/coquinone-product-320\.webp 320w/i);
   assert.equal(
     html.match(/<a[^>]*href="https:\/\/sissi\.usana\.com\/"/gi)?.length,
-    3,
-    "expected direct storefront links in the header, hero, and product section",
+    2,
+    "expected direct storefront links in the header and product section only",
   );
   assert.match(
     html,
@@ -264,7 +260,7 @@ test("publishes a source-linked USANA testing, quality, and manufacturing page",
   );
   assert.match(
     html,
-    /<meta name="description" content="CellSentials, HealthPak, BiOmega, MagneCal D, CoQuinone, and more compared by Supplement Facts label, plus which USANA quality claims are independently verified\."/i,
+    /<meta name="description" content="Compare CellSentials, HealthPak, BiOmega, MagneCal D, and more label by label, then add up a daily stack against upper limits and check the quality claims\."/i,
   );
   assert.match(
     html,
@@ -977,7 +973,7 @@ test("publishes the exact unique public URL inventory with truthful dates", asyn
   const byLocation = new Map(
     entries.map(({ location, lastModified }) => [location, lastModified]),
   );
-  assert.equal(byLocation.get("https://joyhealth.cc/usana"), "2026-09-24");
+  assert.equal(byLocation.get("https://joyhealth.cc/usana"), "2026-10-14");
   assert.equal(byLocation.get("https://joyhealth.cc/nutrition"), "2026-09-24");
   for (const path of SUPPLEMENT_PAGES) {
     assert.equal(byLocation.get(`https://joyhealth.cc${path}`), "2026-09-24", path);
@@ -1069,8 +1065,8 @@ test("keeps the USANA review date aligned with the sitemap", async () => {
   );
 
   assert.equal(pageResponse.status, 200);
-  assert.match(html, /Updated\s*<time datetime="2026-09-24">September 24, 2026<\/time>/i);
-  assert.equal(usanaEntry?.lastModified, "2026-09-24");
+  assert.match(html, /Updated\s*<time datetime="2026-10-14">October 14, 2026<\/time>/i);
+  assert.equal(usanaEntry?.lastModified, "2026-10-14");
 });
 
 test("prerenders every public route and the 404 with static artifacts", async () => {
@@ -1130,58 +1126,31 @@ test("keeps preview hosts out of search results", async () => {
   assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
 });
 
-test("serves responsive hero images with first-scene preload priority", async () => {
-  const homeResponse = await render("/");
-  const html = await homeResponse.text();
-  const heroImages = [
-    "joy-health-morning",
-    "joy-health-balanced-meal",
-    "joy-health-garden-recovery",
-  ];
-  const sizes =
-    "(max-width: 760px) 100vw, (max-width: 1180px) 50vw, 836px";
+test("answers the home goal picker in HTML, without client JavaScript", async () => {
+  const html = await (await render("/")).text();
+  const picker = html.match(/<fieldset class="goal-picker" data-agent="skip">[\s\S]*?<\/fieldset>/)?.[0];
+  assert.ok(picker, "goal picker fieldset");
+  assert.match(picker, /<legend>I want to<\/legend>/);
+  const radios = [...picker.matchAll(/<input type="radio" id="goal-([a-z-]+)" name="goal"([^>]*)\/>/g)];
+  assert.deepEqual(radios.map(([, id]) => id), ["eat-better", "workouts", "fill-gaps", "labels"]);
+  assert.deepEqual(radios.map(([, , rest]) => /checked/.test(rest)), [true, false, false, false]);
 
-  for (const image of heroImages) {
-    assert.match(
-      html,
-      new RegExp(
-        `<img[^>]*src="/images/responsive/hero/${image}-1672\\.webp"[^>]*sizes="${escapeRegex(sizes)}"[^>]*width="1672"[^>]*height="941"`,
-        "i",
-      ),
-    );
-    assert.doesNotMatch(html, new RegExp(`/_next/image\\?[^"']*${image}`, "i"));
-
-    for (const width of [640, 1024, 1672]) {
-      const candidatePath = `/images/responsive/hero/${image}-${width}.webp`;
-      assert.match(
-        html,
-        new RegExp(`${escapeRegex(candidatePath)} ${width}w`, "i"),
-      );
-      const response = await worker.fetch(
-        new Request(`https://joyhealth.cc${candidatePath}`, {
-          headers: { accept: "image/webp" },
-        }),
-        env,
-        ctx,
-      );
-
-      assert.equal(response.status, 200, candidatePath);
-      assert.equal(response.headers.get("location"), null);
-      assert.equal(response.headers.get("content-type"), "image/webp");
-    }
+  // Every answer is in the HTML; CSS chooses which one shows.
+  const replies = [...html.matchAll(/<article class="goal-reply"[^>]*>([\s\S]*?)<\/article>/g)].map(([, body]) => body);
+  assert.equal(replies.length, 4);
+  for (const reply of replies) {
+    assert.match(reply, /<h2 id="[a-z-]+-title">[^<]+\?<\/h2>/, "each answer is headed by a reader question");
+    assert.match(reply, /href="\/nutrition\/[a-z-]+"/, "each answer links the guide behind it");
+    assert.match(reply, /href="\/(supplements\/[a-z0-9-]+|usana#stack)"/, "each answer links a product or the stack builder");
   }
+  assert.doesNotMatch(html, /hero-carousel|joy-health-morning/i);
+  assert.doesNotMatch(html, /fetchPriority="high"[^>]*\/images\/responsive\/hero/i);
 
-  assert.equal(html.match(/loading="eager"/gi)?.length, 1);
-  assert.equal(html.match(/fetchPriority="high"/gi)?.length, 2);
-  // Two lazy hero scenes plus the four lazy product-shelf photos.
-  assert.equal(html.match(/loading="lazy"/gi)?.length, 6);
-  assert.match(
-    html,
-    new RegExp(
-      `<link rel="preload" as="image"[^>]+joy-health-morning-640\\.webp[^>]+imageSizes="${escapeRegex(sizes)}"[^>]+fetchPriority="high"`,
-      "i",
-    ),
-  );
+  // The Markdown twin reads the answers as sections and leaves out the controls.
+  const markdown = await (await worker.fetch(new Request("https://joyhealth.cc/index.md"), env, ctx)).text();
+  assert.match(markdown, /^## Does any supplement help with strength training\? \{#workouts-title\}$/m);
+  assert.match(markdown, /\[The stack builder\]\(https:\/\/joyhealth\.cc\/usana#stack\)/);
+  assert.doesNotMatch(markdown, /eat a bit better|get more from my workouts/, "picker labels stay out of the twin");
 });
 
 test("serves every stylesheet and script emitted by the home page", async () => {
@@ -1692,6 +1661,50 @@ test("publishes the label transcriptions as a described, downloadable dataset th
   assert.equal(csv.trimEnd().split("\n").length, rowCount + 1);
   assert.match(csv, /^product_slug,product_name,panel,/);
   assert.match(csv, /\nmagnecal-d,MagneCal D,[^\n]*Magnesium,[^\n]*,260,mg,/);
+});
+
+test("adds up a default stack in HTML and states what combining adds", async () => {
+  const html = (await (await render("/usana")).text()).replace(/<!-- -->/g, "");
+  const section = html.match(/<section class="usana-stack content-shell" id="stack"[\s\S]*?<\/section>/)?.[0];
+  assert.ok(section, "stack builder section on /usana");
+  assert.ok(html.indexOf('id="stack"') < html.indexOf('id="overlap"'), "the builder comes before the reference table");
+
+  // The prerendered builder shows real totals for CellSentials + MagneCal D at their label directions.
+  assert.match(section, /<ul class="stack-shelf" aria-label="Products" data-agent="skip">/);
+  assert.deepEqual(
+    [...section.matchAll(/<button type="button" aria-pressed="(true|false)">[\s\S]*?<span>([^<]+)<\/span><\/button>/g)]
+      .filter(([, pressed]) => pressed === "true")
+      .map(([, , name]) => name),
+    ["CellSentials", "MagneCal D"],
+  );
+  assert.match(
+    section,
+    /CellSentials \+ MagneCal D: 2 nutrients go above the adult upper limit\. Magnesium 746 mg against 350 mg; niacin 40 mg against 35 mg\./,
+  );
+
+  // Fixed findings, each limit cited.
+  const findings = section.replace(/<a href="[^"]*">([^<]*)<\/a>/g, "$1");
+  assert.match(findings, /<strong>MagneCal D<\/strong>, at its label directions: <span>magnesium comes to 520 mg a day, against a 350 mg limit \(supplements and medications only; magnesium in food is not counted\)<a class="citation"/);
+  assert.match(findings, /<strong>CellSentials \+ HealthPak<\/strong>: HealthPak already repeats CellSentials(?:'|&#x27;) vitamins and minerals, so taking both counts that twice\. Together, <span>folate comes to 1,200 µg a day/);
+  assert.match(findings, /<strong>HealthPak \+ MagneCal D<\/strong>: HealthPak already repeats part of a MagneCal D serving, so taking both counts that twice\./);
+  assert.doesNotMatch(findings, /<strong>CellSentials \+ MagneCal D<\/strong>/, "a pair that only inherits an excess is not listed");
+
+  // Every drawn meter cites its upper limit, including limits the table does not list.
+  const meters = [...section.matchAll(/<li(?: class="is-over")?><p class="stack-meter-head"><strong>([^<]+)<\/strong>[\s\S]*?<\/li>/g)];
+  assert.ok(meters.length >= 5, "default stack draws its meters");
+  for (const [meter, name] of meters) assert.match(meter, /<a class="citation" href="#usana-source-\d+"/, `${name} meter cites its limit`);
+  assert.ok(meters.some(([, name]) => name === "Zinc"), "zinc is drawn and cited though the table has no zinc row");
+  assert.match(html, /one serving\s+each of CellSentials and MagneCal D comes to 373 mg of supplemental\s+magnesium a day, above the 350 mg limit\./);
+
+  // A shared stack link is the same page.
+  const shared = await (await render("/usana?stack=healthpak*1.biomega*1")).text();
+  assert.match(shared, /<link rel="canonical" href="https:\/\/joyhealth\.cc\/usana"/);
+
+  // Answer engines get the worked example and the findings, not the controls.
+  const markdown = await (await worker.fetch(new Request("https://joyhealth.cc/usana.md"), env, ctx)).text();
+  assert.match(markdown, /CellSentials \+ MagneCal D: 2 nutrients go above the adult upper limit\./);
+  assert.match(markdown, /^### What combining adds \{#stack-combined\}$/m);
+  assert.doesNotMatch(markdown, /Label: 2 a day/);
 });
 
 test("revalidates crawlable responses with ETags and advertises the Markdown twin in headers", async () => {

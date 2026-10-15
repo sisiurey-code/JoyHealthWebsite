@@ -39,8 +39,9 @@ export const PUBLICATIONS = {
     path: "/usana",
     title: "USANA supplements compared: labels, testing, limits",
     description:
-      "CellSentials, HealthPak, BiOmega, MagneCal D, CoQuinone, and more compared by Supplement Facts label, plus which USANA quality claims are independently verified.",
-    dateModified: "2026-09-24",
+      "Compare CellSentials, HealthPak, BiOmega, MagneCal D, and more label by label, then add up a daily stack against upper limits and check the quality claims.",
+    // Advanced when the stack builder and its findings were added.
+    dateModified: "2026-10-14",
   },
   nutrition: {
     key: "nutrition",

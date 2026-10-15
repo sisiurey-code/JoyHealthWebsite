@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { HeroCarousel } from "./components/hero-carousel";
+import { GoalPicker } from "./components/goal-picker";
 import { JsonLd } from "./components/json-ld";
 import { ProductShelf } from "./components/product-shelf";
 import { SiteFooter } from "./components/site-footer";
@@ -83,48 +83,7 @@ export default function Home() {
       <SiteHeader />
 
       <main id="main-content">
-        <section className="hero" aria-labelledby="hero-title">
-          <div className="hero-grid content-shell">
-            <div className="hero-content">
-              <p className="hero-kicker">
-                <span aria-hidden="true">01</span>
-                Food, supplements, and straight answers
-              </p>
-              <h1 id="hero-title">
-                Healthy living, made clearer.
-              </h1>
-              <p className="hero-copy">
-                Shop our USANA store, or explore friendly, careful guides to
-                everyday nutrition and supplement comparisons, label by label.
-              </p>
-              <div className="hero-actions">
-                <a
-                  className="primary-link"
-                  href={USANA_STOREFRONT_URL}
-                  rel="sponsored"
-                >
-                  Shop USANA <span aria-hidden="true">↗</span>
-                </a>
-                <Link className="text-link" href="/nutrition#guides-title">
-                  Browse the guides
-                </Link>
-              </div>
-              <aside
-                className="guide-promise"
-                aria-label="What every Joy Health guide includes"
-              >
-                <p className="eyebrow">Every guide includes</p>
-                <ul>
-                  <li>Useful context</li>
-                  <li>Linked sources</li>
-                  <li>Limits and tradeoffs</li>
-                </ul>
-              </aside>
-            </div>
-
-            <HeroCarousel />
-          </div>
-        </section>
+        <GoalPicker />
 
         <section
           className="home-guides content-shell"

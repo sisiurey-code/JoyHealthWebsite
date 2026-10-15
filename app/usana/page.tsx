@@ -8,12 +8,24 @@ import { UsanaCatalogDock } from "../components/usana-catalog-dock";
 import { UsanaProductCards } from "../components/usana-product-cards";
 import { JsonLd } from "../components/json-ld";
 import { LabelOverlapMatrix, overlapMatrixRows } from "../components/label-overlap-matrix";
+import { StackBuilder } from "../components/stack-builder";
+import { StackFindings } from "../components/stack-findings";
 import {
   buildLabelDatasetJsonLd,
   LABEL_DATA_CSV_PATH,
   LABEL_DATA_JSON_PATH,
   LABEL_DATA_LICENSE,
 } from "../lib/label-dataset";
+import { UPPER_LIMITS } from "../lib/nutrient-limits";
+import {
+  DEFAULT_STACK,
+  STACK_INCLUDES,
+  stackFindings,
+  stackNutrients,
+  stackProducts,
+  stackSourceUrls,
+} from "../lib/stack";
+import { formatStackAmount, stackTotals } from "../lib/stack-math";
 import { LABEL_TRANSCRIBED_ON } from "../lib/supplement-labels";
 import {
   absoluteUrl,
@@ -61,14 +73,32 @@ const webPageJsonLd = {
 
 const datasetJsonLd = buildLabelDatasetJsonLd();
 
+const STACK_NUTRIENTS = stackNutrients();
+const STACK_PRODUCTS = stackProducts(STACK_NUTRIENTS);
+const STACK_FINDINGS = stackFindings(STACK_PRODUCTS);
+
+/** One serving each of CellSentials and MagneCal D, for the note under the table. */
+function oneServingMagnesium() {
+  const line = stackTotals(STACK_PRODUCTS, STACK_NUTRIENTS, { cellsentials: 1, magnecal: 1 }).find(
+    ({ nutrient }) => nutrient.key === "magnesium",
+  );
+  if (!line?.over) {
+    throw new Error("/usana: one serving each of CellSentials and MagneCal D no longer exceeds the magnesium UL; revise the note");
+  }
+  return line;
+}
+const ONE_SERVING_MAGNESIUM = oneServingMagnesium();
+
 /**
  * The source list is numbered by first appearance, top to bottom. The
- * hand-numbered entries (1–10) come before the overlap table; the table's
- * sources and the sources cited after it are numbered from data, so the
- * numbers cannot drift when the table changes.
+ * hand-numbered entries (1–10) come before the stack builder; the builder's
+ * default meters and findings, the overlap table, and the sources cited after
+ * it are numbered from data, so the numbers cannot drift when the labels
+ * change. Upper limits that only a reader's own stack shows are listed last.
  */
 const FIRST_OVERLAP_SOURCE = 11;
 const OVERLAP_ROWS = overlapMatrixRows();
+const LIMIT_SOURCES = Object.values(UPPER_LIMITS).map(({ source }) => source);
 const OVERLAP_NOTES: Readonly<Record<string, string>> = {
   "https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/":
     "Used for the supplemental magnesium upper limit and what it counts. Read September 23, 2026.",
@@ -77,10 +107,15 @@ const OVERLAP_NOTES: Readonly<Record<string, string>> = {
 };
 const overlapSources = [
   UL_DEFINITION,
-  ...OVERLAP_ROWS.map(({ limit }) => ({
-    ...limit.source,
+  ...[
+    ...stackSourceUrls(STACK_PRODUCTS, STACK_NUTRIENTS, STACK_FINDINGS).map(
+      (url) => LIMIT_SOURCES.find((source) => source.url === url)!,
+    ),
+    ...OVERLAP_ROWS.map(({ limit }) => limit.source),
+  ].map((source) => ({
+    ...source,
     note:
-      OVERLAP_NOTES[limit.source.url] ??
+      OVERLAP_NOTES[source.url] ??
       "Used for the adult upper limit and what it counts. Read September 23, 2026.",
   })),
 ].filter((source, index, list) => list.findIndex(({ url }) => url === source.url) === index);
@@ -108,6 +143,26 @@ const laterSources = [
   },
 ] as const;
 const FIRST_LATER_SOURCE = FIRST_OVERLAP_SOURCE + overlapSources.length;
+
+/** Limits a reader's stack can show that nothing above cites; listed last. */
+const stackOnlySources = STACK_NUTRIENTS.map(({ sourceUrl }) => LIMIT_SOURCES.find((source) => source.url === sourceUrl)!)
+  .filter((source, index, list) => list.findIndex(({ url }) => url === source.url) === index)
+  .filter(({ url }) => !overlapSources.some((listed) => listed.url === url))
+  .map((source) => ({ ...source, note: "Used for the adult upper limit and what it counts in the stack builder. Read September 23, 2026." }));
+const FIRST_STACK_ONLY_SOURCE = FIRST_LATER_SOURCE + laterSources.length;
+
+/** Source number for every upper limit the stack builder can show. */
+const STACK_CITATIONS = Object.fromEntries(
+  STACK_NUTRIENTS.map(({ key, sourceUrl }) => {
+    const overlapIndex = overlapSources.findIndex(({ url }) => url === sourceUrl);
+    return [
+      key,
+      overlapIndex >= 0
+        ? FIRST_OVERLAP_SOURCE + overlapIndex
+        : FIRST_STACK_ONLY_SOURCE + stackOnlySources.findIndex(({ url }) => url === sourceUrl),
+    ];
+  }),
+);
 
 function citationLink(number: number) {
   return (
@@ -249,41 +304,64 @@ export default function UsanaPage() {
           </div>
         </section>
 
+        <section className="usana-stack content-shell" id="stack" aria-labelledby="stack-title">
+          <header className="usana-section-heading">
+            <p className="eyebrow">Stack builder</p>
+            <h2 id="stack-title">What does your daily stack add up to?</h2>
+            <p>
+              Several of these products repeat the same nutrients. Pick the
+              ones you take or are considering to add them up against each
+              adult Tolerable Upper Intake Level (UL), the highest daily intake
+              likely to pose no risk of adverse effects for almost all healthy
+              adults. A UL is not a target.
+              {overlapCite(UL_DEFINITION.url)} Other supplements, and food
+              where a limit counts it, add to these totals; each meter says
+              what its limit counts.
+            </p>
+          </header>
+          <StackBuilder
+            products={STACK_PRODUCTS}
+            nutrients={STACK_NUTRIENTS}
+            includes={STACK_INCLUDES}
+            defaultStack={DEFAULT_STACK}
+            citations={STACK_CITATIONS}
+          />
+          <StackFindings alone={STACK_FINDINGS.alone} combined={STACK_FINDINGS.combined} cite={overlapCite} />
+          <p className="usana-stack-source">
+            Joy Health arithmetic from the label transcriptions checked{" "}
+            <time dateTime={LABEL_TRANSCRIBED_ON}>{formatEditorialDate(LABEL_TRANSCRIBED_ON)}</time>,
+            at each label&apos;s directions unless you change the servings. The
+            same numbers are in the <a href="#label-data">label data</a>.
+            General education, not medical advice.
+          </p>
+        </section>
+
         <section className="usana-overlap content-shell" id="overlap" aria-labelledby="overlap-title">
           <header className="usana-section-heading">
             <p className="eyebrow">Label overlap</p>
             <h2 id="overlap-title">Where the labels overlap, and the upper limits</h2>
             <p>
-              Several of these products repeat the same nutrients. The table
-              shows each product&apos;s daily amount at its label directions
-              next to the adult Tolerable Upper Intake Level (UL), the highest
-              daily intake likely to pose no risk of adverse effects for almost
-              all healthy adults. A UL is not a target.
-              {overlapCite(UL_DEFINITION.url)} HealthPak repeats
-              CellSentials&apos; vitamins and minerals, so read those two
-              columns as alternatives rather than a stack.
+              The table shows each product&apos;s daily amount at its label
+              directions next to the adult UL, with what each limit counts and
+              its source. HealthPak repeats CellSentials&apos; vitamins and
+              minerals, so read those two columns as alternatives rather than a
+              stack.
             </p>
           </header>
           <LabelOverlapMatrix cite={overlapCite} />
           <p className="usana-overlap-note">
-            Three amounts stand out. MagneCal D (520 mg) and HealthPak (486 mg)
-            each exceed, on their own, the 350 mg upper limit for magnesium
-            from supplements, and CellSentials and HealthPak each provide 40 mg
-            of niacin against a 35 mg limit that is based on skin flushing.
-            {overlapCite("https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/")}
-            {overlapCite("https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/")}{" "}
-            Combinations add up quickly: CellSentials with MagneCal D, both at
-            their label directions, comes to 746 mg of supplemental magnesium a
-            day. Food, fortified foods, and other supplements add to every
-            total.
-          </p>
-          <p className="usana-overlap-note">
-            Food changes the picture differently for the two nutrients. Most
+            Food changes the picture differently for magnesium and niacin, the
+            two nutrients that a product here goes above on its own. Most
             U.S. adults already get more niacin from food than recommended,
             while many get less magnesium than recommended, and neither upper
             limit counts what food provides.
             {overlapCite("https://ods.od.nih.gov/factsheets/Magnesium-HealthProfessional/")}
             {overlapCite("https://ods.od.nih.gov/factsheets/Niacin-HealthProfessional/")}{" "}
+            Combinations add up even below the label directions: one serving
+            each of CellSentials and MagneCal D comes to{" "}
+            {formatStackAmount(ONE_SERVING_MAGNESIUM.total)} mg of supplemental
+            magnesium a day, above the{" "}
+            {formatStackAmount(ONE_SERVING_MAGNESIUM.nutrient.ul)} mg limit.{" "}
             <strong>Joy Health interpretation:</strong> label directions are
             the manufacturer&apos;s, not a minimum. One serving a day of
             CellSentials, HealthPak, or MagneCal D, each on its own, stays under
@@ -578,8 +656,10 @@ export default function UsanaPage() {
             <p>
               Updated <time dateTime={usana.dateModified}>
                 {formatEditorialDate(usana.dateModified)}
-              </time> after rechecking NSF&apos;s official listing and adding the
-              label overlap table. Other source read dates are stated below.
+              </time> to add the stack builder and what the labels add up to,
+              after the September 24, 2026 update that rechecked NSF&apos;s
+              official listing and added the label overlap table. Other source
+              read dates are stated below.
             </p>
           </header>
           <ol className="source-list usana-source-list">
@@ -698,6 +778,14 @@ export default function UsanaPage() {
               <li id={`usana-source-${FIRST_LATER_SOURCE + index}`} key={source.url}>
                 <a href={source.url}>{source.title}</a>
                 <p>{source.note}</p>
+              </li>
+            ))}
+            {stackOnlySources.map((source, index) => (
+              <li id={`usana-source-${FIRST_STACK_ONLY_SOURCE + index}`} key={source.url}>
+                <a href={source.url}>{source.title}</a>
+                <p>
+                  {source.publisher}. {source.note}
+                </p>
               </li>
             ))}
           </ol>

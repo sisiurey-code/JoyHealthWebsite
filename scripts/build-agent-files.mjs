@@ -66,6 +66,8 @@ const escapeText = (text) => text.replace(/([\\`*_])/g, "\\$1");
 function isSkipped(node) {
   if (!node.tag) return false;
   if (SKIP.has(node.tag) || node.attrs["aria-hidden"] === "true" || "hidden" in node.attrs) return true;
+  // Interactive controls (the goal picker, the stack builder's shelf) are not content.
+  if (node.attrs["data-agent"] === "skip") return true;
   if (node.tag === "nav") {
     // In-page contents and breadcrumbs are navigation chrome, not content.
     const links = [];
