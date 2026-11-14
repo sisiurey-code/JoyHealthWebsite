@@ -7,11 +7,22 @@ import {
 } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
 import { INDEXABLE_PUBLICATIONS } from "../app/lib/publications";
+import {
+  parseRepHandle,
+  REP_COOKIE,
+  REP_COOKIE_MAX_AGE_SECONDS,
+  REP_HANDLES,
+  REP_PARAM,
+  repFromCookieHeader,
+  repStoreUrl,
+  STORE_LINK_PATH,
+  type RepHandle,
+} from "../app/lib/reps";
 import { SITE_URL } from "../app/lib/seo";
 
 const canonicalOrigin = new URL(SITE_URL);
 const pagePaths = new Set<string>(INDEXABLE_PUBLICATIONS.map(({ path }) => path));
-const canonicalPaths = new Set<string>([...pagePaths, "/sitemap.xml", "/robots.txt"]);
+const canonicalPaths = new Set<string>([...pagePaths, "/sitemap.xml", "/robots.txt", STORE_LINK_PATH]);
 
 // Machine-readable mirrors written by `scripts/build-agent-files.mjs`.
 const markdownPathFor = (path: string) => (path === "/" ? "/index.md" : `${path}.md`);
@@ -86,6 +97,53 @@ async function serveAgentFile(
   );
   for (const [name, value] of Object.entries(extraHeaders)) headers.set(name, value);
   return new Response(asset.body, { status: 200, headers });
+}
+
+function randomRep(): RepHandle {
+  // Rejection sampling keeps the draw uniform for any number of representatives.
+  const limit = 256 - (256 % REP_HANDLES.length);
+  const byte = new Uint8Array(1);
+  do crypto.getRandomValues(byte);
+  while (byte[0] >= limit);
+  return REP_HANDLES[byte[0] % REP_HANDLES.length];
+}
+
+/** A redirect that also remembers the visitor's representative. Never cached. */
+function repRedirect(location: string, rep: RepHandle): Response {
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: location,
+      "Set-Cookie": `${REP_COOKIE}=${rep}; Max-Age=${REP_COOKIE_MAX_AGE_SECONDS}; Path=/; SameSite=Lax; Secure`,
+      "Cache-Control": "no-store",
+      "X-Robots-Tag": "noindex, nofollow",
+    },
+  });
+}
+
+/**
+ * Store links and personal links. A personal link (`?rep=<handle>`) always
+ * wins; otherwise the visitor keeps the representative they already have, and
+ * a new visitor gets one at random when they first open the store. Nothing is
+ * logged, and the cookie holds only the handle.
+ */
+function routeRepresentative(request: Request, url: URL): Response | undefined {
+  const named = parseRepHandle(url.searchParams.get(REP_PARAM));
+
+  if (url.pathname === STORE_LINK_PATH || url.pathname.startsWith(`${STORE_LINK_PATH}/`)) {
+    const rep = named ?? repFromCookieHeader(request.headers.get("cookie")) ?? randomRep();
+    // An unknown product falls back to the full store rather than a dead end.
+    return repRedirect(repStoreUrl(rep, url.pathname.slice(STORE_LINK_PATH.length + 1)), rep);
+  }
+
+  if (named && pagePaths.has(url.pathname)) {
+    // Remember the representative, then show the page at its canonical URL.
+    const clean = new URL(url);
+    clean.searchParams.delete(REP_PARAM);
+    return repRedirect(clean.toString(), named);
+  }
+
+  return undefined;
 }
 
 interface Env {
@@ -172,6 +230,9 @@ async function route(
   url: URL,
   isLocalPreview: boolean,
 ): Promise<Response> {
+  const representative = routeRepresentative(request, url);
+  if (representative) return secureResponse(request, representative);
+
   if (markdownPaths.has(url.pathname) || agentTextPaths.has(url.pathname)) {
     // Direct mirror URLs serve agents at fetch time. Keeping them out of
     // search indexes leaves the canonical HTML as the page that is cited.

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { auditSeo, sitemapEntries } from "../scripts/audit-seo.mjs";
-import { markdownPath, pageToMarkdown } from "../scripts/build-agent-files.mjs";
+import { markdownPath, pageToMarkdown, stubWorkerRuntime } from "../scripts/build-agent-files.mjs";
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const workerUrl = new URL("../dist/server/index.js", import.meta.url);
 workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
+stubWorkerRuntime();
 const { default: worker } = await import(workerUrl.href);
 
 const env = {
@@ -157,7 +158,7 @@ test("server-renders an indexable, self-canonical home page", async () => {
   );
   assert.match(
     html,
-    /href="\/nutrition#guides-title"[^>]*>Browse the guides/i,
+    /class="goal-more">Or <a href="\/usana#products">compare the supplements<\/a>, or(?:<!-- -->)? <a href="\/nutrition#guides-title">browse every guide<\/a>/i,
   );
   assert.match(
     html,
@@ -165,11 +166,7 @@ test("server-renders an indexable, self-canonical home page", async () => {
   );
   assert.match(
     html,
-    /<div class="site-store">[\s\S]*?<a(?=[^>]*href="https:\/\/sissi\.usana\.com\/")(?=[^>]*rel="sponsored")[^>]*>\s*Shop USANA/i,
-  );
-  assert.match(
-    html,
-    /<div class="hero-actions">\s*<a(?=[^>]*class="primary-link")(?=[^>]*href="https:\/\/sissi\.usana\.com\/")(?=[^>]*rel="sponsored")[^>]*>\s*Shop USANA/i,
+    /<div class="site-store">[\s\S]*?<a(?=[^>]*href="\/go\/usana")(?=[^>]*rel="sponsored nofollow")[^>]*>\s*Shop USANA/i,
   );
   assert.match(html, /<span aria-hidden="true">02<\/span>\s*Start with a question/i);
   assert.match(html, /<h2[^>]*>Good places to start\.<\/h2>/i);
@@ -193,13 +190,13 @@ test("server-renders an indexable, self-canonical home page", async () => {
   assert.match(html, /\/images\/responsive\/usana\/cellsentials-product-320\.webp 320w/i);
   assert.match(html, /\/images\/responsive\/usana\/coquinone-product-320\.webp 320w/i);
   assert.equal(
-    html.match(/<a[^>]*href="https:\/\/sissi\.usana\.com\/"/gi)?.length,
-    3,
-    "expected direct storefront links in the header, hero, and product section",
+    html.match(/<a[^>]*href="\/go\/usana"/gi)?.length,
+    2,
+    "expected store links in the header and product section only",
   );
   assert.match(
     html,
-    /Supplements, compared[\s\S]*class="product-feature-catalog"[\s\S]*Affiliate disclosure:[\s\S]*these are USANA[\s\S]*href="https:\/\/sissi\.usana\.com\/"[^>]*rel="sponsored"/i,
+    /Supplements, compared[\s\S]*class="product-feature-catalog"[\s\S]*Affiliate disclosure:[\s\S]*these are USANA[\s\S]*independent USANA\s+representative[\s\S]*href="\/go\/usana"[^>]*rel="sponsored nofollow"/i,
   );
   assert.match(html, /See current products and prices/i);
   assert.match(html, /<span aria-hidden="true">04<\/span>\s*How we work/i);
@@ -264,7 +261,7 @@ test("publishes a source-linked USANA testing, quality, and manufacturing page",
   );
   assert.match(
     html,
-    /<meta name="description" content="CellSentials, HealthPak, BiOmega, MagneCal D, CoQuinone, and more compared by Supplement Facts label, plus which USANA quality claims are independently verified\."/i,
+    /<meta name="description" content="Compare CellSentials, HealthPak, BiOmega, MagneCal D, and more label by label, then add up a daily stack against upper limits and check the quality claims\."/i,
   );
   assert.match(
     html,
@@ -282,7 +279,7 @@ test("publishes a source-linked USANA testing, quality, and manufacturing page",
   assert.match(html, /href="#products"[^>]*>Compare the products/i);
   assert.match(
     html,
-    /<div class="usana-hero-actions">\s*<a(?=[^>]*class="usana-products-link")(?=[^>]*href="https:\/\/sissi\.usana\.com\/")(?=[^>]*rel="sponsored")[^>]*>\s*Shop USANA/i,
+    /<div class="usana-hero-actions">\s*<a(?=[^>]*class="usana-products-link")(?=[^>]*href="\/go\/usana")(?=[^>]*rel="sponsored nofollow")[^>]*>\s*Shop USANA/i,
   );
   assert.match(html, /The products on this page are made by USANA\./i);
   assert.match(html, /class="product-shelf-grid"/i);
@@ -407,12 +404,12 @@ test("publishes a source-linked USANA testing, quality, and manufacturing page",
     /Friendly nutrition guides that show where the facts come from\./i,
   );
   assert.equal(
-    html.match(/<a[^>]*href="https:\/\/sissi\.usana\.com\/"/gi)?.length,
+    html.match(/<a[^>]*href="\/go\/usana"/gi)?.length,
     4,
     "expected four storefront links on the USANA page",
   );
   assert.equal(
-    html.match(/<a[^>]*href="https:\/\/sissi\.usana\.com\/"[^>]*rel="sponsored"/gi)?.length,
+    html.match(/<a[^>]*href="\/go\/usana"[^>]*rel="sponsored nofollow"/gi)?.length,
     4,
     "expected every storefront link to carry rel=sponsored",
   );
@@ -842,7 +839,7 @@ test("publishes a source-traced supplement guide with separate evidence roles", 
   assert.match(html, /https:\/\/ods\.od\.nih\.gov\/HealthInformation\/ODS_Frequently_Asked_Questions\//i);
   assert.doesNotMatch(
     html.match(/<main\b[^>]*>[\s\S]*?<\/main>/i)?.[0] ?? html,
-    /sissi\.usana\.com/i,
+    /\/go\/usana|[a-z0-9-]+(?<!www|ir|api)\.usana\.com\/"/i,
     "the editorial guide body remains free of affiliate links",
   );
   assert.doesNotMatch(html, /—/);
@@ -880,7 +877,7 @@ test("publishes a source-traced electrolyte guide that separates the label from 
   assert.match(html, /https:\/\/www\.fda\.gov\/food\/nutrition-facts-label\/how-understand-and-use-nutrition-facts-label/i);
   assert.doesNotMatch(
     html.match(/<main\b[^>]*>[\s\S]*?<\/main>/i)?.[0] ?? html,
-    /sissi\.usana\.com/i,
+    /\/go\/usana|[a-z0-9-]+(?<!www|ir|api)\.usana\.com\/"/i,
     "the editorial guide body remains free of affiliate links",
   );
   assert.doesNotMatch(html, /—/);
@@ -977,7 +974,7 @@ test("publishes the exact unique public URL inventory with truthful dates", asyn
   const byLocation = new Map(
     entries.map(({ location, lastModified }) => [location, lastModified]),
   );
-  assert.equal(byLocation.get("https://joyhealth.cc/usana"), "2026-09-24");
+  assert.equal(byLocation.get("https://joyhealth.cc/usana"), "2026-10-14");
   assert.equal(byLocation.get("https://joyhealth.cc/nutrition"), "2026-09-24");
   for (const path of SUPPLEMENT_PAGES) {
     assert.equal(byLocation.get(`https://joyhealth.cc${path}`), "2026-09-24", path);
@@ -1069,8 +1066,8 @@ test("keeps the USANA review date aligned with the sitemap", async () => {
   );
 
   assert.equal(pageResponse.status, 200);
-  assert.match(html, /Updated\s*<time datetime="2026-09-24">September 24, 2026<\/time>/i);
-  assert.equal(usanaEntry?.lastModified, "2026-09-24");
+  assert.match(html, /Updated\s*<time datetime="2026-10-14">October 14, 2026<\/time>/i);
+  assert.equal(usanaEntry?.lastModified, "2026-10-14");
 });
 
 test("prerenders every public route and the 404 with static artifacts", async () => {
@@ -1130,58 +1127,31 @@ test("keeps preview hosts out of search results", async () => {
   assert.equal(response.headers.get("x-robots-tag"), "noindex, nofollow");
 });
 
-test("serves responsive hero images with first-scene preload priority", async () => {
-  const homeResponse = await render("/");
-  const html = await homeResponse.text();
-  const heroImages = [
-    "joy-health-morning",
-    "joy-health-balanced-meal",
-    "joy-health-garden-recovery",
-  ];
-  const sizes =
-    "(max-width: 760px) 100vw, (max-width: 1180px) 50vw, 836px";
+test("answers the home goal picker in HTML, without client JavaScript", async () => {
+  const html = await (await render("/")).text();
+  const picker = html.match(/<fieldset class="goal-picker" data-agent="skip">[\s\S]*?<\/fieldset>/)?.[0];
+  assert.ok(picker, "goal picker fieldset");
+  assert.match(picker, /<legend>I want to<\/legend>/);
+  const radios = [...picker.matchAll(/<input type="radio" id="goal-([a-z-]+)" name="goal"([^>]*)\/>/g)];
+  assert.deepEqual(radios.map(([, id]) => id), ["eat-better", "workouts", "fill-gaps", "labels"]);
+  assert.deepEqual(radios.map(([, , rest]) => /checked/.test(rest)), [true, false, false, false]);
 
-  for (const image of heroImages) {
-    assert.match(
-      html,
-      new RegExp(
-        `<img[^>]*src="/images/responsive/hero/${image}-1672\\.webp"[^>]*sizes="${escapeRegex(sizes)}"[^>]*width="1672"[^>]*height="941"`,
-        "i",
-      ),
-    );
-    assert.doesNotMatch(html, new RegExp(`/_next/image\\?[^"']*${image}`, "i"));
-
-    for (const width of [640, 1024, 1672]) {
-      const candidatePath = `/images/responsive/hero/${image}-${width}.webp`;
-      assert.match(
-        html,
-        new RegExp(`${escapeRegex(candidatePath)} ${width}w`, "i"),
-      );
-      const response = await worker.fetch(
-        new Request(`https://joyhealth.cc${candidatePath}`, {
-          headers: { accept: "image/webp" },
-        }),
-        env,
-        ctx,
-      );
-
-      assert.equal(response.status, 200, candidatePath);
-      assert.equal(response.headers.get("location"), null);
-      assert.equal(response.headers.get("content-type"), "image/webp");
-    }
+  // Every answer is in the HTML; CSS chooses which one shows.
+  const replies = [...html.matchAll(/<article class="goal-reply"[^>]*>([\s\S]*?)<\/article>/g)].map(([, body]) => body);
+  assert.equal(replies.length, 4);
+  for (const reply of replies) {
+    assert.match(reply, /<h2 id="[a-z-]+-title">[^<]+\?<\/h2>/, "each answer is headed by a reader question");
+    assert.match(reply, /href="\/nutrition\/[a-z-]+"/, "each answer links the guide behind it");
+    assert.match(reply, /href="\/(supplements\/[a-z0-9-]+|usana#stack)"/, "each answer links a product or the stack builder");
   }
+  assert.doesNotMatch(html, /hero-carousel|joy-health-morning/i);
+  assert.doesNotMatch(html, /fetchPriority="high"[^>]*\/images\/responsive\/hero/i);
 
-  assert.equal(html.match(/loading="eager"/gi)?.length, 1);
-  assert.equal(html.match(/fetchPriority="high"/gi)?.length, 2);
-  // Two lazy hero scenes plus the four lazy product-shelf photos.
-  assert.equal(html.match(/loading="lazy"/gi)?.length, 6);
-  assert.match(
-    html,
-    new RegExp(
-      `<link rel="preload" as="image"[^>]+joy-health-morning-640\\.webp[^>]+imageSizes="${escapeRegex(sizes)}"[^>]+fetchPriority="high"`,
-      "i",
-    ),
-  );
+  // The Markdown twin reads the answers as sections and leaves out the controls.
+  const markdown = await (await worker.fetch(new Request("https://joyhealth.cc/index.md"), env, ctx)).text();
+  assert.match(markdown, /^## Does any supplement help with strength training\? \{#workouts-title\}$/m);
+  assert.match(markdown, /\[The stack builder\]\(https:\/\/joyhealth\.cc\/usana#stack\)/);
+  assert.doesNotMatch(markdown, /eat a bit better|get more from my workouts/, "picker labels stay out of the twin");
 });
 
 test("serves every stylesheet and script emitted by the home page", async () => {
@@ -1558,8 +1528,8 @@ test("publishes a label page per product with text tables and sources", async ()
     assert.deepEqual(sources, sources.map((_, index) => index + 1), `${pathname}: sources numbered in order`);
     for (const number of citations) assert.ok(number <= sources.length, `${pathname}: citation ${number} has a source`);
 
-    for (const [link] of html.matchAll(/<a href="https:\/\/sissi\.usana\.com\/"[^>]*>/g)) {
-      assert.match(link, /rel="sponsored"/, `${pathname}: sponsored rel`);
+    for (const [link] of html.matchAll(/<a href="\/go\/usana[^"]*"[^>]*>/g)) {
+      assert.match(link, /rel="sponsored nofollow"/, `${pathname}: sponsored rel`);
     }
 
     const breadcrumb = jsonLdBlocks(html).find((item) => item["@type"] === "BreadcrumbList");
@@ -1694,6 +1664,50 @@ test("publishes the label transcriptions as a described, downloadable dataset th
   assert.match(csv, /\nmagnecal-d,MagneCal D,[^\n]*Magnesium,[^\n]*,260,mg,/);
 });
 
+test("adds up a default stack in HTML and states what combining adds", async () => {
+  const html = (await (await render("/usana")).text()).replace(/<!-- -->/g, "");
+  const section = html.match(/<section class="usana-stack content-shell" id="stack"[\s\S]*?<\/section>/)?.[0];
+  assert.ok(section, "stack builder section on /usana");
+  assert.ok(html.indexOf('id="stack"') < html.indexOf('id="overlap"'), "the builder comes before the reference table");
+
+  // The prerendered builder shows real totals for CellSentials + MagneCal D at their label directions.
+  assert.match(section, /<ul class="stack-shelf" aria-label="Products" data-agent="skip">/);
+  assert.deepEqual(
+    [...section.matchAll(/<button type="button" aria-pressed="(true|false)">[\s\S]*?<span>([^<]+)<\/span><\/button>/g)]
+      .filter(([, pressed]) => pressed === "true")
+      .map(([, , name]) => name),
+    ["CellSentials", "MagneCal D"],
+  );
+  assert.match(
+    section,
+    /CellSentials \+ MagneCal D: 2 nutrients go above the adult upper limit\. Magnesium 746 mg against 350 mg; niacin 40 mg against 35 mg\./,
+  );
+
+  // Fixed findings, each limit cited.
+  const findings = section.replace(/<a href="[^"]*">([^<]*)<\/a>/g, "$1");
+  assert.match(findings, /<strong>MagneCal D<\/strong>, at its label directions: <span>magnesium comes to 520 mg a day, against a 350 mg limit \(supplements and medications only; magnesium in food is not counted\)<a class="citation"/);
+  assert.match(findings, /<strong>CellSentials \+ HealthPak<\/strong>: HealthPak already repeats CellSentials(?:'|&#x27;) vitamins and minerals, so taking both counts that twice\. Together, <span>folate comes to 1,200 µg a day/);
+  assert.match(findings, /<strong>HealthPak \+ MagneCal D<\/strong>: HealthPak already repeats part of a MagneCal D serving, so taking both counts that twice\./);
+  assert.doesNotMatch(findings, /<strong>CellSentials \+ MagneCal D<\/strong>/, "a pair that only inherits an excess is not listed");
+
+  // Every drawn meter cites its upper limit, including limits the table does not list.
+  const meters = [...section.matchAll(/<li(?: class="is-over")?><p class="stack-meter-head"><strong>([^<]+)<\/strong>[\s\S]*?<\/li>/g)];
+  assert.ok(meters.length >= 5, "default stack draws its meters");
+  for (const [meter, name] of meters) assert.match(meter, /<a class="citation" href="#usana-source-\d+"/, `${name} meter cites its limit`);
+  assert.ok(meters.some(([, name]) => name === "Zinc"), "zinc is drawn and cited though the table has no zinc row");
+  assert.match(html, /one serving\s+each of CellSentials and MagneCal D comes to 373 mg of supplemental\s+magnesium a day, above the 350 mg limit\./);
+
+  // A shared stack link is the same page.
+  const shared = await (await render("/usana?stack=healthpak*1.biomega*1")).text();
+  assert.match(shared, /<link rel="canonical" href="https:\/\/joyhealth\.cc\/usana"/);
+
+  // Answer engines get the worked example and the findings, not the controls.
+  const markdown = await (await worker.fetch(new Request("https://joyhealth.cc/usana.md"), env, ctx)).text();
+  assert.match(markdown, /CellSentials \+ MagneCal D: 2 nutrients go above the adult upper limit\./);
+  assert.match(markdown, /^### What combining adds \{#stack-combined\}$/m);
+  assert.doesNotMatch(markdown, /Label: 2 a day/);
+});
+
 test("revalidates crawlable responses with ETags and advertises the Markdown twin in headers", async () => {
   for (const pathname of ["/nutrition/hydration", "/nutrition/hydration.md", "/llms.txt", "/sitemap.xml", "/data/supplement-labels.json"]) {
     const first = await requestWithAccept(pathname, "*/*");
@@ -1755,5 +1769,102 @@ test("numbers every page's sources by first appearance, top to bottom", async ()
     const listed = [...main.matchAll(/<li id="(?:usana-)?source-(\d+)"/g)].map(([, number]) => Number(number));
     assert.deepEqual(listed, listed.map((_, index) => index + 1), `${pathname}: source list numbering`);
     assert.ok(firstSeen.length <= listed.length, `${pathname}: citation without a listed source`);
+  }
+});
+
+const REP_HANDLES = ["sissi", "brand"];
+const STORE_PRODUCT = "/ux/cart/en-US/product";
+
+function storeRequest(path, cookie) {
+  return worker.fetch(
+    new Request(new URL(path, "https://joyhealth.cc"), {
+      headers: { accept: "text/html", ...(cookie ? { cookie } : {}) },
+    }),
+    env,
+    ctx,
+  );
+}
+
+test("sends store links to one representative per visitor", async () => {
+  const seen = new Set();
+  for (let attempt = 0; attempt < 200; attempt++) {
+    const response = await storeRequest("/go/usana");
+    assert.equal(response.status, 302);
+    const [, handle] = response.headers.get("location").match(/^https:\/\/([a-z0-9-]+)\.usana\.com\/$/);
+    assert.ok(REP_HANDLES.includes(handle), `unknown representative ${handle}`);
+    assert.equal(
+      response.headers.get("set-cookie"),
+      `jh_rep=${handle}; Max-Age=2592000; Path=/; SameSite=Lax; Secure`,
+    );
+    assert.equal(response.headers.get("cache-control"), "no-store");
+    assert.match(response.headers.get("x-robots-tag"), /noindex/);
+    seen.add(handle);
+  }
+  assert.deepEqual([...seen].sort(), [...REP_HANDLES].sort(), "a new visitor can get any representative");
+
+  for (const handle of REP_HANDLES) {
+    for (let attempt = 0; attempt < 20; attempt++) {
+      const kept = await storeRequest("/go/usana", `other=1; jh_rep=${handle}`);
+      assert.equal(kept.headers.get("location"), `https://${handle}.usana.com/`, "a returning visitor keeps their representative");
+    }
+  }
+
+  const unknown = await storeRequest("/go/usana", "jh_rep=evil.example");
+  assert.match(unknown.headers.get("location"), /^https:\/\/(sissi|brand)\.usana\.com\/$/, "an unknown cookie value never becomes a destination");
+  const named = await storeRequest("/go/usana?rep=BRAND", "jh_rep=sissi");
+  assert.equal(named.headers.get("location"), "https://brand.usana.com/", "a named representative wins over the cookie");
+});
+
+test("personal links pin a representative and land on the canonical page", async () => {
+  const response = await storeRequest("/usana?rep=brand&utm=x", "jh_rep=sissi");
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get("location"), "https://joyhealth.cc/usana?utm=x");
+  assert.match(response.headers.get("set-cookie"), /^jh_rep=brand;/);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+
+  const home = await storeRequest("/?rep=sissi");
+  assert.equal(home.headers.get("location"), "https://joyhealth.cc/");
+  assert.match(home.headers.get("set-cookie"), /^jh_rep=sissi;/);
+
+  const unknown = await storeRequest("/usana?rep=nobody");
+  assert.equal(unknown.status, 200, "an unknown handle is ignored");
+  assert.equal(unknown.headers.get("set-cookie"), null);
+
+  const plain = await storeRequest("/usana", "jh_rep=sissi");
+  assert.equal(plain.headers.get("set-cookie"), null, "pages themselves never set a cookie");
+});
+
+test("names no representative in static HTML", async () => {
+  for (const pathname of ["/", "/usana", "/supplements/cellsentials", "/standards"]) {
+    const html = await (await render(pathname)).text();
+    assert.doesNotMatch(html, /(sissi|brand)\.usana\.com|[?&]ref=/i, `${pathname}: representative named in static HTML`);
+  }
+});
+
+test("links each product page and card to that product on the representative's store", async () => {
+  const items = {
+    cellsentials: "101-010104",
+    healthpak: "100-010105",
+    procosa: "131-010104",
+    biomega: "122-010104",
+    "magnecal-d": "120-010103",
+    "coquinone-30": "123-010102",
+    "clear-protein-creatine": "250-010100",
+    "core-aminos": "179-010100",
+  };
+  const hub = await (await render("/usana")).text();
+  for (const pathname of SUPPLEMENT_PAGES) {
+    const slug = pathname.split("/").at(-1);
+    const link = new RegExp(`<a[^>]*href="/go/usana/${slug}"[^>]*rel="sponsored nofollow"`);
+    const html = await (await render(pathname)).text();
+    assert.equal(html.match(new RegExp(link, "g"))?.length, 1, `${pathname}: one product store link`);
+    assert.match(hub, link, `/usana card links ${slug} to the store`);
+    const response = await storeRequest(`/go/usana/${slug}`, "jh_rep=brand");
+    assert.equal(response.status, 302);
+    assert.equal(response.headers.get("location"), `https://brand.usana.com${STORE_PRODUCT}/${items[slug]}`);
+  }
+  for (const slug of ["not-a-product", "constructor"]) {
+    const fallback = await storeRequest(`/go/usana/${slug}`, "jh_rep=sissi");
+    assert.equal(fallback.headers.get("location"), "https://sissi.usana.com/", "an unknown product opens the full store");
   }
 });

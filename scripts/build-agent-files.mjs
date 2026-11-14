@@ -5,6 +5,7 @@
  * Worker, so the Markdown always matches the prerendered HTML it mirrors.
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { register } from "node:module";
 import { pathToFileURL } from "node:url";
 
 const SITE = "https://joyhealth.cc";
@@ -66,6 +67,8 @@ const escapeText = (text) => text.replace(/([\\`*_])/g, "\\$1");
 function isSkipped(node) {
   if (!node.tag) return false;
   if (SKIP.has(node.tag) || node.attrs["aria-hidden"] === "true" || "hidden" in node.attrs) return true;
+  // Interactive controls (the goal picker, the stack builder's shelf) are not content.
+  if (node.attrs["data-agent"] === "skip") return true;
   if (node.tag === "nav") {
     // In-page contents and breadcrumbs are navigation chrome, not content.
     const links = [];
@@ -332,7 +335,27 @@ export function buildLlmsFullTxt(pages) {
   ].join("\n\n") + "\n";
 }
 
+let workerRuntimeStubbed = false;
+
+/**
+ * Lets Node import the built Worker. The bundle imports `cloudflare:workers`,
+ * which only exists inside workerd, and reads nothing from it but the optional
+ * `tracing` hook. The stand-in exports just that, so a bundle that starts
+ * using a real binding fails at import instead of running against a fake.
+ */
+export function stubWorkerRuntime() {
+  if (workerRuntimeStubbed) return;
+  workerRuntimeStubbed = true;
+  const stub = `data:text/javascript,${encodeURIComponent("export const tracing = undefined;")}`;
+  const hooks = `export async function resolve(specifier, context, nextResolve) {
+    if (specifier === "cloudflare:workers") return { shortCircuit: true, url: ${JSON.stringify(stub)} };
+    return nextResolve(specifier, context);
+  }`;
+  register(`data:text/javascript,${encodeURIComponent(hooks)}`);
+}
+
 async function loadWorker(distUrl) {
+  stubWorkerRuntime();
   const workerUrl = new URL("server/index.js", distUrl);
   workerUrl.searchParams.set("agent-files", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);

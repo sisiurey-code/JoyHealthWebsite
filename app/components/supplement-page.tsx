@@ -12,13 +12,13 @@ import {
   getGuide,
   type NutritionGuide,
 } from "../lib/publications";
+import { productStoreLinkPath, STORE_LINK_REL } from "../lib/reps";
 import { buildBreadcrumbJsonLd, buildSupplementJsonLd } from "../lib/seo";
 import { LABEL_TRANSCRIBED_ON, PRODUCT_LABELS, type ProductLabel } from "../lib/supplement-labels";
 import type { SupplementProduct } from "../lib/supplements";
 import {
   responsiveProductSources,
   USANA_PRODUCT_IMAGES,
-  USANA_STOREFRONT_URL,
 } from "../lib/usana";
 
 type GuideKey = Parameters<typeof getGuide>[0];
@@ -289,10 +289,11 @@ export function SupplementPage({
 
         <div className="usana-product-conversion supplement-store">
           <p>
-            This link opens USANA&apos;s storefront, where you can check the
-            current label and price for {product.name}.
+            This link opens an independent USANA representative&apos;s store,
+            where you can check the current label and price for{" "}
+            {product.name}. The representative may earn a commission.
           </p>
-          <a href={USANA_STOREFRONT_URL} rel="sponsored">
+          <a href={productStoreLinkPath(product.path)} rel={STORE_LINK_REL}>
             See {product.name} on the USANA store <span aria-hidden="true">↗</span>
           </a>
         </div>

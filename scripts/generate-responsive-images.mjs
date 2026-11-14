@@ -12,16 +12,6 @@ const outputRoot = path.join(projectRoot, "public/images/responsive");
 
 const inventory = [
   ...[
-    "joy-health-balanced-meal.webp",
-    "joy-health-garden-recovery.webp",
-    "joy-health-morning.webp",
-  ].map((filename) => ({
-    source: `public/images/${filename}`,
-    outputDirectory: "hero",
-    widths: [640, 1024, 1672],
-    encoding: "display",
-  })),
-  ...[
     "biomega-product.png",
     "cellsentials-product.png",
     "clear-protein-creatine-product.png",

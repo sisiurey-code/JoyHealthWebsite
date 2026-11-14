@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
+import { productStoreLinkPath, STORE_LINK_REL } from "../lib/reps";
 import { SUPPLEMENT_PRODUCTS } from "../lib/supplements";
 import {
   responsiveProductSources,
@@ -136,6 +137,13 @@ function ProductCard({
           <Link className="usana-product-page-link" href={href}>
             {name}: full label as text <span aria-hidden="true">→</span>
           </Link>
+          <a
+            className="usana-product-page-link usana-product-store-link"
+            href={productStoreLinkPath(href)}
+            rel={STORE_LINK_REL}
+          >
+            {name}: price on the store <span aria-hidden="true">↗</span>
+          </a>
         </div>
       </div>
 

@@ -1,5 +1,3 @@
-export const USANA_STOREFRONT_URL = "https://sissi.usana.com/";
-
 export type ProductImage = Readonly<{
   src: string;
   alt: string;

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { USANA_STOREFRONT_URL } from "../lib/usana";
+import { STORE_LINK_PATH, STORE_LINK_REL } from "../lib/reps";
+import { StoreDestination } from "./store-destination";
 
 const preferenceKey = "joy-health-usana-catalog";
 const viewportMargin = 8;
@@ -199,10 +200,10 @@ export function UsanaCatalogDock() {
               </p>
             </div>
             <div className="usana-catalog-action">
-              <a href={USANA_STOREFRONT_URL} rel="sponsored">
+              <a href={STORE_LINK_PATH} rel={STORE_LINK_REL}>
                 Open the storefront <span aria-hidden="true">↗</span>
               </a>
-              <small>You&apos;ll leave Joy Health for sissi.usana.com.</small>
+              <StoreDestination />
             </div>
           </div>
         ) : null}

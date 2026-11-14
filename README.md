@@ -63,6 +63,23 @@ and Search Console monitoring are documented in
 transcribed and how to re-check them is in
 [docs/SUPPLEMENT_LABELS.md](docs/SUPPLEMENT_LABELS.md).
 
+## Representatives and store links
+
+Every store link points at `/go/usana`, or at `/go/usana/<product>` for one
+product's store page (item numbers are in `app/lib/reps.ts`). The Worker
+redirects it to the store of one independent USANA representative listed in
+`app/lib/reps.ts`:
+
+- a personal link such as `https://joyhealth.cc/?rep=sissi` (any page works)
+  pins that representative;
+- otherwise a returning visitor keeps the representative they already have;
+- otherwise one is chosen at random.
+
+The choice lasts 30 days in a first-party cookie, `jh_rep`, that holds only the
+handle. To add a representative, add their handle to `REP_HANDLES` and to
+`REP_HANDLES` in `tests/rendered-html.test.mjs`. USANA serves the same page for
+any handle, so confirm the address shows the right person first.
+
 ## License and brand
 
 The repository is licensed under Apache-2.0. Modified files must be marked as

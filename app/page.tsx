@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { HeroCarousel } from "./components/hero-carousel";
+import { GoalPicker } from "./components/goal-picker";
 import { JsonLd } from "./components/json-ld";
 import { ProductShelf } from "./components/product-shelf";
 import { SiteFooter } from "./components/site-footer";
@@ -13,7 +13,7 @@ import {
   SUPPLEMENT_EVIDENCE_GUIDE,
 } from "./lib/publications";
 import { buildPageMetadata, SITE_URL } from "./lib/seo";
-import { USANA_STOREFRONT_URL } from "./lib/usana";
+import { STORE_LINK_PATH, STORE_LINK_REL } from "./lib/reps";
 
 export const metadata: Metadata = buildPageMetadata(PUBLICATIONS.home);
 
@@ -83,48 +83,7 @@ export default function Home() {
       <SiteHeader />
 
       <main id="main-content">
-        <section className="hero" aria-labelledby="hero-title">
-          <div className="hero-grid content-shell">
-            <div className="hero-content">
-              <p className="hero-kicker">
-                <span aria-hidden="true">01</span>
-                Food, supplements, and straight answers
-              </p>
-              <h1 id="hero-title">
-                Healthy living, made clearer.
-              </h1>
-              <p className="hero-copy">
-                Shop our USANA store, or explore friendly, careful guides to
-                everyday nutrition and supplement comparisons, label by label.
-              </p>
-              <div className="hero-actions">
-                <a
-                  className="primary-link"
-                  href={USANA_STOREFRONT_URL}
-                  rel="sponsored"
-                >
-                  Shop USANA <span aria-hidden="true">↗</span>
-                </a>
-                <Link className="text-link" href="/nutrition#guides-title">
-                  Browse the guides
-                </Link>
-              </div>
-              <aside
-                className="guide-promise"
-                aria-label="What every Joy Health guide includes"
-              >
-                <p className="eyebrow">Every guide includes</p>
-                <ul>
-                  <li>Useful context</li>
-                  <li>Linked sources</li>
-                  <li>Limits and tradeoffs</li>
-                </ul>
-              </aside>
-            </div>
-
-            <HeroCarousel />
-          </div>
-        </section>
+        <GoalPicker />
 
         <section
           className="home-guides content-shell"
@@ -214,11 +173,12 @@ export default function Home() {
               <div className="product-feature-catalog">
                 <p>
                   <strong>Affiliate disclosure:</strong> these are USANA
-                  products, and Joy Health may earn a commission when you shop
-                  through this link. The price and our evidence standards do
-                  not change.
+                  products. This link opens the store of an independent USANA
+                  representative Joy Health works with, who may earn a
+                  commission when you shop there. The price and our evidence
+                  standards do not change.
                 </p>
-                <a href={USANA_STOREFRONT_URL} rel="sponsored">
+                <a href={STORE_LINK_PATH} rel={STORE_LINK_REL}>
                   See current products and prices <span aria-hidden="true">↗</span>
                 </a>
               </div>

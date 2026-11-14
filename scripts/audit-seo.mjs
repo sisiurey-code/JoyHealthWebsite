@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
 
 const SITE = "https://joyhealth.cc";
+// First-party redirect to a representative's store; see app/lib/reps.ts.
+const STORE_LINK = "/go/usana";
 const decode = (value) => value.replace(/&(?:amp|quot|apos|lt|gt|#x[\da-f]+|#\d+);/gi, (entity) => {
   const named = { "&amp;": "&", "&quot;": '"', "&apos;": "'", "&lt;": "<", "&gt;": ">" };
   return named[entity] ?? String.fromCodePoint(Number(entity.startsWith("&#x") ? `0x${entity.slice(3, -1)}` : entity.slice(2, -1)));
@@ -140,13 +142,20 @@ export async function auditSeo(request) {
     pages.set(pathname, { ids: new Set(ids), links });
   }
   let internalLinks = 0;
+  let storeLinks = 0;
   const incoming = new Set(["/"]);
   for (const [pathname, { links }] of pages) {
-    for (const { href } of links) {
+    for (const { href, rel } of links) {
       const url = new URL(href, `${SITE}${pathname}`);
       if (url.hostname !== "joyhealth.cc" && url.hostname !== "www.joyhealth.cc") continue;
       assert.equal(url.origin, SITE, `Noncanonical internal link: ${pathname} -> ${href}`);
       if (/\.[a-z0-9]+$/i.test(url.pathname)) { assets.add(url.pathname); continue; }
+      if (url.pathname === STORE_LINK || url.pathname.startsWith(`${STORE_LINK}/`)) {
+        assert.equal(rel, "sponsored nofollow", `Store link rel: ${pathname}`);
+        assert.equal(url.search, "", `Store link query: ${href}`);
+        storeLinks++;
+        continue;
+      }
       assert.ok(pages.has(url.pathname), `Broken/unlisted internal page: ${pathname} -> ${href}`);
       assert.equal(url.search, "", `Internal query variant: ${href}`);
       if (url.hash) assert.ok(pages.get(url.pathname).ids.has(decodeURIComponent(url.hash.slice(1))), `Broken fragment: ${pathname} -> ${href}`);
@@ -164,13 +173,18 @@ export async function auditSeo(request) {
   }
   assert.equal(reachable.size, pages.size, "Every sitemap page must be reachable from home");
   for (const pathname of assets) assert.equal((await request(pathname)).status, 200, `Linked asset: ${pathname}`);
+  assert.ok(storeLinks > 0, "Expected store links");
+  const store = await request(STORE_LINK);
+  assert.equal(store.status, 302, "Store link must redirect");
+  assert.match(store.headers.get("location"), /^https:\/\/[a-z0-9-]+\.usana\.com\/$/, "Store link destination");
+  assert.match(store.headers.get("cache-control") ?? "", /no-store/, "Store redirect must not be cached");
   const llms = await request("/llms.txt");
   assert.equal(llms.status, 200, "llms.txt status");
   const llmsText = await llms.text();
   for (const { location } of entries) assert.ok(llmsText.includes(`](${location})`), `llms.txt omits ${location}`);
   const missing = await request("/seo-audit-page-that-does-not-exist");
   assert.equal(missing.status, 404, "Unknown routes must not be soft 404s");
-  return { pages: pages.size, internalLinks, linkedAssets: assets.size };
+  return { pages: pages.size, internalLinks, storeLinks, linkedAssets: assets.size };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
