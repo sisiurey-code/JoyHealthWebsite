@@ -1392,7 +1392,7 @@ function requestWithAccept(pathname, accept, method = "GET") {
   );
 }
 
-test("publishes a noindexed Markdown twin of every sitemap page that matches its HTML", async () => {
+test("publishes an indexable Markdown twin of every sitemap page identifying its HTML canonical", async () => {
   for (const { pathname, location } of await sitemapPaths()) {
     const html = await (await render(pathname)).text();
     assert.ok(
@@ -1402,7 +1402,8 @@ test("publishes a noindexed Markdown twin of every sitemap page that matches its
     const response = await requestWithAccept(markdownPath(pathname), "*/*");
     assert.equal(response.status, 200, pathname);
     assert.equal(response.headers.get("content-type"), "text/markdown; charset=utf-8");
-    assert.equal(response.headers.get("x-robots-tag"), "noindex", pathname);
+    assert.equal(response.headers.get("x-robots-tag"), null, pathname);
+    assert.equal(response.headers.get("link"), `<${new URL(location).href}>; rel="canonical"`, pathname);
     const markdown = await response.text();
     assert.match(markdown, new RegExp(`^---\\n[\\s\\S]*?\\ncanonical_url: ${escapeRegex(new URL(location).href)}\\n`));
     const h1 = html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)[1].replace(/<[^>]+>/g, "").replace(/&#x27;|&apos;/g, "'").replace(/&amp;/g, "&");
@@ -1444,7 +1445,7 @@ test("publishes llms.txt and llms-full.txt covering exactly the sitemap", async 
   const llms = await requestWithAccept("/llms.txt", "*/*");
   assert.equal(llms.status, 200);
   assert.equal(llms.headers.get("content-type"), "text/plain; charset=utf-8");
-  assert.equal(llms.headers.get("x-robots-tag"), "noindex");
+  assert.equal(llms.headers.get("x-robots-tag"), null);
   const index = await llms.text();
   assert.match(index, /^# Joy Health\n\n> .+\n/);
   assert.match(index, /not individualized medical advice/);
@@ -1458,7 +1459,11 @@ test("publishes llms.txt and llms-full.txt covering exactly the sitemap", async 
       "https://joyhealth.cc/data/supplement-labels.csv",
     ]),
   );
-  const full = await (await requestWithAccept("/llms-full.txt", "*/*")).text();
+  const fullResponse = await requestWithAccept("/llms-full.txt", "*/*");
+  assert.equal(fullResponse.status, 200);
+  assert.equal(fullResponse.headers.get("content-type"), "text/plain; charset=utf-8");
+  assert.equal(fullResponse.headers.get("x-robots-tag"), null);
+  const full = await fullResponse.text();
   for (const { location } of pages) {
     assert.ok(full.includes(`canonical_url: ${new URL(location).href}\n`), location);
   }
@@ -1736,9 +1741,9 @@ test("revalidates crawlable responses with ETags and advertises the Markdown twi
   assert.equal((await render("/not-a-page")).headers.get("etag"), null);
 });
 
-test("serves robots content signals and the IndexNow key file", async () => {
+test("allows public crawling without declaring content-use permissions and serves the IndexNow key file", async () => {
   const robots = await (await render("/robots.txt")).text();
-  assert.match(robots, /^User-agent: \*\nContent-Signal: search=yes, ai-input=yes, ai-train=yes\nAllow: \/\n/);
+  assert.equal(robots, "User-agent: *\nAllow: /\n\nSitemap: https://joyhealth.cc/sitemap.xml\n");
   const { readdir } = await import("node:fs/promises");
   const [keyFile] = (await readdir(new URL("../public/", import.meta.url))).filter((name) => /^[0-9a-f]{32}\.txt$/.test(name));
   assert.ok(keyFile, "IndexNow key file in public/");
@@ -1797,7 +1802,7 @@ test("sends store links to one representative per visitor", async () => {
       `jh_rep=${handle}; Max-Age=2592000; Path=/; SameSite=Lax; Secure`,
     );
     assert.equal(response.headers.get("cache-control"), "no-store");
-    assert.match(response.headers.get("x-robots-tag"), /noindex/);
+    assert.equal(response.headers.get("x-robots-tag"), null);
     seen.add(handle);
   }
   assert.deepEqual([...seen].sort(), [...REP_HANDLES].sort(), "a new visitor can get any representative");
@@ -1821,6 +1826,7 @@ test("personal links pin a representative and land on the canonical page", async
   assert.equal(response.headers.get("location"), "https://joyhealth.cc/usana?utm=x");
   assert.match(response.headers.get("set-cookie"), /^jh_rep=brand;/);
   assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.equal(response.headers.get("x-robots-tag"), null);
 
   const home = await storeRequest("/?rep=sissi");
   assert.equal(home.headers.get("location"), "https://joyhealth.cc/");

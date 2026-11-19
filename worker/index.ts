@@ -116,7 +116,6 @@ function repRedirect(location: string, rep: RepHandle): Response {
       Location: location,
       "Set-Cookie": `${REP_COOKIE}=${rep}; Max-Age=${REP_COOKIE_MAX_AGE_SECONDS}; Path=/; SameSite=Lax; Secure`,
       "Cache-Control": "no-store",
-      "X-Robots-Tag": "noindex, nofollow",
     },
   });
 }
@@ -234,13 +233,15 @@ async function route(
   if (representative) return secureResponse(request, representative);
 
   if (markdownPaths.has(url.pathname) || agentTextPaths.has(url.pathname)) {
-    // Direct mirror URLs serve agents at fetch time. Keeping them out of
-    // search indexes leaves the canonical HTML as the page that is cited.
-    // (No HTTP rel=canonical here: Google treats noindex plus canonical as
-    // conflicting signals.)
+    // Identify the HTML original without excluding the public Markdown copy.
+    const headers: Record<string, string> = {};
+    if (markdownPaths.has(url.pathname)) {
+      const pagePath = url.pathname === "/index.md" ? "/" : url.pathname.slice(0, -3);
+      headers.Link = `<${new URL(pagePath, SITE_URL).href}>; rel="canonical"`;
+    }
     return secureResponse(
       request,
-      await serveAgentFile(request, env, url.pathname, { "X-Robots-Tag": "noindex" }),
+      await serveAgentFile(request, env, url.pathname, headers),
     );
   }
 

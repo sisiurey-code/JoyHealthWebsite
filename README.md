@@ -3,9 +3,9 @@
 [joyhealth.cc](https://joyhealth.cc) publishes plain-language nutrition
 guides that cite their sources.
 
-The first release is intentionally static: no accounts, forms, database, or
-customer health data. Content and code remain reviewable in Git, and the site
-deploys directly to Cloudflare Workers.
+The current site serves static educational content and store redirects, without
+accounts, forms, or a customer health database. Content and code remain
+reviewable in Git, and the site deploys directly to Cloudflare Workers.
 
 ## Local development
 
@@ -49,14 +49,14 @@ npx wrangler deploy --dry-run --config dist/server/wrangler.json
 For an authenticated local release, `npm run deploy` runs the full quality gate
 before publishing the generated Worker bundle.
 
-## Publishing principles
+## Content quality
 
 - Cite and characterize health evidence accurately.
 - Never imply medical credentials or individualized medical advice.
 - Prefer useful original synthesis over search-targeted content volume.
 - Keep pages server-rendered, accessible, and lightweight by default.
 
-The public editorial charter is published at
+The public editorial standards are published at
 [joyhealth.cc/standards](https://joyhealth.cc/standards). Release verification
 and Search Console monitoring are documented in
 [docs/SEO_OPERATIONS.md](docs/SEO_OPERATIONS.md). How supplement labels were

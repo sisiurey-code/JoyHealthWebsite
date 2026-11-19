@@ -1,10 +1,10 @@
-# SEO release, measurement, and Search Console operations
+# SEO checks and Search Console diagnostics
 
-This runbook defines how Joy Health verifies the public site, observes Google
-Search, records evidence, and responds to SEO incidents. It does not choose
-topics or change health claims. Topic selection, content briefs, source review,
-internal linking, corrections, and content retirement live in
-[`SEO_EDITORIAL.md`](SEO_EDITORIAL.md).
+This runbook describes the current site and checks for build, transport, crawl,
+and indexing problems. It does not establish product direction, named roles,
+mandatory reporting, or a review schedule. Content accuracy, source review,
+links, and corrections are covered in [SEO_EDITORIAL.md](SEO_EDITORIAL.md).
+Documentation of existing behavior does not establish the owner's approval.
 
 Joy Health has one canonical public origin, one public URL registry, one
 sitemap, and one observable path from source publication through crawling and
@@ -32,13 +32,19 @@ they cannot drift:
 
 | Surface | What it is | Indexing |
 | --- | --- | --- |
-| `/<path>.md` (home: `/index.md`) | Markdown twin of every sitemap page, with a front-matter block naming the canonical URL | `X-Robots-Tag: noindex`, so search indexes keep the HTML page |
-| `Accept: text/markdown` on a canonical URL | The same twin, negotiated, with `Vary: Accept` | Never `noindex`: an indexer asking for Markdown must not drop the page |
-| `/llms.txt` | Curated index of every page with its description ([llmstxt.org](https://llmstxt.org) format) | `noindex` |
-| `/llms-full.txt` | Every page's Markdown in sitemap order | `noindex` |
+| `/<path>.md` (home: `/index.md`) | Markdown twin of every sitemap page, with canonical front matter | No indexing restriction; HTTP `Link: <HTML URL>; rel="canonical"` identifies the original |
+| `Accept: text/markdown` on a canonical URL | The same twin, negotiated, with `Vary: Accept` | No indexing restriction |
+| `/llms.txt` | Index of every page with its description ([llmstxt.org](https://llmstxt.org) format) | No indexing restriction |
+| `/llms-full.txt` | Every page's Markdown in sitemap order | No indexing restriction |
 | `/feed.xml` | RSS of dated guides and product pages, editorial dates only | Normal |
 | `/data/supplement-labels.json`, `.csv` | Every transcribed label row, with daily amounts and upper limits (JSON), generated from `app/lib/supplement-labels.ts`; described by a `Dataset` on `/usana#label-data`; licensed CC BY 4.0 | Normal |
-| `/robots.txt` | `Content-Signal: search=yes, ai-input=yes, ai-train=yes` ([contentsignals.org](https://contentsignals.org/)), the publisher's decision of 2026-09-24 | Normal |
+| `/robots.txt` | Allows public crawling and names the sitemap; no content-use declaration | Normal |
+| `/go/usana` and `/go/usana/<product>` | Temporary redirect to a representative's store | No indexing restriction; the response remains a redirect |
+
+Preview hosts and genuine 404 pages retain `noindex` to keep test deployments
+and missing-page responses out of search results. Affiliate links retain
+`rel="sponsored nofollow"` to identify their commercial relationship. None of
+these headers guarantees that Google will crawl or index a resource.
 
 `scripts/build-agent-files.mjs` writes the twins and both text files after
 every `vinext build` (the `postbuild` script), rendering through the built
@@ -78,13 +84,19 @@ not as a score to optimize.
 Checks after a deploy:
 
 ```bash
-curl -sI https://joyhealth.cc/nutrition/hydration.md | grep -iE 'content-type|x-robots-tag'
+curl -sI https://joyhealth.cc/nutrition/hydration.md | grep -iE 'content-type|x-robots-tag|^link:'
 curl -s -H 'Accept: text/markdown' https://joyhealth.cc/nutrition/hydration | head -5
 curl -s https://joyhealth.cc/llms.txt | head -12
 curl -s -A 'Mozilla/5.0 (compatible; GPTBot/1.2; +https://openai.com/gptbot)' -o /dev/null -w '%{http_code}\n' https://joyhealth.cc/
-curl -s https://joyhealth.cc/robots.txt | grep Content-Signal
+curl -fsS https://joyhealth.cc/robots.txt
 curl -s -o /dev/null -w '%{http_code}\n' -H "If-None-Match: $(curl -s -D - -o /dev/null https://joyhealth.cc/usana | grep -i '^etag' | cut -d' ' -f2 | tr -d '\r')" https://joyhealth.cc/usana
 ```
+
+The Markdown response should identify its HTML canonical in the `Link` header
+and have no `X-Robots-Tag` exclusion. `npm run seo:audit` also checks that public
+twins, both `llms` files, and the store redirect have no indexing exclusions,
+and that `robots.txt` makes no content-use declaration. Run it after deployment
+to distinguish the verified local build from the currently installed behavior.
 
 The last command should print `304`; Cloudflare may weaken the ETag when it
 compresses a response, and the Worker compares tags weakly. HTML keeps its ETag
@@ -100,7 +112,7 @@ rule first used a full-URI wildcard of `joyhealth.cc` with no `*`, which
 matched nothing; matching the hostname fixed it. If this check prints `200`,
 confirm the rule still exists and matches.
 
-Account-side steps that code cannot take (each needs the owner's decision):
+Optional account-side tools, requiring separate authorization before changes:
 
 - **Bing Webmaster Tools:** verify the site (it can import the Search Console
   property) and submit the sitemap. Bing's index feeds Copilot and has been
@@ -113,17 +125,17 @@ Account-side steps that code cannot take (each needs the owner's decision):
   alternative that notifies IndexNow engines automatically; either is enough.
 - **Cloudflare bot settings:** on 2026-09-23 every major AI crawler user agent
   received HTTP 200, and `robots.txt` is the site's own, not Cloudflare's
-  managed version. Keep "Block AI bots" and AI Crawl Control blocking off if
-  assistant visibility is the goal. Browser Integrity Check returns error 1010
-  to the `Python-urllib` user agent, which some agent tools send; other HTTP
-  clients were allowed.
+  managed version. Those observations are historical; inspect current bot
+  settings and test the relevant client before attributing a fetch failure to
+  the site. Browser Integrity Check then returned error 1010 to the
+  `Python-urllib` user agent, while other HTTP clients were allowed.
 
 A Page Indexing exclusion for `sitemap.xml` itself is different from an error
 in the Sitemaps report. Evaluate XML processing in the Sitemaps report and
 index inclusion on the HTML URLs. Do not try to get the XML document indexed
 as a search result or repeatedly resubmit it to clear an indexing exclusion.
 
-## Operating boundaries
+## Current configuration and privacy
 
 - **Canonical origin:** `https://joyhealth.cc`
 - **Public URL source of truth:** `INDEXABLE_PUBLICATIONS` in
@@ -134,29 +146,19 @@ as a search result or repeatedly resubmit it to clear an indexing exclusion.
   canonical origin
 - **Privacy boundary:** do not commit verification tokens, account details,
   private screenshots, raw query exports, or other private Search Console data
-- **Tracking boundary:** Search Console is sufficient for search operations.
-  Adding on-site analytics or affiliate-event tracking requires a separate,
-  explicit product and privacy decision.
+- **Visitor privacy:** keep the representative cookie limited to its handle,
+  keep visits and clicks out of application logs, and explain any requested new
+  collection or tracking before implementing it.
 
 The operator must never describe a live URL Inspection test as proof that a URL
 is indexed. A successful test establishes current fetchability and indexing
 eligibility only.
 
-## Roles and access
-
-Every active release period needs these roles. One person may hold more than one
-role, but each responsibility must have an owner and backup.
-
-| Role | Responsibility |
-| --- | --- |
-| Release operator | Runs the clean-checkout gate, deploys, and verifies production |
-| Search Console owner | Confirms the property, records Google observations, and sets checkpoints |
-| Editorial owner | Decides whether search observations warrant content review under `SEO_EDITORIAL.md` |
+## Account access
 
 Keep personal account identifiers and access instructions outside the
-repository. The operational log may use a role, team alias, or non-sensitive
-owner name. If no owner or backup is available, record the gap; do not make an
-unowned Search Console change.
+repository. Account changes and publication need authorization for the actual
+action; a procedure here does not grant it.
 
 ## Evidence and success model
 
@@ -172,13 +174,12 @@ SEO operations use guardrails and trends, not a single score.
 | Search engagement | Clicks and CTR by page and query | Searchers choose the result when it appears |
 | Page experience | Search Console Core Web Vitals page groups | Real users receive acceptable loading, responsiveness, and stability |
 
-Technical failures are incidents. Index inclusion, impressions, clicks, CTR,
-and average position are observations rather than release service-level
-objectives: Google controls indexing and result presentation, and new sites may
-have too little data for meaningful comparisons.
+Investigate concrete transport or metadata failures separately from Google
+indexing and search performance. Google controls inclusion and presentation;
+new sites may have too little data for meaningful comparisons.
 
 Use average position only as a diagnostic alongside impressions, clicks, page,
-query, country, device, and search type. It is not the north-star metric.
+query, country, device, and search type.
 
 ## Release procedure
 
@@ -189,7 +190,6 @@ Run release validation from a clean checkout with Node.js 22.13 or newer:
 ```bash
 npm ci
 npm run check
-npm run build
 node -e "const fs=require('node:fs');const m=JSON.parse(fs.readFileSync('dist/server/vinext-prerender.json','utf8'));const pages=m.routes.filter(r=>r.reason!=='api');const bad=pages.filter(r=>r.status!=='rendered'||r.revalidate!==false);if(bad.length||pages.length!==21){console.error(bad);process.exit(1)}console.log('Verified 20 public routes plus the 404 as static artifacts; /feed.xml, /robots.txt, and /data/* are served by the Worker.')"
 npx wrangler deploy --dry-run --config dist/server/wrangler.json
 ```
@@ -351,15 +351,14 @@ state.
 
 ### Record the release
 
-Create one operational-log entry containing the deployed commit, intended route
-count, repository checks, production checks, exceptions, owner, and next UTC
-checkpoint. A successful release with no Search Console change still receives
-a short entry so production provenance remains reconstructable.
+Keep a concise verification receipt with the deployed commit, route count,
+checks, results, and unresolved concerns. This preserves release provenance;
+it does not require a separate role assignment or reporting calendar.
 
 ## Search Console operations
 
-The following steps require a human with access to the correct Search Console
-property. They are not repository automation.
+These checks require access to the correct Search Console property. A local
+build or public HTTP probe cannot supply Google's account-side observations.
 
 ### Property and sitemap discipline
 
@@ -380,8 +379,9 @@ After deploying a new canonical URL or a substantive update:
 1. Complete the production procedure above.
 2. Inspect the exact canonical URL in Search Console.
 3. Run one live test.
-4. Request indexing once for the highest-priority changed URL. Let the sitemap
-   remain the discovery mechanism for the complete route set.
+4. If useful, request indexing for changed canonical URLs after live testing.
+   The sitemap supports discovery of the complete route set; repeated requests
+   do not guarantee faster crawling or indexing.
 5. Record these observations separately:
 
    - **Live test accessible:** whether Google can fetch the current response.
@@ -395,31 +395,18 @@ After deploying a new canonical URL or a substantive update:
 
 Never summarize those observations as `Google passed it`.
 
-### Launch cadence
+### Reports useful for diagnosis
 
-Until the Search Console owner records that launch state is stable, review once
-per calendar week:
-
-- Page Indexing;
-- Sitemaps;
-- Core Web Vitals;
-- Manual Actions;
-- Security Issues; and
-- Search results performance, if enough data exists.
-
-The owner defines stability in the operational log. At minimum, production
-checks must remain clean, the intended sitemap must have a settled processing
-state, and no unexplained indexing exclusion, manual action, security issue, or
-poor Core Web Vitals group may remain open. After that, change to monthly
-review. Return to weekly review after a route migration, material publishing
-expansion, sustained unexplained search decline, manual action, security issue,
-or Core Web Vitals regression.
+Depending on the issue, inspect Page Indexing, Sitemaps, Core Web Vitals,
+Manual Actions, Security Issues, or search performance. Record the report date,
+exact affected URLs, last-crawl dates, and relevant observations. No recurring
+review schedule is prescribed here.
 
 ### Search performance review
 
-Use a 28-day period compared with the preceding 28 days unless a documented
-event calls for a different window. Record the window and filters so the review
-can be repeated.
+Choose a window suited to the question and available data. Comparing 28 days
+with the preceding 28 days is one option. Record the window and filters so the
+comparison can be repeated.
 
 Review:
 
@@ -459,13 +446,13 @@ After a fix is deployed, verify production, start Search Console validation when
 appropriate, and record the validation state without promising a completion
 date.
 
-## Decision matrix
+## Interpreting observations
 
-| Observation | Required response |
+| Observation | Diagnostic response |
 | --- | --- |
-| Production URL returns 4xx/5xx, wrong content type, wrong canonical, or unexpected `noindex` | Open a technical incident and fix the concrete production defect |
+| Production URL returns 4xx/5xx, wrong content type, wrong canonical, or unexpected `noindex` | Identify and fix the concrete production defect |
 | Sitemap fails independent HTTP, content-type, XML, host, or parity checks | Classify and fix the defect, verify production, then resubmit once if needed |
-| Independent sitemap checks pass but Search Console reports a processing error | Record exact error and UTC time; wait until the explicit checkpoint; do not change code or resubmit |
+| Independent sitemap checks pass but Search Console reports a processing error | Record the exact error and time; recheck processing without speculative code changes or resubmission |
 | Live test succeeds but URL is not indexed | Record eligibility, canonical, and exclusion state; inspect duplication or content fit; do not repeatedly request indexing |
 | Google selects a different canonical | Compare rendered content, redirects, internal links, and sitemap entries before changing metadata |
 | Impressions rise while clicks remain flat | Segment by page and query; consider title/snippet review only with a meaningful sample |
@@ -473,7 +460,7 @@ date.
 | Sitewide clicks or impressions decline | Separate technical/indexing failure, demand change, page-group change, and query change before editing content |
 | A source or health recommendation changes | Start substantive editorial review; do not refresh dates before the review is complete |
 | A Core Web Vitals page group becomes poor | Reproduce by page type and metric, fix the responsible regression, and validate after deployment |
-| Manual Action or Security Issue appears | Escalate immediately; preserve the exact notice privately and do not make speculative bulk changes |
+| Manual Action or Security Issue appears | Investigate promptly; preserve the exact notice privately and avoid speculative bulk changes |
 
 ## Rollback and recovery
 
@@ -489,7 +476,7 @@ After recovery:
 2. confirm the restored production commit and intended route count;
 3. inspect the affected canonical URL in Search Console only after production
    is stable;
-4. record the failure window, recovery commit, checks, and next checkpoint; and
+4. record the failure window, recovery commit, checks, and remaining concerns; and
 5. open editorial review as well when readers could have received materially
    incorrect health or product information.
 
@@ -497,10 +484,9 @@ A rollback restores production behavior; it does not erase Search Console
 observations. Preserve the timeline and allow Google to recrawl the corrected
 state without repeated indexing requests.
 
-## Operational log template
+## Optional verification receipt
 
-Copy one entry for a release, material editorial review, changed Search Console
-state, performance review, or incident resolution. Do not paste credentials,
+Use the fields relevant to the change or investigation. Do not paste credentials,
 verification tokens, personal account details, private query rows, screenshots
 containing private data, or raw exports.
 
@@ -522,9 +508,7 @@ Indexed status:
 Sitemap processing status:
 Core Web Vitals summary:
 Search performance summary (sanitized aggregates only):
-Search Console owner:
-Editorial owner, if review is required:
-Next checkpoint (explicit UTC date):
+Follow-up, if needed:
 Resolution / next action:
 ```
 
@@ -547,30 +531,28 @@ as new operational-log entries rather than silently rewriting this baseline.
 - **Sitemap processing observation:** the Search Console sitemap report then
   displayed `could not be read` even though the independent production checks
   passed.
-- **Owner / next checkpoint:** the Search Console owner must record an explicit
-  UTC checkpoint in the operational log; none is stored in this repository.
-- **Next action:** wait for processing, then recheck the same submission at that
-  recorded checkpoint. Do not repeatedly resubmit it.
+- **Follow-up record:** no later processing checkpoint or resolution is stored
+  with this baseline. This does not establish the current Search Console state.
 
 ## Escalation for the launch sitemap discrepancy
 
 - If the sitemap report clears on its own, record the resolution. Make no code
   change and do not resubmit.
-- If it still reports unreadable at the next recorded checkpoint, rerun every
-  production transport, XML, all-page, and Googlebot-parity check above, then
+- If a new check still reports unreadable, rerun the production transport,
+  XML, all-page, and Googlebot-parity checks above, then
   use live inspection on the exact submitted sitemap URL.
 - If those checks still pass, keep the code unchanged. Record the exact Search
   Console error text and UTC observation time for support or later comparison.
-- If a production check fails, open a new incident for the concrete failure.
+- If a production check fails, identify the concrete failure.
   Classify it as DNS/TLS, redirect, 4xx/5xx, content type, malformed XML, bot
   blocking, canonical mismatch, or route-set corruption before editing source.
 - Resubmit once only after a concrete sitemap defect was fixed or the existing
   Search Console record was shown to reference the wrong exact URL or property.
 
-Do not promise a Google processing or indexing deadline. The Search Console
-owner chooses and records explicit calendar checkpoints. While production
-checks pass, a processing-state discrepancy is an observation to monitor, not a
-reason to change the sitemap, robots rules, URLs, metadata, content, or Worker.
+Google processing and indexing dates cannot be promised. Passing production
+checks do not resolve the account-side report, but a processing discrepancy
+alone does not identify a defect in the sitemap, robots rules, URLs, metadata,
+content, or Worker.
 
 ## Authoritative references
 

@@ -49,11 +49,8 @@ export async function auditSeo(request) {
   assert.equal(robots.status, 200);
   assert.match(robots.headers.get("content-type") ?? "", /^text\/plain\b/i);
   const rules = await robots.text();
-  assert.match(rules, /^User-agent: \*\s*\n(?:Content-Signal: [^\n]+\n)?Allow: \/\s*$/im);
-  // Content signals may be absent, but must never refuse search or AI answers.
-  for (const [, signals] of rules.matchAll(/^Content-Signal:\s*(.+)$/gim)) {
-    assert.doesNotMatch(signals, /\b(?:search|ai-input)\s*=\s*no\b/i, "Content-Signal refuses search or ai-input");
-  }
+  assert.match(rules, /^User-agent: \*\s*\nAllow: \/\s*$/im);
+  assert.doesNotMatch(rules, /^Content-Signal:/im, "Unexpected content-use declaration");
   assert.doesNotMatch(rules, /^Disallow:\s*\S/m);
   assert.match(rules, /^Sitemap: https:\/\/joyhealth\.cc\/sitemap\.xml\s*$/im);
   const pages = new Map();
@@ -86,13 +83,14 @@ export async function auditSeo(request) {
     const headLinks = [...head.matchAll(/<link\b[^>]*>/gi)].map(([tag]) => attrs(tag));
     const canonicals = headLinks.filter(({ rel }) => rel === "canonical");
     assert.deepEqual(canonicals.map(({ href }) => new URL(href).href), [location], pathname);
-    // Machine-readable twin for agents; noindexed so the HTML stays the cited page.
+    // The public twin identifies its HTML original without blocking indexing.
     const markdownLinks = headLinks.filter(({ rel, type }) => rel === "alternate" && type === "text/markdown");
     assert.equal(markdownLinks.length, 1, `${pathname}: Markdown alternate`);
     const markdown = await request(new URL(markdownLinks[0].href).pathname);
     assert.equal(markdown.status, 200, `${pathname}: Markdown twin status`);
     assert.match(markdown.headers.get("content-type") ?? "", /^text\/markdown\b/i);
-    assert.match(markdown.headers.get("x-robots-tag") ?? "", /noindex/i);
+    assert.doesNotMatch(markdown.headers.get("x-robots-tag") ?? "", /noindex|nofollow|none/i);
+    assert.equal(markdown.headers.get("link"), `<${location}>; rel="canonical"`);
     assert.ok((await markdown.text()).includes(`\ncanonical_url: ${location}\n`), `${pathname}: Markdown canonical`);
     assert.equal(new URL(oneMeta("og:url")).href, location);
     assert.equal(oneMeta("og:title"), title);
@@ -178,10 +176,16 @@ export async function auditSeo(request) {
   assert.equal(store.status, 302, "Store link must redirect");
   assert.match(store.headers.get("location"), /^https:\/\/[a-z0-9-]+\.usana\.com\/$/, "Store link destination");
   assert.match(store.headers.get("cache-control") ?? "", /no-store/, "Store redirect must not be cached");
+  assert.doesNotMatch(store.headers.get("x-robots-tag") ?? "", /noindex|nofollow|none/i, "Store redirect");
   const llms = await request("/llms.txt");
   assert.equal(llms.status, 200, "llms.txt status");
   const llmsText = await llms.text();
   for (const { location } of entries) assert.ok(llmsText.includes(`](${location})`), `llms.txt omits ${location}`);
+  for (const [pathname, response] of [["/llms.txt", llms], ["/llms-full.txt", await request("/llms-full.txt")]]) {
+    assert.equal(response.status, 200, pathname);
+    assert.match(response.headers.get("content-type") ?? "", /^text\/plain\b/i, pathname);
+    assert.doesNotMatch(response.headers.get("x-robots-tag") ?? "", /noindex|nofollow|none/i, pathname);
+  }
   const missing = await request("/seo-audit-page-that-does-not-exist");
   assert.equal(missing.status, 404, "Unknown routes must not be soft 404s");
   return { pages: pages.size, internalLinks, storeLinks, linkedAssets: assets.size };
